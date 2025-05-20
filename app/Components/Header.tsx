@@ -10,9 +10,7 @@ import { ThemeSwitch } from "./ThemeSwitch";
 // Navigation links
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/surf", label: "Surf Lessons" },
-  { href: "/rooms", label: "Accommodation" },
-  { href: "/tours", label: "Tours & Activities" },
+  { href: "/services", label: "Services" },
   { href: "/gallery", label: "Gallery" },
   { href: "/about", label: "About Us" },
   { href: "/contact", label: "Contact" },
