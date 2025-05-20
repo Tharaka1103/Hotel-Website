@@ -2,9 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ThemeSwitch } from "./ThemeSwitch";
@@ -63,7 +62,7 @@ export const Header = () => {
                 "transition-all duration-300",
                 scrolled ? "text-primary" : "text-white"
               )}>
-                <h1 className="text-xl font-bold">Rupa's Surf</h1>
+                <h1 className="text-xl font-bold">Rupa&apos;s Surf</h1>
                 <p className="text-xs -mt-1 opacity-90">by rupa</p>
               </div>
             </div>

@@ -7,7 +7,6 @@ import { motion } from "framer-motion";
 import {
   Waves,
   Palmtree,
-  Instagram,
   ChevronDown,
   Play,
   ArrowRight,
@@ -22,7 +21,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 
 // Simplified Hero Section with Full Video Background
 const VideoHero = ({ children }: { children: React.ReactNode }) => {
@@ -232,7 +230,7 @@ export default function HomePage() {
               </h2>
               <div className="space-y-6">
                 <p className="text-xl leading-relaxed">
-                  Nestled on the pristine shores of Sri Lanka, Rupa's Surf Resort was born from a passion for the ocean and a dream to create an authentic surf experience for travelers from around the world.
+                  Nestled on the pristine shores of Sri Lanka, Rupa&apos;s Surf Resort was born from a passion for the ocean and a dream to create an authentic surf experience for travelers from around the world.
                 </p>
                 <p className="text-xl leading-relaxed">
                   Founded in 2015 by professional surfer Rupa Hiranya, our boutique resort combines luxury accommodation with world-class surf instruction, creating the perfect balance of adventure and relaxation.
@@ -380,7 +378,7 @@ export default function HomePage() {
               What Our Guests <span className="text-blue-500">Say</span>
             </h2>
             <p className="text-xl max-w-3xl mx-auto ">
-              Don't just take our word for it, hear from those who have experienced our hospitality.
+              Don&apos;t just take our word for it, hear from those who have experienced our hospitality.
             </p>
           </div>
           
