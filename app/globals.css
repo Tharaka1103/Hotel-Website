@@ -45,15 +45,15 @@ h1,h2 {
 
 @layer base {
   :root {
-    --background: #F1e1cc;
+    --background: #ffffff;
     --foreground: #0A0A0B;
-    --card: #FFFFFF;
+    --card: #fcf1e3;
     --card-foreground: #0A0A0B;
     --text: #000000;
     --text-foreground: #1c1c1c;
     --popover: #FFFFFF;
     --popover-foreground: #0A0A0B;
-    --primary: #055db0;
+    --primary: #009387;
     --primary-foreground: #FFF1F2;
     --secondary: #F4F4F5;
     --secondary-foreground: #18181B;
@@ -71,7 +71,7 @@ h1,h2 {
     --chart-2: #2D9B9B;
     --chart-3: #1F3640;
     --chart-4: #D9B64B;
-    --chart-5: #E67E22;
+    --chart-5: #ffefdb;
     --sidebar-background: #FAFAFA;
     --sidebar-foreground: #404040;
     --sidebar-primary: #18181B;
@@ -91,7 +91,7 @@ h1,h2 {
     --text-foreground: #9e9e9e;
     --popover: #171717;
     --popover-foreground: #F2F2F2;
-    --primary: #0871d3;
+    --primary: #00756b;
     --primary-foreground: #052E16;
     --secondary: #27272A;
     --secondary-foreground: #FAFAFA;
@@ -109,7 +109,7 @@ h1,h2 {
     --chart-2: #2E8B57;
     --chart-3: #FFA500;
     --chart-4: #9370DB;
-    --chart-5: #FF69B4;
+    --chart-5: #ffefdb;
     --sidebar-background: #18181B;
     --sidebar-foreground: #F4F4F5;
     --sidebar-primary: #4F46E5;

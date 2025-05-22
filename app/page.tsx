@@ -86,7 +86,7 @@ const TestimonialCard = ({ name, location, rating, text }: {
     <CardHeader className="pb-2">
       <div className="flex items-center gap-4">
         <div className="h-14 w-14 rounded-full overflow-hidden border-2 border-blue-200 shadow bg-blue-100 flex items-center justify-center">
-          <span className="text-lg font-bold text-blue-500">{name.charAt(0)}</span>
+          <span className="text-lg font-bold text-primary">{name.charAt(0)}</span>
         </div>
         <div>
           <CardTitle className="text-xl">{name}</CardTitle>
@@ -187,27 +187,6 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* Feature Bar */}
-      <section className="bg-blue-900 py-8">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12">
-            {[
-              { icon: <MapPin className="h-6 w-6" />, label: "Beachfront Location" },
-              { icon: <Waves className="h-6 w-6" />, label: "World-Class Surfing" },
-              { icon: <Coffee className="h-6 w-6" />, label: "Authentic Cuisine" },
-              { icon: <Users className="h-6 w-6" />, label: "Personalized Service" }
-            ].map((feature, i) => (
-              <div key={i} className="flex items-center justify-center md:justify-start gap-3">
-                <div className="p-3 rounded-full bg-blue-800 text-white">
-                  {feature.icon}
-                </div>
-                <span className="font-medium text-white">{feature.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* About Us Section */}
       <section className="py-10 md:py-16 bg-transparent overflow-hidden">
         <div className="container mx-auto px-4">
@@ -226,7 +205,7 @@ export default function HomePage() {
                 Our Story
               </Badge>
               <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight">
-                Your Beach Home <span className="text-blue-500">Away From Home</span>
+                Your Beach Home <span className="text-primary">Away From Home</span>
               </h2>
               <div className="space-y-6">
                 <p className="text-xl leading-relaxed">
@@ -237,7 +216,7 @@ export default function HomePage() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 pt-4">
                   <Button 
-                    className="bg-blue-500 hover:bg-blue-600 rounded-full px-8 py-6 text-lg shadow-md"
+                    className=" hover:bg-primary rounded-full px-8 py-6 text-lg shadow-md"
                   >
                     Our Story
                   </Button>
@@ -264,12 +243,12 @@ export default function HomePage() {
               <div className="absolute -bottom-1 -left-1 bg-white p-4 rounded-xl shadow-xl border border-blue-100 z-10">
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <p className="text-5xl font-bold text-blue-500">8+</p>
-                    <p className="">Years Experience</p>
+                    <p className="text-5xl font-bold text-primary">8+</p>
+                    <p className="text-black">Years Experience</p>
                   </div>
                   <div>
-                    <p className="text-5xl font-bold text-blue-500">5k+</p>
-                    <p className="">Happy Guests</p>
+                    <p className="text-5xl font-bold text-primary">5k+</p>
+                    <p className="text-black">Happy Guests</p>
                   </div>
                 </div>
               </div>
@@ -289,7 +268,7 @@ export default function HomePage() {
               Experience Paradise
             </Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 max-w-4xl mx-auto leading-tight">
-              What We <span className="text-blue-500">Offer</span>
+              What We <span className="text-primary">Offer</span>
             </h2>
             <p className="text-xl max-w-3xl mx-auto ">
               From comfortable accommodations to exciting adventures, we have everything you need for an amazing stay.
@@ -352,7 +331,7 @@ export default function HomePage() {
                   <p className="mb-6 flex-grow">{item.description}</p>
                   <Link href={item.link}>
                     <Button
-                      className="bg-blue-500 hover:bg-blue-600 transition-colors duration-300 rounded-full px-6 py-3 w-full shadow-md"
+                      className=" hover:bg-primary transition-colors duration-300 rounded-full px-6 py-3 w-full shadow-md"
                     >
                       Explore <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
@@ -375,7 +354,7 @@ export default function HomePage() {
               Guest Experiences
             </Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 max-w-4xl mx-auto leading-tight">
-              What Our Guests <span className="text-blue-500">Say</span>
+              What Our Guests <span className="text-primary">Say</span>
             </h2>
             <p className="text-xl max-w-3xl mx-auto ">
               Don&apos;t just take our word for it, hear from those who have experienced our hospitality.
@@ -428,7 +407,7 @@ export default function HomePage() {
               Our Paradise
             </Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 max-w-4xl mx-auto leading-tight">
-              Experience <span className="text-blue-500">The Beauty</span>
+              Experience <span className="text-primary">The Beauty</span>
             </h2>
             <p className="text-xl max-w-3xl mx-auto ">
               Explore our breathtaking location through our gallery of stunning images.
@@ -457,7 +436,7 @@ export default function HomePage() {
           </div>
           
           <div className="mt-12 text-center">
-            <Button className="bg-blue-500 hover:bg-blue-600 rounded-full px-8 py-6 text-lg shadow-lg">
+            <Button className="bg-primary hover:bg-blue-600 rounded-full px-8 py-6 text-lg shadow-lg">
               View Full Gallery <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -475,7 +454,7 @@ export default function HomePage() {
               Experiences
             </Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 max-w-4xl mx-auto leading-tight">
-              More Than Just <span className="text-blue-500">Surfing</span>
+              More Than Just <span className="text-primary">Surfing</span>
             </h2>
             <p className="text-xl max-w-3xl mx-auto ">
               Discover all the exciting activities we offer for a complete Sri Lankan experience.
@@ -528,7 +507,7 @@ export default function HomePage() {
                 </div>
                 <div className="p-6">
                   <p className="mb-6">{activity.description}</p>
-                  <Button className="w-full rounded-full bg-blue-500 hover:bg-blue-600 shadow">
+                  <Button className="w-full rounded-full  hover:bg-primary shadow">
                     Learn More <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </div>
@@ -539,7 +518,7 @@ export default function HomePage() {
       </section>
 
       {/* Call to Action */}
-      <section className="py-10 md:py-16 bg-gradient-to-r from-blue-600 to-blue-400 relative overflow-hidden">
+      <section className="py-10 md:py-16 bg-gradient-to-r from-primary to-primary relative overflow-hidden">
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -564,7 +543,7 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Button
                 size="lg"
-                className="bg-white text-blue-600 hover:bg-blue-50 transition-colors duration-300 text-xl px-10 py-7 rounded-full shadow-xl"
+                className="bg-white text-primary hover:bg-blue-50 transition-colors duration-300 text-xl px-10 py-7 rounded-full shadow-xl"
               >
                 Book Your Stay
               </Button>
@@ -581,10 +560,10 @@ export default function HomePage() {
         
         {/* Decorative elements */}
         <div className="absolute top-1/3 left-0 transform -translate-y-1/2 pointer-events-none">
-          <div className="w-64 h-64 rounded-full bg-blue-300/30 blur-3xl"></div>
+          <div className="w-64 h-64 rounded-full bg-teal-500 blur-3xl"></div>
         </div>
         <div className="absolute bottom-0 right-0 pointer-events-none">
-          <div className="w-80 h-80 rounded-full bg-blue-300/30 blur-3xl"></div>
+          <div className="w-80 h-80 rounded-full bg-teal-500 blur-3xl"></div>
         </div>
       </section>
     </main>

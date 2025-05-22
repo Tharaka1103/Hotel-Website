@@ -53,15 +53,15 @@ export const Header = () => {
           <Link href="/" className="relative z-10">
             <div className="flex items-center">
               <div className="relative h-10 w-10 mr-2">
-                <div className="absolute inset-0 bg-blue-500 rounded-full opacity-80"></div>
+                <div className="absolute inset-0 bg-primary rounded-full opacity-80"></div>
                 <div className="absolute inset-0 flex items-center justify-center text-white font-bold text-xl">R</div>
               </div>
               <div className={cn(
                 "transition-all duration-300",
                 scrolled ? "text-primary" : "text-white"
               )}>
-                <h1 className="text-xl font-bold">Rupa&apos;s Surf</h1>
-                <p className="text-xs -mt-1 opacity-90">by rupa</p>
+                <h1 className="text-xl font-bold">Rupa&apos;s Surf  House</h1>
+                <p className="text-xs -mt-1 opacity-90">by rupas</p>
               </div>
             </div>
           </Link>
@@ -73,7 +73,7 @@ export const Header = () => {
                 key={link.href} 
                 href={link.href}
                 className={cn(
-                  "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200",
+                  "px-3 py-2 rounded-md text-lg font-medium transition-colors duration-200",
                   scrolled 
                     ? "hover:bg-primary hover:text-white hover:rounded-full" 
                     : ""
@@ -91,7 +91,7 @@ export const Header = () => {
               className={cn(
                 "rounded-full transition-all duration-300",
                 scrolled 
-                  ? "bg-blue-500 hover:bg-blue-600" 
+                  ? "bg-primary hover:bg-blue-600" 
                   : "bg-white/20 backdrop-blur-md hover:bg-white/30 border border-white/20"
               )}
             >
