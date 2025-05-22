@@ -11,8 +11,6 @@ import {
   Play,
   ArrowRight,
   Pause,
-  MapPin,
-  Coffee,
   Users,
   Star,
   Car,
