@@ -34,7 +34,6 @@ export default function RoomsPage() {
     // Room card component
     const RoomCard = ({
     title,
-    description,
     price,
     image,
     features,
@@ -43,7 +42,6 @@ export default function RoomsPage() {
     guestCount,
     }: {
     title: string;
-    description: string;
     price: number;
     image: string;
     features: { icon: React.ReactNode; text: string }[];
@@ -134,8 +132,6 @@ export default function RoomsPage() {
   const rooms = [
     {
       title: "Deluxe Ocean View Suite",
-      description:
-        "Our spacious Deluxe Ocean View Suite offers breathtaking panoramic views of the turquoise waters. Wake up to the sound of waves and enjoy your morning coffee on your private balcony overlooking the pristine beach. This suite features a luxurious king-size bed, elegant furnishings, and a spa-inspired bathroom.",
       price: 299,
       image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80",
       guestCount: 4,
@@ -150,8 +146,6 @@ export default function RoomsPage() {
     },
     {
       title: "Premium Garden Bungalow",
-      description:
-        "Nestled within our lush tropical gardens, this private bungalow offers a serene retreat with direct access to our swimming pool. The spacious interior features traditional decor with modern amenities, creating a perfect blend of comfort and local charm. Enjoy the sounds of nature from your private terrace.",
       price: 249,
       image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80",
       guestCount: 3,
@@ -166,8 +160,6 @@ export default function RoomsPage() {
     },
     {
       title: "Beachfront Villa",
-      description:
-        "Experience ultimate luxury in our exclusive Beachfront Villa, located just steps from the shoreline. This spacious accommodation features two bedrooms, a full kitchen, and a private dining area. The expansive terrace offers unobstructed ocean views and direct beach access, perfect for watching spectacular sunsets.",
       price: 499,
       image: "https://images.unsplash.com/photo-1540541338287-41700207dee6?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80",
       guestCount: 6,
@@ -182,8 +174,6 @@ export default function RoomsPage() {
     },
     {
       title: "Surf Enthusiast Room",
-      description:
-        "Designed specifically for surf lovers, this comfortable room is located close to the best surf spots. The modern interior includes surf-inspired decor and all the essentials for a perfect stay. After a day of riding the waves, relax on your balcony with views of our tropical gardens and the ocean beyond.",
       price: 189,
       image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80",
       guestCount: 2,
@@ -198,8 +188,6 @@ export default function RoomsPage() {
     },
     {
       title: "Family Suite",
-      description:
-        "Our spacious Family Suite is perfect for creating unforgettable memories with your loved ones. Featuring separate sleeping areas for parents and children, this suite offers comfort and privacy for everyone. The large living area provides plenty of space for family activities, while the private balcony overlooks our beautiful gardens.",
       price: 349,
       image: "https://images.unsplash.com/photo-1568495248636-6432b97bd949?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80",
       guestCount: 5,
@@ -285,7 +273,6 @@ export default function RoomsPage() {
                 key={index}
                 index={index}
                 title={room.title}
-                description={room.description}
                 price={room.price}
                 image={room.image}
                 features={room.features}

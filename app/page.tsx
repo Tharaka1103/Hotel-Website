@@ -394,7 +394,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Gallery Section - Simplified */}
+      {/* Gallery Section - Animated Slider */}
       <section className="py-10 md:py-16 bg-transparent overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
@@ -412,34 +412,47 @@ export default function HomePage() {
             </p>
           </div>
           
-          {/* Simplified Gallery Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {galleryImages.map((image, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.05 }}
-                className="relative overflow-hidden rounded-xl h-64 md:h-80"
-              >
-                <Image 
-                  src={image}
-                  alt={`Gallery image ${index}`}
-                  fill
-                  className="object-cover hover:scale-105 transition-transform duration-700"
-                />
-              </motion.div>
-            ))}
+          {/* Animated Gallery Slider */}
+          <div className="w-full overflow-hidden">
+            <motion.div
+              className="flex gap-4"
+              initial={{ x: 0 }}
+              animate={{ x: [0, -1000, 0] }}
+              transition={{
+                duration: 60,
+                ease: "linear",
+                repeat: Infinity,
+                repeatType: "loop"
+              }}
+            >
+              {galleryImages.concat(galleryImages).map((image, index) => (
+                <motion.div
+                  key={index}
+                  className="relative min-w-[300px] h-[70vh] rounded-xl overflow-hidden flex-shrink-0"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Image 
+                    src={image}
+                    alt={`Gallery image ${index}`}
+                    fill
+                    className="object-cover"
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
           </div>
           
           <div className="mt-12 text-center">
-            <Button className="bg-primary hover:bg-blue-600 rounded-full px-8 py-6 text-lg shadow-lg">
-              View Full Gallery <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+            <Link href={'/gallery'}>
+              <Button className="bg-primary hover:bg-blue-600 rounded-full px-8 py-6 text-lg shadow-lg">
+                View Full Gallery <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
+
 
       {/* Activities Preview Section - Simplified */}
       <section className="py-10 md:py-16 bg-background overflow-hidden">
