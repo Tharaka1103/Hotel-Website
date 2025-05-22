@@ -498,7 +498,7 @@ export default function GalleryPage() {
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-background">
       {/* Hero Section */}
-      <section className="relative h-[50vh] sm:h-[60vh] overflow-hidden">
+      <section className="relative h-screen sm:h-screen overflow-hidden">
         <div className="absolute inset-0">
           <motion.div 
             className="w-full h-full"
