@@ -22,125 +22,127 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-// Room feature component
-const RoomFeature = ({ icon, text }: { icon: React.ReactNode; text: string }) => (
-  <div className="flex items-center gap-2 ">
-    <div className="text-primary">{icon}</div>
-    <span className="text-sm md:text-base">{text}</span>
-  </div>
-);
-
-// Room card component
-const RoomCard = ({
-  title,
-  description,
-  price,
-  image,
-  features,
-  reverse = false,
-  index,
-  guestCount, // Add this prop
-}: {
-  title: string;
-  description: string;
-  price: number;
-  image: string;
-  features: { icon: React.ReactNode; text: string }[];
-  reverse?: boolean;
-  index: number;
-  guestCount: number
-}) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.7, delay: index * 0.1 }}
-      className={cn(
-        "flex flex-col lg:flex-row gap-8 py-8 border-b border-gray-200",
-        reverse ? "lg:flex-row-reverse" : ""
-      )}
-    >
-      {/* Image Container */}
-      <div className="w-full lg:w-2/3 relative h-[300px] md:h-[400px] overflow-hidden rounded-2xl shadow-xl">
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.5 }}
-          className="h-full w-full"
-        >
-          <Image
-            src={image}
-            alt={title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 50vw"
-            priority
-          />
-        </motion.div>
-        <div className="absolute top-4 left-4">
-          <Badge className="bg-primary text-white px-3 py-1.5 text-sm font-medium">
-            {index % 2 === 0 ? "Popular Choice" : "Best Value"}
-          </Badge>
-        </div>
-      </div>
-
-      {/* Content Container */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-between">
-        <div>
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-2">{title}</h2>
-              <div className="flex items-center gap-2 mb-4">
-                <Users className="h-4 w-4 text-primary" />
-                <span className="text-sm ">
-                    Accommodates: {guestCount} guests
-                </span>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-sm ">per night</p>
-              <p className="text-3xl font-bold text-primary">${price}</p>
-            </div>
-          </div>
-
-          <h3 className="font-semibold text-lg mb-4">Room Features</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-2 mb-6">
-            {features.map((feature, i) => (
-              <RoomFeature key={i} icon={feature.icon} text={feature.text} />
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-6 flex flex-col sm:flex-row gap-4">
-          <Button
-            size="lg"
-            className="bg-primary hover:bg-primary/90 text-white rounded-full shadow-lg transition-all duration-300"
-          >
-            Book Now <CalendarDays className="ml-2 h-5 w-5" />
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="rounded-full border-primary text-primary hover:bg-primary/10"
-          >
-            View Details
-          </Button>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
 
 export default function RoomsPage() {
-  // Sample room data
+  
+    // Room feature component
+    const RoomFeature = ({ icon, text }: { icon: React.ReactNode; text: string }) => (
+    <div className="flex items-center gap-2 text-gray-700">
+        <div className="text-primary">{icon}</div>
+        <span className="text-sm md:text-base">{text}</span>
+    </div>
+    );
+
+    // Room card component
+    const RoomCard = ({
+    title,
+    description,
+    price,
+    image,
+    features,
+    reverse = false,
+    index,
+    guestCount,
+    }: {
+    title: string;
+    description: string;
+    price: number;
+    image: string;
+    features: { icon: React.ReactNode; text: string }[];
+    reverse?: boolean;
+    index: number;
+    guestCount: number;
+    }) => {
+    return (
+        <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.7, delay: index * 0.1 }}
+        className={cn(
+            "flex flex-col lg:flex-row gap-8 py-8 border-b border-gray-200",
+            reverse ? "lg:flex-row-reverse" : ""
+        )}
+        >
+        {/* Image Container */}
+        <div className="w-full lg:w-1/2 relative h-[300px] md:h-[400px] overflow-hidden rounded-2xl shadow-xl">
+            <motion.div
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.5 }}
+            className="h-full w-full"
+            >
+            <Image
+                src={image}
+                alt={title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority
+            />
+            </motion.div>
+            <div className="absolute top-4 left-4">
+            <Badge className="bg-primary text-white px-3 py-1.5 text-sm font-medium">
+                {index % 2 === 0 ? "Popular Choice" : "Best Value"}
+            </Badge>
+            </div>
+        </div>
+
+        {/* Content Container */}
+        <div className="w-full lg:w-1/2 flex flex-col justify-between">
+            <div>
+            <div className="flex justify-between items-start mb-4">
+                <div>
+                <h2 className="text-2xl md:text-3xl font-bold mb-2">{title}</h2>
+                <div className="flex items-center gap-2 mb-4">
+                    <Users className="h-4 w-4 text-primary" />
+                    <span className="text-sm text-gray-600">
+                    Accommodates {guestCount} guests
+                    </span>
+                </div>
+                </div>
+                <div className="text-right">
+                <p className="text-sm text-gray-600">per night</p>
+                <p className="text-3xl font-bold text-primary">${price}</p>
+                </div>
+            </div>
+
+            <p className="text-gray-700 mb-6">{description}</p>
+
+            <h3 className="font-semibold text-lg mb-4">Room Features</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-2 mb-6">
+                {features.map((feature, i) => (
+                <RoomFeature key={i} icon={feature.icon} text={feature.text} />
+                ))}
+            </div>
+            </div>
+
+            <div className="mt-6 flex flex-col sm:flex-row gap-4">
+            <Button
+                size="lg"
+                className="bg-primary hover:bg-primary/90 text-white rounded-full shadow-lg transition-all duration-300"
+            >
+                Book Now <CalendarDays className="ml-2 h-5 w-5" />
+            </Button>
+            <Button
+                variant="outline"
+                size="lg"
+                className="rounded-full border-primary text-primary hover:bg-primary/10"
+            >
+                View Details
+            </Button>
+            </div>
+        </div>
+        </motion.div>
+    );
+    };
   const rooms = [
     {
       title: "Deluxe Ocean View Suite",
-      guestCount: 4,
       description:
         "Our spacious Deluxe Ocean View Suite offers breathtaking panoramic views of the turquoise waters. Wake up to the sound of waves and enjoy your morning coffee on your private balcony overlooking the pristine beach. This suite features a luxurious king-size bed, elegant furnishings, and a spa-inspired bathroom.",
       price: 299,
       image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80",
+      guestCount: 4,
       features: [
         { icon: <Wifi className="h-4 w-4" />, text: "Free high-speed WiFi" },
         { icon: <Bath className="h-4 w-4" />, text: "Luxury bathroom" },
@@ -152,11 +154,11 @@ export default function RoomsPage() {
     },
     {
       title: "Premium Garden Bungalow",
-    guestCount: 4,
       description:
         "Nestled within our lush tropical gardens, this private bungalow offers a serene retreat with direct access to our swimming pool. The spacious interior features traditional decor with modern amenities, creating a perfect blend of comfort and local charm. Enjoy the sounds of nature from your private terrace.",
       price: 249,
       image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80",
+      guestCount: 3,
       features: [
         { icon: <Wifi className="h-4 w-4" />, text: "Free high-speed WiFi" },
         { icon: <TreePalm className="h-4 w-4" />, text: "Garden view" },
@@ -168,11 +170,11 @@ export default function RoomsPage() {
     },
     {
       title: "Beachfront Villa",
-    guestCount: 4,
       description:
         "Experience ultimate luxury in our exclusive Beachfront Villa, located just steps from the shoreline. This spacious accommodation features two bedrooms, a full kitchen, and a private dining area. The expansive terrace offers unobstructed ocean views and direct beach access, perfect for watching spectacular sunsets.",
       price: 499,
       image: "https://images.unsplash.com/photo-1540541338287-41700207dee6?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80",
+      guestCount: 6,
       features: [
         { icon: <Wifi className="h-4 w-4" />, text: "Free high-speed WiFi" },
         { icon: <Users className="h-4 w-4" />, text: "2 bedrooms" },
@@ -184,11 +186,11 @@ export default function RoomsPage() {
     },
     {
       title: "Surf Enthusiast Room",
-    guestCount: 4,
       description:
         "Designed specifically for surf lovers, this comfortable room is located close to the best surf spots. The modern interior includes surf-inspired decor and all the essentials for a perfect stay. After a day of riding the waves, relax on your balcony with views of our tropical gardens and the ocean beyond.",
       price: 189,
       image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80",
+      guestCount: 2,
       features: [
         { icon: <Wifi className="h-4 w-4" />, text: "Free high-speed WiFi" },
         { icon: <Waves className="h-4 w-4" />, text: "Surf board storage" },
@@ -200,11 +202,11 @@ export default function RoomsPage() {
     },
     {
       title: "Family Suite",
-    guestCount: 4,
       description:
         "Our spacious Family Suite is perfect for creating unforgettable memories with your loved ones. Featuring separate sleeping areas for parents and children, this suite offers comfort and privacy for everyone. The large living area provides plenty of space for family activities, while the private balcony overlooks our beautiful gardens.",
       price: 349,
       image: "https://images.unsplash.com/photo-1568495248636-6432b97bd949?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80",
+      guestCount: 5,
       features: [
         { icon: <Wifi className="h-4 w-4" />, text: "Free high-speed WiFi" },
         { icon: <Users className="h-4 w-4" />, text: "Fits up to 5 guests" },
@@ -219,7 +221,7 @@ export default function RoomsPage() {
   return (
     <main className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative h-[50vh] md:h-screen overflow-hidden">
+      <section className="relative h-screen md:h-screen overflow-hidden">
         <div className="absolute inset-0">
           <Image
             src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80"
