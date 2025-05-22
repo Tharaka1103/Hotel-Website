@@ -25,7 +25,7 @@ export default function RoomsPage() {
   
     // Room feature component
     const RoomFeature = ({ icon, text }: { icon: React.ReactNode; text: string }) => (
-    <div className="flex items-center gap-2 text-gray-700">
+    <div className="flex items-center gap-2 ">
         <div className="text-primary">{icon}</div>
         <span className="text-sm md:text-base">{text}</span>
     </div>
@@ -63,7 +63,7 @@ export default function RoomsPage() {
         )}
         >
         {/* Image Container */}
-        <div className="w-full lg:w-1/2 relative h-[300px] md:h-[400px] overflow-hidden rounded-2xl shadow-xl">
+        <div className="w-full lg:w-2/3 relative h-[300px] md:h-[400px] overflow-hidden rounded-2xl shadow-xl">
             <motion.div
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.5 }}
@@ -93,18 +93,16 @@ export default function RoomsPage() {
                 <h2 className="text-2xl md:text-3xl font-bold mb-2">{title}</h2>
                 <div className="flex items-center gap-2 mb-4">
                     <Users className="h-4 w-4 text-primary" />
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm ">
                     Accommodates {guestCount} guests
                     </span>
                 </div>
                 </div>
                 <div className="text-right">
-                <p className="text-sm text-gray-600">per night</p>
+                <p className="text-sm ">per night</p>
                 <p className="text-3xl font-bold text-primary">${price}</p>
                 </div>
             </div>
-
-            <p className="text-gray-700 mb-6">{description}</p>
 
             <h3 className="font-semibold text-lg mb-4">Room Features</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-2 mb-6">
