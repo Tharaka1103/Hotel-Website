@@ -3,10 +3,7 @@ import dbConnect from '@/lib/mongodb';
 import Admin from '@/models/Admin';
 import { getSession } from '@/lib/jwt';
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest) {
   try {
     const session = await getSession();
     if (!session || session.role !== 'super_admin') {
@@ -19,7 +16,17 @@ export async function PUT(
     await dbConnect();
     
     const { email, name, role, isActive } = await request.json();
-    const adminId = params.id;
+    
+    // Extract ID from URL
+    const url = new URL(request.url);
+    const adminId = url.pathname.split('/').pop();
+
+    if (!adminId) {
+      return NextResponse.json(
+        { error: 'Admin ID is required' },
+        { status: 400 }
+      );
+    }
 
     if (!email || !name) {
       return NextResponse.json(

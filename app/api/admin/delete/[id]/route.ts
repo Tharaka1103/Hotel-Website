@@ -3,10 +3,7 @@ import dbConnect from '@/lib/mongodb';
 import Admin from '@/models/Admin';
 import { getSession } from '@/lib/jwt';
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest) {
   try {
     const session = await getSession();
     if (!session || session.role !== 'super_admin') {
@@ -18,7 +15,16 @@ export async function DELETE(
 
     await dbConnect();
     
-    const adminId = params.id;
+    // Extract ID from URL
+    const url = new URL(request.url);
+    const adminId = url.pathname.split('/').pop();
+
+    if (!adminId) {
+      return NextResponse.json(
+        { error: 'Admin ID is required' },
+        { status: 400 }
+      );
+    }
 
     // Prevent super admin from deleting themselves
     if (adminId === session.userId) {
