@@ -13,7 +13,7 @@ export default function AdminFooter() {
           <Shield className="h-4 w-4 text-blue-600" />
           <span>Admin Panel</span>
           <span className="text-gray-400">•</span>
-          <span>Rupa's Serf Hotel</span>
+          <span>Rupa&apos;s Serf Hotel</span>
         </div>
 
         {/* Center - Quick Stats or Info */}
@@ -34,7 +34,7 @@ export default function AdminFooter() {
       {/* Mobile version - simplified */}
       <div className="md:hidden mt-2 pt-2 border-t border-gray-100">
         <div className="text-center text-xs text-gray-500">
-          &copy; {currentYear} Rupa's Serf Hotel Admin Panel
+          &copy; {currentYear} Rupa&apos;s Serf Hotel Admin Panel
         </div>
       </div>
     </footer>

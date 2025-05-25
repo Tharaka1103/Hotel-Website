@@ -11,7 +11,6 @@ import {
   Calendar,
   DollarSign,
   TrendingUp,
-  TrendingDown,
   Activity,
   Clock,
   Star,
