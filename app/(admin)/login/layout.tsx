@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
-import "./globals.css";
-import { ThemeProvider } from './Components/ThemeProvider'
-import Header from "./Components/Header";
-import Footer from './Components/Footer'
+import "../../globals.css";
+import { ThemeProvider } from '@/app/Components/ThemeProvider'
 import { Josefin_Slab, Berkshire_Swash } from 'next/font/google'
-import ConditionalLayout from './Components/ConditionalLayout'
 
 const josefinSlab = Josefin_Slab({
   subsets: ['latin'],
@@ -19,12 +16,11 @@ const berkshireSwash = Berkshire_Swash({
 })
 
 export const metadata: Metadata = {
-  title: "Rupa's Serf - Hotel & Resort",
-  description: "Experience luxury and comfort at our oceanfront hotel with world-class amenities",
-  keywords: "hotel, resort, luxury, oceanfront, vacation, accommodation",
+  title: "Admin Login - Rupa's Serf",
+  description: "Admin login for hotel management system",
 };
 
-export default function RootLayout({
+export default function LoginLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -33,9 +29,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className={`${josefinSlab.variable} ${berkshireSwash.variable}`}>
       <body className="min-h-screen">
         <ThemeProvider>
-          <ConditionalLayout>
-            {children}
-          </ConditionalLayout>
+          {/* No header, no footer, just the login page */}
+          {children}
         </ThemeProvider>
       </body>
     </html>

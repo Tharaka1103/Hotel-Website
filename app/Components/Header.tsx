@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -53,14 +54,19 @@ export const Header = () => {
           <Link href="/" className="relative z-10">
             <div className="flex items-center">
               <div className="relative h-10 w-10 mr-2">
-                <div className="absolute inset-0 bg-primary rounded-full opacity-80"></div>
-                <div className="absolute inset-0 flex items-center justify-center text-white font-bold text-xl">R</div>
+                <Image
+                  src="/logo.png"
+                  alt="Rupa's Surf House Logo"
+                  fill
+                  className="object-contain"
+                  priority
+                />
               </div>
               <div className={cn(
                 "transition-all duration-300",
                 scrolled ? "text-primary" : "text-white"
               )}>
-                <h1 className="text-xl font-bold">Rupa&apos;s Surf  House</h1>
+                <h1 className="text-xl font-bold">Rupa's Surf  House</h1>
                 <p className="text-xs -mt-1 opacity-90">by rupas</p>
               </div>
             </div>

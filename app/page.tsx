@@ -131,7 +131,7 @@ export default function HomePage() {
                 transition={{ delay: 0.2, duration: 0.8 }}
                 className="text-5xl md:text-7xl font-extrabold mb-8 drop-shadow-lg tracking-tight text-white"
               >
-                Surf, Relax, <span className="text-primary">Explore</span>
+                Arugam <span className="text-primary">Bay</span>
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0 }}
