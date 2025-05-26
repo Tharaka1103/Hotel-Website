@@ -12,7 +12,7 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
   const pathname = usePathname();
   
   // Define admin routes that should not show regular header/footer
-  const adminRoutes = ['/adminDashboard', '/adminLogin', '/admins', '/packages', '/bookings'];
+  const adminRoutes = ['/adminDashboard', '/adminLogin', '/admins', '/packages', '/bookings', '/notifications', '/notification'];
   const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route));
 
   // If it's an admin route, don't show regular header/footer

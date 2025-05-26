@@ -117,7 +117,7 @@ export default function AdminFooter() {
                   <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse delay-200"></div>
                 </div>
                 <div className="text-xs text-muted-foreground font-mono">
-                  <span className="hidden sm:inline">Build </span>V!.0.0
+                  <span className="hidden sm:inline">Build </span>V1.0.0
                 </div>
               </div>
             </div>

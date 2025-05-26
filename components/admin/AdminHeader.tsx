@@ -22,7 +22,10 @@ import {
   FileText,
   Box,
   Shield,
-  Home
+  Home,
+  Check,
+  CheckCheck,
+  Trash2
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -56,6 +59,21 @@ interface Counts {
   bookings: number;
   reviews: number;
   notifications: number;
+}
+
+interface Notification {
+  _id: string;
+  type: string;
+  title: string;
+  message: string;
+  isRead: boolean;
+  priority: 'low' | 'medium' | 'high';
+  createdAt: string;
+  bookingId?: {
+    _id: string;
+    customerName: string;
+    roomNumber: number;
+  };
 }
 
 const navigationItems = [
@@ -110,8 +128,10 @@ export default function AdminHeader() {
     packages: 0, 
     bookings: 0, 
     reviews: 0, 
-    notifications: 3 
+    notifications: 0 
   });
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
@@ -120,6 +140,14 @@ export default function AdminHeader() {
   useEffect(() => {
     fetchCurrentAdmin();
     fetchCounts();
+    fetchNotifications();
+    
+    // Set up polling for real-time notification updates
+    const interval = setInterval(() => {
+      fetchNotificationCount();
+    }, 30000); // Poll every 30 seconds
+
+    return () => clearInterval(interval);
   }, []);
 
   const fetchCurrentAdmin = async () => {
@@ -151,15 +179,107 @@ export default function AdminHeader() {
         bookingsResponse.json()
       ]);
 
-      setCounts({
+      setCounts(prev => ({
+        ...prev,
         admins: adminsData.success ? adminsData.admins?.length || 0 : 0,
         packages: packagesData.packages?.length || 0,
         bookings: bookingsData.bookings?.length || 0,
-        reviews: 15,
-        notifications: 3
-      });
+        reviews: 15
+      }));
     } catch (error) {
       console.error('Error fetching counts:', error);
+    }
+  };
+
+  const fetchNotificationCount = async () => {
+    try {
+      const response = await fetch('/api/notifications/count');
+      const data = await response.json();
+      setCounts(prev => ({
+        ...prev,
+        notifications: data.count
+      }));
+    } catch (error) {
+      console.error('Error fetching notification count:', error);
+    }
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      const response = await fetch('/api/notifications?limit=10');
+      const data = await response.json();
+      setNotifications(data.notifications || []);
+      
+      // Update notification count
+      const unreadCount = data.notifications?.filter((n: Notification) => !n.isRead).length || 0;
+      setCounts(prev => ({
+        ...prev,
+        notifications: unreadCount
+      }));
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
+
+  const markNotificationAsRead = async (notificationId: string) => {
+    try {
+      await fetch(`/api/notifications?action=markRead&id=${notificationId}`, {
+        method: 'PUT',
+      });
+      
+      setNotifications(prev =>
+        prev.map(notif =>
+          notif._id === notificationId ? { ...notif, isRead: true } : notif
+        )
+      );
+      
+      setCounts(prev => ({
+        ...prev,
+        notifications: Math.max(0, prev.notifications - 1)
+      }));
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
+  };
+
+  const markAllNotificationsAsRead = async () => {
+    try {
+      await fetch('/api/notifications?action=markAllRead', {
+        method: 'PUT',
+      });
+      
+      setNotifications(prev =>
+        prev.map(notif => ({ ...notif, isRead: true }))
+      );
+      
+      setCounts(prev => ({
+        ...prev,
+        notifications: 0
+      }));
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+    }
+  };
+
+  const deleteNotification = async (notificationId: string) => {
+    try {
+      await fetch(`/api/notifications?id=${notificationId}`, {
+        method: 'DELETE',
+      });
+      
+      const deletedNotification = notifications.find(n => n._id === notificationId);
+      setNotifications(prev =>
+        prev.filter(notif => notif._id !== notificationId)
+      );
+      
+      if (deletedNotification && !deletedNotification.isRead) {
+        setCounts(prev => ({
+          ...prev,
+          notifications: Math.max(0, prev.notifications - 1)
+        }));
+      }
+    } catch (error) {
+      console.error('Error deleting notification:', error);
     }
   };
 
@@ -202,12 +322,42 @@ export default function AdminHeader() {
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
 
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'booking_created': return '🏨';
+      case 'booking_updated': return '✏️';
+      case 'booking_cancelled': return '❌';
+      case 'system': return '⚙️';
+      default: return '📢';
+    }
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high': return 'text-red-600';
+      case 'medium': return 'text-yellow-600';
+      case 'low': return 'text-green-600';
+      default: return 'text-gray-600';
+    }
+  };
+
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
+    return `${Math.floor(diffInMinutes / 1440)}d ago`;
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-card backdrop-blur-md border-b shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 lg:h-20">
           
-          {/* Desktop Layout - Completely Redesigned */}
+          {/* Desktop Layout */}
           <div className="hidden lg:flex items-center justify-between w-full">
             
             {/* Center Section - Navigation */}
@@ -252,50 +402,136 @@ export default function AdminHeader() {
                 <ThemeSwitch />
               </div>
 
-              {/* Notifications */}
-              <DropdownMenu>
+              {/* Enhanced Notifications */}
+              <DropdownMenu open={notificationDropdownOpen} onOpenChange={setNotificationDropdownOpen}>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="relative h-10 w-10 rounded-full border hover:shadow-md transition-all duration-200">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="relative h-10 w-10 rounded-full border hover:shadow-md transition-all duration-200"
+                    onClick={() => {
+                      if (!notificationDropdownOpen) {
+                        fetchNotifications();
+                      }
+                    }}
+                  >
                     <Bell className="w-4 h-4" />
                     {counts.notifications > 0 && (
                       <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-bounce">
-                        {counts.notifications}
+                        {counts.notifications > 99 ? '99+' : counts.notifications}
                       </span>
                     )}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-80">
+                <DropdownMenuContent align="end" className="w-96 max-h-96 overflow-hidden">
                   <DropdownMenuLabel className="flex items-center justify-between">
                     <span>Notifications</span>
-                    <Badge variant="secondary" className="text-xs">
-                      {counts.notifications} new
-                    </Badge>
+                    <div className="flex items-center space-x-2">
+                      {counts.notifications > 0 && (
+                        <Badge variant="secondary" className="text-xs">
+                          {counts.notifications} new
+                        </Badge>
+                      )}
+                      {counts.notifications > 0 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={markAllNotificationsAsRead}
+                          className="h-6 px-2 text-xs"
+                        >
+                          <CheckCheck className="w-3 h-3 mr-1" />
+                          Mark all read
+                        </Button>
+                      )}
+                    </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="p-3">
-                    <div className="flex items-start space-x-3">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">New booking received</p>
-                        <p className="text-xs text-muted-foreground">Ocean View Suite - Room 205</p>
-                        <p className="text-xs text-muted-foreground mt-1">2 minutes ago</p>
+                  
+                  <div className="max-h-80 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="p-4 text-center text-muted-foreground text-sm">
+                        No notifications
                       </div>
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="p-3">
-                    <div className="flex items-start space-x-3">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">Payment confirmed</p>
-                        <p className="text-xs text-muted-foreground">$299.00 received</p>
-                        <p className="text-xs text-muted-foreground mt-1">1 hour ago</p>
-                      </div>
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-center text-sm text-blue-600 hover:text-blue-700">
-                    View all notifications
-                  </DropdownMenuItem>
+                    ) : (
+                      notifications.slice(0, 10).map((notification) => (
+                        <div
+                          key={notification._id}
+                          className={cn(
+                            "p-3 border-b border hover:bg-muted/50 transition-colors",
+                            !notification.isRead && "bg-card"
+                          )}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center space-x-2 mb-1">
+                                <span className="text-sm">{getTypeIcon(notification.type)}</span>
+                                <h4 className={cn(
+                                  "text-sm font-medium truncate",
+                                  !notification.isRead ? "text-foreground" : "text-muted-foreground"
+                                )}>
+                                  {notification.title}
+                                </h4>
+                                <span className={cn(
+                                  "text-xs px-1.5 py-0.5 rounded-full",
+                                  getPriorityColor(notification.priority)
+                                )}>
+                                  {notification.priority}
+                                </span>
+                              </div>
+                              <p className="text-xs text-muted-foreground mb-1 line-clamp-2">
+                                {notification.message}
+                              </p>
+                              {notification.bookingId && (
+                                <p className="text-xs text-blue-600 mb-1">
+                                  {notification.bookingId.customerName} - Room {notification.bookingId.roomNumber}
+                                </p>
+                              )}
+                              <p className="text-xs text-muted-foreground">
+                                {formatTimeAgo(notification.createdAt)}
+                              </p>
+                            </div>
+                            <div className="flex flex-col space-y-1 ml-2 flex-shrink-0">
+                              {!notification.isRead && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => markNotificationAsRead(notification._id)}
+                                  className="h-6 w-6 p-0 hover:bg-blue-500"
+                                  title="Mark as read"
+                                >
+                                  <Check className="w-3 h-3" />
+                                </Button>
+                              )}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => deleteNotification(notification._id)}
+                                className="h-6 w-6 p-0 hover:bg-red-100 text-red-600"
+                                title="Delete notification"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  
+                  {notifications.length > 0 && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        className="text-center text-sm text-blue-600 hover:text-blue-700 cursor-pointer justify-center"
+                        onClick={() => {
+                          setNotificationDropdownOpen(false);
+                          router.push('/admin/notifications');
+                        }}
+                      >
+                        View all notifications
+                      </DropdownMenuItem>
+                    </>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
 
@@ -365,19 +601,23 @@ export default function AdminHeader() {
             </div>
           </div>
 
-          {/* Mobile & Tablet Layout - Unchanged */}
+          {/* Mobile & Tablet Layout */}
           <div className="flex lg:hidden items-center justify-end w-full">
-            {/* Right Section */}
             <ThemeSwitch/>
             <div className="flex items-center space-x-2 lg:space-x-3">
-              {/* Notifications */}
+              {/* Mobile Notifications */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="relative h-9 w-9 p-0">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="relative h-9 w-9 p-0"
+                    onClick={() => fetchNotifications()}
+                  >
                     <Bell className="w-4 h-4" />
                     {counts.notifications > 0 && (
                       <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                        {counts.notifications}
+                        {counts.notifications > 9 ? '9+' : counts.notifications}
                       </span>
                     )}
                   </Button>
@@ -385,39 +625,96 @@ export default function AdminHeader() {
                 <DropdownMenuContent align="end" className="w-80">
                   <DropdownMenuLabel className="flex items-center justify-between">
                     <span>Notifications</span>
-                    <Badge variant="secondary" className="text-xs">
-                      {counts.notifications} new
-                    </Badge>
+                    <div className="flex items-center space-x-2">
+                      {counts.notifications > 0 && (
+                        <Badge variant="secondary" className="text-xs bg-red-600">
+                          {counts.notifications} new
+                        </Badge>
+                      )}
+                      {counts.notifications > 0 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={markAllNotificationsAsRead}
+                          className="h-6 px-2 text-xs"
+                        >
+                          <CheckCheck className="w-3 h-3" />
+                        </Button>
+                      )}
+                    </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="p-3">
-                    <div className="flex items-start space-x-3">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">New booking received</p>
-                        <p className="text-xs text-muted-foreground">Ocean View Suite - Room 205</p>
-                        <p className="text-xs text-muted-foreground mt-1">2 minutes ago</p>
+                  
+                  <div className="max-h-64 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="p-4 text-center text-muted-foreground text-sm">
+                        No notifications
                       </div>
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="p-3">
-                    <div className="flex items-start space-x-3">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">Payment confirmed</p>
-                        <p className="text-xs text-muted-foreground">$299.00 received</p>
-                        <p className="text-xs text-muted-foreground mt-1">1 hour ago</p>
-                      </div>
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-center text-sm text-blue-600 hover:text-blue-700">
-                    View all notifications
-                  </DropdownMenuItem>
+                    ) : (
+                      notifications.slice(0, 5).map((notification) => (
+                        <div
+                          key={notification._id}
+                          className={cn(
+                            "p-3 border-b border bg-card hover:bg-muted/50",
+                            !notification.isRead && "bg-background"
+                          )}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2 mb-1">
+                                <span className="text-sm">{getTypeIcon(notification.type)}</span>
+                                <h4 className="text-sm font-medium truncate">
+                                  {notification.title}
+                                </h4>
+                              </div>
+                              <p className="text-xs text-muted-foreground mb-1">
+                                {notification.message}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {formatTimeAgo(notification.createdAt)}
+                              </p>
+                            </div>
+                            <div className="flex space-x-1 ml-2">
+                              {!notification.isRead && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => markNotificationAsRead(notification._id)}
+                                  className="h-6 w-6 p-0"
+                                >
+                                  <Check className="w-3 h-3" />
+                                </Button>
+                              )}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => deleteNotification(notification._id)}
+                                className="h-6 w-6 p-0 text-red-600"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  
+                  {notifications.length > 0 && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        className="text-center text-sm text-blue-600 hover:text-blue-700 cursor-pointer justify-center"
+                        onClick={() => router.push('/notifications')}
+                      >
+                        View all notifications
+                      </DropdownMenuItem>
+                    </>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* Mobile Admin Profile (Fallback) */}
+              {/* Mobile Admin Profile */}
               {currentAdmin && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

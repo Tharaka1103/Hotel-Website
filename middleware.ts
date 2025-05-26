@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { decrypt } from '@/lib/jwt';
 
 // Updated protected routes to match new structure
-const protectedRoutes = ['/adminDashboard', '/admins', '/bookings', '/packages'];
+const protectedRoutes = ['/adminDashboard', '/admins', '/bookings', '/packages', '/notifications', '/notification'];
 const publicRoutes = ['/adminLogin'];
 
 export default async function middleware(req: NextRequest) {

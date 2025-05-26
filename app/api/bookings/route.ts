@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import Package from '@/models/Package';
+import { NotificationService } from '@/lib/notificationService';
 
 export async function GET(request: NextRequest) {
   try {
@@ -88,13 +89,20 @@ export async function POST(request: NextRequest) {
 
     const populatedBooking = await Booking.findById(booking._id).populate('packageId');
 
+    // Create notification for new booking
+    try {
+      await NotificationService.createBookingNotification('booking_created', populatedBooking);
+    } catch (notificationError) {
+      console.error('Error creating notification:', notificationError);
+      // Don't fail the booking creation if notification fails
+    }
+
     return NextResponse.json({ booking: populatedBooking }, { status: 201 });
   } catch (error) {
     console.error('Error creating booking:', error);
     return NextResponse.json({ error: 'Failed to create booking' }, { status: 500 });
   }
 }
-
 
 export async function PUT(request: NextRequest) {
   try {
@@ -122,6 +130,17 @@ export async function PUT(request: NextRequest) {
 
     if (!booking) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
+    }
+
+    // Create notification for booking update
+    try {
+      if (status === 'cancelled') {
+        await NotificationService.createBookingNotification('booking_cancelled', booking);
+      } else {
+        await NotificationService.createBookingNotification('booking_updated', booking);
+      }
+    } catch (notificationError) {
+      console.error('Error creating notification:', notificationError);
     }
 
     return NextResponse.json({ booking });
