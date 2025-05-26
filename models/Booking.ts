@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 
 const BookingSchema = new mongoose.Schema({
+  bookingId: {
+    type: String,
+    required: true,
+    unique: true  // This creates the index automatically, no need for separate schema.index()
+  },
   packageId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Package',
@@ -35,6 +40,10 @@ const BookingSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
+  bookingDate: {
+    type: Date,
+    default: Date.now
+  },
   totalPrice: {
     type: Number,
     required: true,
@@ -42,8 +51,12 @@ const BookingSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['active', 'completed', 'cancelled'],
-    default: 'active'
+    enum: ['pending', 'confirmed', 'cancelled', 'completed'], // Added 'confirmed' to the enum
+    default: 'confirmed'
+  },
+  adminNotes: {
+    type: String,
+    default: ''
   }
 }, {
   timestamps: true
@@ -51,5 +64,6 @@ const BookingSchema = new mongoose.Schema({
 
 // Compound index to prevent double booking
 BookingSchema.index({ roomNumber: 1, checkInDate: 1, checkOutDate: 1 });
+// Remove the duplicate bookingId index since unique: true already creates it
 
 export default mongoose.models.Booking || mongoose.model('Booking', BookingSchema);

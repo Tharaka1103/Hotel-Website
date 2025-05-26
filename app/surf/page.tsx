@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 interface Package {
   _id: string;
@@ -55,6 +56,7 @@ interface FormErrors {
 }
 
 export default function SurfPage() {
+  const router = useRouter();
   const [packages, setPackages] = useState<Package[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [checkInDate, setCheckInDate] = useState('');
@@ -96,7 +98,7 @@ export default function SurfPage() {
         setAvailableRooms(data.availableRooms);
         setBookedRooms(data.bookedRooms);
       } else {
-        setErrors(prev => ({ ...prev, checkInDate: 'Failed to check availability' }));
+        setErrors(prev => ({ ...prev, checkInDate: data.error || 'Failed to check availability' }));
       }
     } catch (error) {
       setErrors(prev => ({ ...prev, checkInDate: 'Failed to check availability' }));
@@ -137,7 +139,6 @@ export default function SurfPage() {
       newErrors.phone = 'Please enter a valid phone number';
     }
 
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -149,33 +150,42 @@ export default function SurfPage() {
 
     setBookingLoading(true);
     try {
+      const bookingData = {
+        packageId: selectedPackage._id,
+        roomNumber: selectedRoom,
+        customerName: customerInfo.name.trim(),
+        customerEmail: customerInfo.email.trim(),
+        customerPhone: customerInfo.phone.trim(),
+        checkInDate
+      };
+
+      console.log('Sending booking data:', bookingData);
+
       const response = await fetch('/api/bookings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          packageId: selectedPackage._id,
-          roomNumber: selectedRoom,
-          customerName: customerInfo.name,
-          customerEmail: customerInfo.email,
-          customerPhone: customerInfo.phone,
-          checkInDate
-        }),
+        body: JSON.stringify(bookingData),
       });
+
+      const responseData = await response.json();
+      console.log('Response:', responseData);
 
       if (response.ok) {
         toast.success('Booking created successfully!');
-        setIsDialogOpen(false);
+        
+        // Reset form and close dialog
         resetBookingForm();
-        if (selectedPackage && checkInDate) {
-          checkAvailability(selectedPackage._id, checkInDate);
-        }
+        setIsDialogOpen(false);
+        
+        // Redirect to booking details page
+        router.push(`/surf/${responseData.bookingId}`);
       } else {
-        const error = await response.json();
-        toast.error(error.error || 'Failed to create booking');
+        toast.error(responseData.error || 'Failed to create booking');
       }
     } catch (error) {
+      console.error('Booking error:', error);
       toast.error('Failed to create booking');
     } finally {
       setBookingLoading(false);
@@ -262,14 +272,6 @@ export default function SurfPage() {
   };
 
   const getPackageImage = (index: number) => {
-    const imageIds = [
-      'surf,surfing,wave,ocean,beach',
-      'beach,tropical,ocean,paradise,waves',
-      'surfboard,beach,sunset,surf,ocean',
-      'ocean,wave,blue,water,surf',
-      'beach,palm,tropical,paradise,surf'
-    ];
-    const query = imageIds[index % imageIds.length];
     return "/surfer-blue-wave.jpg";
   };
 
@@ -278,7 +280,7 @@ export default function SurfPage() {
       <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 ">Loading amazing surf packages...</p>
+          <p className="mt-4">Loading amazing surf packages...</p>
         </div>
       </div>
     );
@@ -300,56 +302,56 @@ export default function SurfPage() {
           <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-cyan-800/70 to-blue-900/80" />
         </div>
         
-        <div className="relative container mx-auto px-6 py-24 text-center min-h-screen flex flex-col justify-center">
+        <div className="relative container mx-auto px-4 sm:px-6 py-12 sm:py-24 text-center min-h-screen flex flex-col justify-center">
           <div className="flex justify-center mb-6">
-            <Waves className="w-16 h-16 text-white animate-bounce" />
+            <Waves className="w-12 h-12 sm:w-16 sm:h-16 text-white animate-bounce" />
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
             Surf Paradise
             <span className="block text-cyan-200">Packages</span>
           </h1>
-          <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed px-4">
             Discover our amazing surf packages and book your perfect getaway. 
             Weekly stays from Sunday to Sunday in our premium oceanfront accommodations.
           </p>
           
           {/* Feature highlights */}
-          <div className="flex flex-wrap justify-center gap-6 mt-12">
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
-              <Calendar className="w-5 h-5 text-cyan-200" />
-              <span className="text-white font-medium">7-Day Stays</span>
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-8 sm:mt-12 px-4">
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 sm:px-4 py-2">
+              <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-200" />
+              <span className="text-white font-medium text-sm sm:text-base">7-Day Stays</span>
             </div>
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
-              <MapPin className="w-5 h-5 text-cyan-200" />
-              <span className="text-white font-medium">Oceanfront Rooms</span>
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 sm:px-4 py-2">
+              <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-200" />
+              <span className="text-white font-medium text-sm sm:text-base">Oceanfront Rooms</span>
             </div>
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
-              <Users className="w-5 h-5 text-cyan-200" />
-              <span className="text-white font-medium">5 Premium Rooms</span>
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 sm:px-4 py-2">
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-200" />
+              <span className="text-white font-medium text-sm sm:text-base">5 Premium Rooms</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Quick Stats Section */}
-      <div className="py-16 bg-background">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      <div className="py-12 sm:py-16 bg-background">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-center">
             <div className="space-y-2">
-              <div className="text-3xl font-bold text-primary">500+</div>
-              <div className="">Happy Surfers</div>
+              <div className="text-2xl sm:text-3xl font-bold text-primary">500+</div>
+              <div className="text-sm sm:text-base">Happy Surfers</div>
             </div>
             <div className="space-y-2">
-              <div className="text-3xl font-bold text-primary">50+</div>
-              <div className="">Surf Spots</div>
+              <div className="text-2xl sm:text-3xl font-bold text-primary">50+</div>
+              <div className="text-sm sm:text-base">Surf Spots</div>
             </div>
             <div className="space-y-2">
-              <div className="text-3xl font-bold text-primary">24/7</div>
-              <div className="">Support</div>
+              <div className="text-2xl sm:text-3xl font-bold text-primary">24/7</div>
+              <div className="text-sm sm:text-base">Support</div>
             </div>
             <div className="space-y-2">
-              <div className="text-3xl font-bold text-primary">5⭐</div>
-              <div className="">Rating</div>
+              <div className="text-2xl sm:text-3xl font-bold text-primary">5⭐</div>
+              <div className="text-sm sm:text-base">Rating</div>
             </div>
           </div>
         </div>
@@ -357,14 +359,14 @@ export default function SurfPage() {
 
       {/* Featured Package Section */}
       {packages.length > 0 && (
-        <div className="py-16 bg-background">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-12">
+        <div className="py-12 sm:py-16 bg-background">
+          <div className="container mx-auto px-4 sm:px-6">
+            <div className="text-center mb-8 sm:mb-12">
               <Badge className="mb-4 bg-primary/10 text-primary border-primary">Featured Package</Badge>
-              <h2 className="text-3xl md:text-4xl font-bold  mb-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
                 Most Popular Choice
               </h2>
-              <p className=" max-w-2xl mx-auto">
+              <p className="max-w-2xl mx-auto px-4">
                 Join hundreds of satisfied customers who chose our premium surf experience
               </p>
             </div>
@@ -381,31 +383,31 @@ export default function SurfPage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                     <div className="absolute bottom-4 left-4 text-white">
-                      <Waves className="w-8 h-8 mb-2" />
+                      <Waves className="w-6 h-6 sm:w-8 sm:h-8 mb-2" />
                       <p className="text-sm font-semibold">Premium Ocean View</p>
                     </div>
                   </div>
-                  <div className="md:w-1/2 p-8">
+                  <div className="md:w-1/2 p-6 sm:p-8">
                     <CardHeader className="p-0 mb-6">
-                      <div className="flex justify-between items-start">
-                        <CardTitle className="text-2xl font-bold ">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+                        <CardTitle className="text-xl sm:text-2xl font-bold">
                           {packages[0].title}
                         </CardTitle>
-                        <Badge variant="secondary" className="text-2xl font-bold bg-primary text-white px-4 py-2">
+                        <Badge variant="secondary" className="text-xl sm:text-2xl font-bold bg-primary text-white px-3 sm:px-4 py-2 self-start">
                           ${packages[0].price}
                         </Badge>
                       </div>
-                      <p className=" mt-4">{packages[0].description}</p>
+                      <p className="mt-4 text-sm sm:text-base">{packages[0].description}</p>
                     </CardHeader>
                     
                     <div className="space-y-4">
-                      <h4 className="font-semibold flex items-center ">
+                      <h4 className="font-semibold flex items-center">
                         <Star className="w-4 h-4 mr-2 text-yellow-500" />
                         Package Features
                       </h4>
                       <div className="grid grid-cols-1 gap-2">
                         {packages[0].features.slice(0, 4).map((feature, index) => (
-                          <div key={index} className="flex items-center text-sm ">
+                          <div key={index} className="flex items-center text-sm">
                             {getFeatureIcon(feature)}
                             <span className="ml-3">{feature}</span>
                           </div>
@@ -438,18 +440,18 @@ export default function SurfPage() {
       )}
 
       {/* All Packages Section */}
-      <div className="py-16 bg-background">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold  mb-4">
+      <div className="py-12 sm:py-16 bg-background">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
               All Surf Packages
             </h2>
-            <p className=" max-w-2xl mx-auto">
+            <p className="max-w-2xl mx-auto px-4">
               Choose from our carefully curated selection of surf packages, each designed to give you the ultimate beach experience
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {packages.map((pkg, index) => (
               <Card key={pkg._id} className="group hover:shadow-2xl transition-all duration-500 border-0 shadow-lg bg-card overflow-hidden transform hover:-translate-y-2">
                 {/* Package Image */}
@@ -469,21 +471,21 @@ export default function SurfPage() {
                 </div>
 
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-xl font-bold  group-hover:text-primary transition-colors">
+                  <CardTitle className="text-lg sm:text-xl font-bold group-hover:text-primary transition-colors">
                     {pkg.title}
                   </CardTitle>
-                  <p className=" text-sm leading-relaxed">{pkg.description}</p>
+                  <p className="text-sm leading-relaxed">{pkg.description}</p>
                 </CardHeader>
                 
                 <CardContent className="space-y-6">
                   <div>
-                    <h4 className="font-semibold mb-4 flex items-center ">
+                    <h4 className="font-semibold mb-4 flex items-center">
                       <Star className="w-4 h-4 mr-2 text-yellow-500" />
                       Package Features
                     </h4>
                     <div className="space-y-3">
                       {pkg.features.map((feature, featureIndex) => (
-                        <div key={featureIndex} className="flex items-center text-sm ">
+                        <div key={featureIndex} className="flex items-center text-sm">
                           {getFeatureIcon(feature)}
                           <span className="ml-3">{feature}</span>
                         </div>
@@ -492,15 +494,15 @@ export default function SurfPage() {
                   </div>
 
                   <div className="bg-background p-4 rounded-lg space-y-2">
-                    <div className="flex items-center text-sm ">
+                    <div className="flex items-center text-sm">
                       <Calendar className="w-4 h-4 mr-2 text-blue-500" />
                       7-day stay (Sunday to Sunday)
                     </div>
-                    <div className="flex items-center text-sm ">
+                    <div className="flex items-center text-sm">
                       <MapPin className="w-4 h-4 mr-2 text-green-500" />
                       Premium oceanfront rooms
                     </div>
-                    <div className="flex items-center text-sm ">
+                    <div className="flex items-center text-sm">
                       <Users className="w-4 h-4 mr-2 text-purple-500" />
                       5 rooms available
                     </div>
@@ -535,24 +537,26 @@ export default function SurfPage() {
           if (!open) resetBookingForm();
           setIsDialogOpen(open);
         }}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-center  flex items-center justify-center gap-2">
-                <Waves className="w-6 h-6 text-primary" />
-                Book {selectedPackage.title}
-              </DialogTitle>
-            </DialogHeader>
+          <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto p-0">
+            <div className="sticky top-0 bg-white z-10 border-b">
+              <DialogHeader className="p-4 sm:p-6">
+                <DialogTitle className="text-xl sm:text-2xl font-bold text-center flex items-center justify-center gap-2">
+                  <Waves className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                  Book {selectedPackage.title}
+                </DialogTitle>
+              </DialogHeader>
+            </div>
             
-            <div className="space-y-6">
+            <div className="p-4 sm:p-6 space-y-6">
               {/* Package Summary */}
               <Card className="bg-gradient-to-r from-primary/5 to-cyan-600/5 border-primary/20">
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-center">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                     <div>
                       <span className="text-lg font-semibold">Total Price (7 days)</span>
-                      <p className="text-sm  mt-1">Sunday to Sunday stay</p>
+                      <p className="text-sm mt-1">Sunday to Sunday stay</p>
                     </div>
-                    <span className="text-3xl font-bold text-primary">${selectedPackage.price}</span>
+                    <span className="text-2xl sm:text-3xl font-bold text-primary">${selectedPackage.price}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -571,6 +575,7 @@ export default function SurfPage() {
                     const selectedDate = new Date(e.target.value);
                     setCheckInDate(e.target.value);
                     setErrors(prev => ({ ...prev, checkInDate: undefined }));
+                    setSelectedRoom(null); // Reset room selection
                     
                     if (selectedDate.getDay() !== 0) {
                       setErrors(prev => ({ ...prev, checkInDate: 'Check-in must be on a Sunday' }));
@@ -604,7 +609,7 @@ export default function SurfPage() {
                     <MapPin className="w-4 h-4 inline mr-2" />
                     Select Room
                   </label>
-                  <div className="grid grid-cols-5 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                     {[1, 2, 3, 4, 5].map((roomNum) => (
                       <button
                         key={roomNum}
@@ -616,17 +621,17 @@ export default function SurfPage() {
                         }}
                         disabled={bookedRooms.includes(roomNum)}
                         className={`
-                          p-4 rounded-lg border-2 transition-all transform hover:scale-105
+                          p-3 sm:p-4 rounded-lg border-2 transition-all transform hover:scale-105
                           ${bookedRooms.includes(roomNum) 
                             ? 'bg-red-50 border-red-300 text-red-600 cursor-not-allowed opacity-60' 
                             : selectedRoom === roomNum
-                            ? 'bg-primary border-primary  shadow-lg'
+                            ? 'bg-primary border-primary text-white shadow-lg'
                             : 'bg-background border hover:border-primary hover:shadow-md cursor-pointer'
                           }
                         `}
                       >
                         <div className="text-center">
-                          <div className="font-bold text-lg">Room {roomNum}</div>
+                          <div className="font-bold text-sm sm:text-lg">Room {roomNum}</div>
                           <div className="text-xs mt-1">
                             {bookedRooms.includes(roomNum) ? 'Booked' : 'Available'}
                           </div>
@@ -651,7 +656,7 @@ export default function SurfPage() {
                     Customer Information
                   </h3>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="block text-sm font-medium">
                         <User className="w-4 h-4 inline mr-2" />
@@ -725,32 +730,36 @@ export default function SurfPage() {
 
               {/* Booking Summary */}
               {selectedRoom && customerInfo.name && customerInfo.email && customerInfo.phone && !Object.keys(errors).length && (
-                <Card className="bg-background">
-                  <CardContent className="p-6">
+                <Card className="bg-background border-green-200">
+                  <CardContent className="p-4 sm:p-6">
                     <h3 className="font-semibold mb-4 flex items-center gap-2 text-green-600">
                       <CheckCircle2 className="w-5 h-5" />
                       Booking Summary
                     </h3>
-                    <div className="space-y-3 text-sm">
-                      <div className="flex justify-between">
-                        <span>Package:</span>
-                        <span className="font-medium">{selectedPackage.title}</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                      <div className="space-y-3">
+                        <div className="flex justify-between">
+                          <span>Package:</span>
+                          <span className="font-medium">{selectedPackage.title}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Room:</span>
+                          <span className="font-medium">Room {selectedRoom}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Check-in:</span>
+                          <span className="font-medium">{formatDate(checkInDate)}</span>
+                        </div>
                       </div>
-                      <div className="flex justify-between">
-                        <span>Room:</span>
-                        <span className="font-medium">Room {selectedRoom}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Check-in:</span>
-                        <span className="font-medium">{formatDate(checkInDate)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Check-out:</span>
-                        <span className="font-medium">{formatDate(getCheckOutDate(checkInDate))}</span>
-                      </div>
-                      <div className="flex justify-between border-t pt-3 text-lg font-bold text-green-800">
-                        <span>Total:</span>
-                        <span>${selectedPackage.price}</span>
+                      <div className="space-y-3">
+                        <div className="flex justify-between">
+                          <span>Check-out:</span>
+                          <span className="font-medium">{formatDate(getCheckOutDate(checkInDate))}</span>
+                        </div>
+                        <div className="flex justify-between border-t pt-3 text-base font-bold text-green-800">
+                          <span>Total:</span>
+                          <span>${selectedPackage.price}</span>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -758,20 +767,21 @@ export default function SurfPage() {
               )}
 
               {/* Action Buttons */}
-              <div className="flex gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row gap-4 pt-4 sticky bottom-0 bg-white border-t -mx-4 sm:-mx-6 px-4 sm:px-6 py-4">
                 <Button
                   variant="outline"
                   onClick={() => {
                     resetBookingForm();
                     setIsDialogOpen(false);
                   }}
-                  className="flex-1"
+                  className="flex-1 order-2 sm:order-1"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={handleBooking}
-                  className="flex-1"
+                  disabled={bookingLoading}
+                  className="flex-1 order-1 sm:order-2"
                 >
                   {bookingLoading ? (
                     <div className="flex items-center gap-2">
@@ -792,30 +802,30 @@ export default function SurfPage() {
       {packages.length === 0 && (
         <div className="text-center py-20 bg-white">
           <div className="text-6xl mb-6">🏄‍♂️</div>
-          <p className="text-2xl  mb-4">No packages available</p>
+          <p className="text-2xl mb-4">No packages available</p>
           <p className="">Check back soon for amazing surf packages!</p>
         </div>
       )}
 
       {/* Why Choose Us Section */}
-      <div className="py-16 bg-background">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold  mb-4">
+      <div className="py-12 sm:py-16 bg-background">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
               Why Choose Surf Paradise?
             </h2>
-            <p className=" max-w-2xl mx-auto">
+            <p className="max-w-2xl mx-auto px-4">
               Experience the ultimate surf vacation with our premium amenities and unmatched service
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             <div className="text-center space-y-4">
               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto">
                 <Waves className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-lg font-semibold">Perfect Waves</h3>
-              <p className=" text-sm">Access to the best surf spots with perfect wave conditions year-round</p>
+              <p className="text-sm">Access to the best surf spots with perfect wave conditions year-round</p>
             </div>
             
             <div className="text-center space-y-4">
@@ -823,7 +833,7 @@ export default function SurfPage() {
                 <Shield className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-lg font-semibold">Safe & Secure</h3>
-              <p className=" text-sm">24/7 security and professional lifeguards ensure your safety</p>
+              <p className="text-sm">24/7 security and professional lifeguards ensure your safety</p>
             </div>
             
             <div className="text-center space-y-4">
@@ -831,7 +841,7 @@ export default function SurfPage() {
                 <Heart className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-lg font-semibold">Premium Service</h3>
-              <p className=" text-sm">Exceptional hospitality and personalized service for every guest</p>
+              <p className="text-sm">Exceptional hospitality and personalized service for every guest</p>
             </div>
             
             <div className="text-center space-y-4">
@@ -839,7 +849,7 @@ export default function SurfPage() {
                 <Star className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-lg font-semibold">5-Star Experience</h3>
-              <p className=" text-sm">Luxury accommodations with world-class amenities and facilities</p>
+              <p className="text-sm">Luxury accommodations with world-class amenities and facilities</p>
             </div>
           </div>
         </div>

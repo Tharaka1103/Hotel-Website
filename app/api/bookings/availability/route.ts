@@ -5,22 +5,25 @@ import Booking from '@/models/Booking';
 export async function GET(request: NextRequest) {
   try {
     await dbConnect();
+    
     const url = new URL(request.url);
-    const checkInDate = url.searchParams.get('checkInDate');
     const packageId = url.searchParams.get('packageId');
-
-    if (!checkInDate || !packageId) {
-      return NextResponse.json({ error: 'checkInDate and packageId are required' }, { status: 400 });
+    const checkInDate = url.searchParams.get('checkInDate');
+    
+    if (!packageId || !checkInDate) {
+      return NextResponse.json({ 
+        error: 'Package ID and check-in date are required' 
+      }, { status: 400 });
     }
 
     const checkIn = new Date(checkInDate);
     const checkOut = new Date(checkIn);
-    checkOut.setDate(checkOut.getDate() + 7);
+    checkOut.setDate(checkOut.getDate() + 7); // 7-day stay
 
-    // Get all active bookings that overlap with the requested dates
-    const overlappingBookings = await Booking.find({
+    // Find all bookings that conflict with the requested dates
+    const conflictingBookings = await Booking.find({
       packageId,
-      status: 'active',
+      status: { $in: ['confirmed', 'pending'] },
       $or: [
         {
           checkInDate: { $lte: checkIn },
@@ -33,21 +36,32 @@ export async function GET(request: NextRequest) {
         {
           checkInDate: { $gte: checkIn },
           checkOutDate: { $lte: checkOut }
+        },
+        {
+          checkInDate: { $lte: checkIn },
+          checkOutDate: { $gte: checkOut }
         }
       ]
     });
 
-    const bookedRooms = overlappingBookings.map(booking => booking.roomNumber);
-    const availableRooms = [1, 2, 3, 4, 5].filter(room => !bookedRooms.includes(room));
+    // Get booked room numbers
+    const bookedRooms = conflictingBookings.map(booking => booking.roomNumber);
+    
+    // All available rooms (1-5)
+    const allRooms = [1, 2, 3, 4, 5];
+    const availableRooms = allRooms.filter(room => !bookedRooms.includes(room));
 
     return NextResponse.json({
       availableRooms,
       bookedRooms,
-      checkInDate: checkIn,
-      checkOutDate: checkOut
+      checkInDate: checkIn.toISOString().split('T')[0],
+      checkOutDate: checkOut.toISOString().split('T')[0]
     });
+
   } catch (error) {
     console.error('Error checking availability:', error);
-    return NextResponse.json({ error: 'Failed to check availability' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Failed to check availability' 
+    }, { status: 500 });
   }
 }
