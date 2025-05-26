@@ -538,7 +538,7 @@ export default function SurfPage() {
           setIsDialogOpen(open);
         }}>
           <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto p-0">
-            <div className="sticky top-0 bg-white z-10 border-b">
+            <div className="sticky top-0 bg-card z-10 border-b">
               <DialogHeader className="p-4 sm:p-6">
                 <DialogTitle className="text-xl sm:text-2xl font-bold text-center flex items-center justify-center gap-2">
                   <Waves className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
@@ -767,7 +767,7 @@ export default function SurfPage() {
               )}
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-4 sticky bottom-0 bg-white border-t -mx-4 sm:-mx-6 px-4 sm:px-6 py-4">
+              <div className="flex flex-col sm:flex-row gap-4 pt-4 sticky bottom-0 bg-card border-t -mx-4 sm:-mx-6 px-4 sm:px-6 py-4">
                 <Button
                   variant="outline"
                   onClick={() => {
