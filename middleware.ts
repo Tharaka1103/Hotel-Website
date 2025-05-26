@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { decrypt } from '@/lib/jwt';
 
 // Updated protected routes to match new structure
-const protectedRoutes = ['/adminDashboard', '/dashboard', '/admins', '/bookings', '/rooms', '/settings'];
-const publicRoutes = ['/adminLogin', '/login'];
+const protectedRoutes = ['/adminDashboard', '/admins', '/bookings', '/packages'];
+const publicRoutes = ['/adminLogin'];
 
 export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
@@ -37,13 +37,13 @@ export default async function middleware(req: NextRequest) {
 
   // Redirect to login if trying to access protected route without valid session
   if (isProtectedRoute && !session?.userId) {
-    const loginUrl = path.startsWith('/adminDashboard') ? '/adminLogin' : '/login';
+    const loginUrl = path.startsWith('/adminDashboard') ? '/adminLogin' : '/adminLogin';
     return NextResponse.redirect(new URL(loginUrl, req.nextUrl));
   }
 
   // Redirect to dashboard if already logged in and trying to access login page
   if (isPublicRoute && session?.userId) {
-    const dashboardUrl = path === '/adminLogin' ? '/adminDashboard' : '/dashboard';
+    const dashboardUrl = path === '/adminLogin' ? '/adminDashboard' : '/adminDashboard';
     return NextResponse.redirect(new URL(dashboardUrl, req.nextUrl));
   }
 

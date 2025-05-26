@@ -1,36 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AdminHeader from './AdminHeader';
-import AdminSidebar from './AdminSidebar';
-import { cn } from '@/lib/utils';
+import AdminFooter from './AdminFooter';
+import { Toaster } from 'sonner';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
-  const toggleSidebar = () => {
-    setSidebarCollapsed(!sidebarCollapsed);
-  };
-
   return (
-    <div className="min-h-screen">
-      <AdminSidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
-      <AdminHeader sidebarCollapsed={sidebarCollapsed} />
+    <div className="min-h-screen bg-background flex flex-col">
+      <AdminHeader />
       
-      <main 
-        className={cn(
-          'transition-all duration-300 pt-16',
-          sidebarCollapsed ? 'ml-16' : 'ml-64'
-        )}
-      >
-        <div className="p-4 lg:p-6">
+      <main className="flex-1 pt-16 lg:pt-20">
+        <div className="container mx-auto px-4 py-6 lg:py-8">
           {children}
         </div>
       </main>
+
+      <AdminFooter />
+      <Toaster position="top-right" />
     </div>
   );
 }

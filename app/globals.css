@@ -8,9 +8,7 @@ html, body {
   overflow-x: hidden;
   overflow-y: auto;
 }
-h1,h2 {
-  font-family: var(--font-berkshire-swash);
-}
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
   display: block;
