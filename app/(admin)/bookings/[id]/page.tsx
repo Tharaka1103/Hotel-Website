@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -42,11 +42,12 @@ import {
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import AdminLayout from '@/components/admin/AdminLayout';
 
 interface BookingDetails {
   _id: string;
   bookingId: string;
-    packageTitle: string;
+  packageTitle: string;
   packageDescription: string;
   packagePrice: number;
   packageFeatures: string[];
@@ -62,13 +63,14 @@ interface BookingDetails {
 }
 
 interface AdminBookingPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function AdminBookingPage({ params }: AdminBookingPageProps) {
   const router = useRouter();
+  const resolvedParams = use(params);
   const [booking, setBooking] = useState<BookingDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
@@ -78,11 +80,11 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
 
   useEffect(() => {
     fetchBookingDetails();
-  }, [params.id]);
+  }, [resolvedParams.id]);
 
   const fetchBookingDetails = async () => {
     try {
-      const response = await fetch(`/api/admin/bookings/${params.id}`);
+      const response = await fetch(`/api/bookings/${resolvedParams.id}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -105,7 +107,7 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
 
     setUpdating(true);
     try {
-      const response = await fetch(`/api/admin/bookings/${params.id}`, {
+      const response = await fetch(`/api/bookings/${resolvedParams.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -236,7 +238,7 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
             <p className="text-gray-600 mb-6">
               {error || 'The booking you are looking for does not exist or has been removed.'}
             </p>
-            <Link href="/admin">
+            <Link href="/bookings">
               <Button className="bg-gradient-to-r from-primary to-cyan-600 hover:from-primary/90 hover:to-cyan-600/90">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Admin
@@ -249,11 +251,12 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 p-4 sm:p-6 lg:p-8">
+    <AdminLayout>
+    <div className="min-h-screen bg-background p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8">
-          <Link href="/admin">
+          <Link href="/bookings">
             <Button
               variant="outline"
               className="mb-4 sm:mb-0 flex items-center gap-2 hover:bg-primary hover:text-white transition-colors"
@@ -289,7 +292,7 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
           {/* Booking Details */}
           <div className="lg:col-span-2 space-y-6">
             {/* Customer Information */}
-            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+            <Card className="shadow-lg border-0 bg-card backdrop-blur-sm">
               <CardHeader className="bg-gradient-to-r from-primary to-cyan-600 text-white rounded-t-lg">
                 <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
                   <User className="w-5 h-5" />
@@ -335,7 +338,7 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
             </Card>
 
             {/* Booking Details */}
-            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+            <Card className="shadow-lg border-0 bg-card backdrop-blur-sm">
               <CardHeader className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-t-lg">
                 <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
                   <MapPin className="w-5 h-5" />
@@ -379,8 +382,8 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
                   </div>
                 </div>
                 
-                <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border border-blue-200">
-                  <p className="text-center text-blue-800 font-semibold">
+                <div className="mt-6 p-4 bg-background">
+                  <p className="text-center font-semibold">
                     🏄‍♂️ 7-Day Surf Adventure Experience
                   </p>
                 </div>
@@ -388,7 +391,7 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
             </Card>
 
             {/* Package Features */}
-            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+            <Card className="shadow-lg border-0 bg-card backdrop-blur-sm">
               <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-t-lg">
                 <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
                   <Star className="w-5 h-5" />
@@ -398,7 +401,7 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
               <CardContent className="p-4 sm:p-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {booking.packageFeatures.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+                    <div key={index} className="flex items-center gap-3 p-3 bg-background hover:shadow-md transition-shadow">
                       {getFeatureIcon(feature)}
                       <span className="text-sm font-medium">{feature}</span>
                     </div>
@@ -441,7 +444,7 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
             </Card>
 
             {/* Admin Controls */}
-            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+            <Card className="shadow-lg border-0 bg-card backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Settings className="w-5 h-5 text-primary" />
@@ -496,14 +499,14 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
             </Card>
 
             {/* Quick Actions */}
-            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+            <Card className="shadow-lg border-0 bg-card backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="text-lg">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button
                   variant="outline"
-                  className="w-full flex items-center gap-2 hover:bg-green-50 border-green-200 text-green-700"
+                  className="w-full flex items-center gap-2 bg-green-600 text-white hover:bg-green-500 hover:text-white"
                   onClick={() => setStatus('confirmed')}
                 >
                   <CheckCircle2 className="w-4 h-4" />
@@ -511,7 +514,7 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full flex items-center gap-2"
+                  className="w-full flex items-center gap-2 bg-red-600 text-white hover:bg-red-500 hover:text-white"
                   onClick={() => setStatus('cancelled')}
                 >
                   <XCircle className="w-4 h-4" />
@@ -519,7 +522,7 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full flex items-center gap-2 hover:bg-blue-50 border-blue-200 text-blue-700"
+                  className="w-full flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-500 hover:text-white"
                   onClick={() => setStatus('completed')}
                 >
                   <CheckCircle2 className="w-4 h-4" />
@@ -529,16 +532,16 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
             </Card>
 
             {/* Customer Link */}
-            <Card className="shadow-lg border-0 bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200">
+            <Card className="shadow-lg border-0 bg-card">
               <CardContent className="p-6 text-center">
-                <h3 className="font-bold text-purple-800 mb-3">Customer View</h3>
-                <p className="text-sm text-purple-700 mb-4">
+                <h3 className="font-bold mb-3">Customer View</h3>
+                <p className="text-sm mb-4">
                   View this booking from customer perspective
                 </p>
-                <Link href={`/booking/${booking.bookingId}`}>
+                <Link href={`/surf/${booking.bookingId}`}>
                   <Button
                     variant="outline"
-                    className="w-full border-purple-500 text-purple-700 hover:bg-purple-500 hover:text-white flex items-center gap-2"
+                    className="w-full hover:text-white flex items-center gap-2"
                   >
                     <User className="w-4 h-4" />
                     Customer View
@@ -567,6 +570,6 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
         )}
       </div>
     </div>
+    </AdminLayout>
   );
 }
-

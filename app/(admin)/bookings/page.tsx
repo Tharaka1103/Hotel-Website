@@ -6,10 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Calendar, Mail, Phone, User, MapPin, Package, Trash2, CheckCircle, XCircle, AlertTriangle, Clock, Edit } from 'lucide-react';
+import { Calendar, Mail, Phone, User, MapPin, Package, Trash2, CheckCircle, XCircle, AlertTriangle, Clock, Edit, Settings, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import AdminLayout from '@/components/admin/AdminLayout';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface Booking {
   _id: string;
@@ -88,12 +90,14 @@ const BookingCardSkeleton = () => (
       <div className="flex flex-col sm:flex-row gap-2 pt-3 sm:pt-4">
         <Skeleton className="h-8 sm:h-9 flex-1" />
         <Skeleton className="h-8 sm:h-9 flex-1" />
+        <Skeleton className="h-8 sm:h-9 flex-1" />
       </div>
     </CardContent>
   </Card>
 );
 
 export default function BookingsPage() {
+  const router = useRouter();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -213,6 +217,10 @@ export default function BookingsPage() {
     setBookingToDelete(null);
   };
 
+  const handleManageBooking = (bookingId: string) => {
+    router.push(`/bookings/${bookingId}`);
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       weekday: 'short',
@@ -262,8 +270,22 @@ export default function BookingsPage() {
     
     return (
       <div className="space-y-2">
-        {/* Status Change Actions */}
+        {/* Primary Action Row - Manage Button + Quick Status Actions */}
         <div className="flex flex-col sm:flex-row gap-2">
+          {/* Manage Button - Always visible */}
+          <Button
+            onClick={() => handleManageBooking(booking.bookingId)}
+            disabled={isLoading}
+            size="sm"
+            className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-auto"
+          >
+            <div className="flex items-center justify-center gap-1 sm:gap-2">
+              <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span>Manage</span>
+            </div>
+          </Button>
+
+          {/* Quick Status Actions */}
           {booking.status === 'pending' && (
             <>
               <Button
@@ -277,7 +299,8 @@ export default function BookingsPage() {
                 ) : (
                   <div className="flex items-center justify-center gap-1 sm:gap-2">
                     <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span>Confirm</span>
+                    <span className="hidden sm:inline">Confirm</span>
+                    <span className="sm:hidden">✓</span>
                   </div>
                 )}
               </Button>
@@ -293,7 +316,8 @@ export default function BookingsPage() {
                 ) : (
                   <div className="flex items-center justify-center gap-1 sm:gap-2">
                     <XCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span>Cancel</span>
+                    <span className="hidden sm:inline">Cancel</span>
+                    <span className="sm:hidden">✗</span>
                   </div>
                 )}
               </Button>
@@ -330,7 +354,8 @@ export default function BookingsPage() {
                 ) : (
                   <div className="flex items-center justify-center gap-1 sm:gap-2">
                     <XCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span>Cancel</span>
+                    <span className="hidden sm:inline">Cancel</span>
+                    <span className="sm:hidden">✗</span>
                   </div>
                 )}
               </Button>
@@ -342,14 +367,15 @@ export default function BookingsPage() {
               onClick={() => updateBookingStatus(booking._id, 'confirmed')}
               disabled={isLoading}
               size="sm"
-              className="w-full bg-green-600 hover:bg-green-700 text-white text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-auto"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-auto"
             >
               {isLoading ? (
                 <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white"></div>
               ) : (
                 <div className="flex items-center justify-center gap-1 sm:gap-2">
                   <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span>Reactivate</span>
+                  <span className="hidden sm:inline">Reactivate</span>
+                  <span className="sm:hidden">Restore</span>
                 </div>
               )}
             </Button>
@@ -360,39 +386,59 @@ export default function BookingsPage() {
               onClick={() => updateBookingStatus(booking._id, 'confirmed')}
               disabled={isLoading}
               size="sm"
-              className="w-full bg-orange-600 hover:bg-orange-700 text-white text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-auto"
+              className="flex-1 bg-orange-600 hover:bg-orange-700 text-white text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-auto"
             >
               {isLoading ? (
                 <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white"></div>
               ) : (
                 <div className="flex items-center justify-center gap-1 sm:gap-2">
                   <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span>Reopen</span>
+                  <span className="hidden sm:inline">Reopen</span>
+                  <span className="sm:hidden">Edit</span>
                 </div>
               )}
             </Button>
           )}
         </div>
 
-        {/* Delete Action */}
-        {(booking.status === 'cancelled' || booking.status === 'completed') && (
-          <Button
-            onClick={() => handleDeleteClick(booking)}
-            disabled={isLoading}
-            variant="destructive"
-            size="sm"
-            className="w-full text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-auto"
-          >
-            {isLoading ? (
-              <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white"></div>
-            ) : (
+        {/* Secondary Actions Row - Delete and Customer View */}
+        <div className="flex flex-col sm:flex-row gap-2">
+          {/* Delete Action - Only for cancelled/completed */}
+          {(booking.status === 'cancelled' || booking.status === 'completed') && (
+            <Button
+              onClick={() => handleDeleteClick(booking)}
+              disabled={isLoading}
+              variant="destructive"
+              size="sm"
+              className="flex-1 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-auto"
+            >
+              {isLoading ? (
+                <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white"></div>
+              ) : (
+                <div className="flex items-center justify-center gap-1 sm:gap-2">
+                  <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Delete</span>
+                  <span className="sm:hidden">Del</span>
+                </div>
+              )}
+            </Button>
+          )}
+
+          {/* Customer View Link */}
+          <Link href={`/surf/${booking.bookingId}`} className="flex-1">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 h-auto"
+            >
               <div className="flex items-center justify-center gap-1 sm:gap-2">
-                <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>Delete</span>
+                <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Customer View</span>
+                <span className="sm:hidden">View</span>
               </div>
-            )}
-          </Button>
-        )}
+            </Button>
+          </Link>
+        </div>
 
         {/* Warning for overdue bookings */}
         {booking.status === 'confirmed' && checkoutPassed && (
@@ -468,7 +514,7 @@ export default function BookingsPage() {
             <div className="flex flex-wrap gap-2 w-full sm:w-auto">
               <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400 text-xs sm:text-sm px-2 py-1">
                 {bookings.filter(b => b.status === 'pending').length} Pending
-                              </Badge>
+              </Badge>
               <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 text-xs sm:text-sm px-2 py-1">
                 {bookings.filter(b => b.status === 'confirmed').length} Confirmed
               </Badge>
@@ -632,7 +678,7 @@ export default function BookingsPage() {
                 {booking.adminNotes && (
                   <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
                     <div className="text-xs text-blue-600 mb-1 font-medium">Admin Notes</div>
-                    <div className="text-sm text-blue-800">
+                    <div className="text-sm text-blue-800 line-clamp-2">
                       {booking.adminNotes}
                     </div>
                   </div>
