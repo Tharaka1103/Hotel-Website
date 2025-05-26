@@ -3,19 +3,19 @@ import "./globals.css";
 import { ThemeProvider } from './Components/ThemeProvider'
 import Header from "./Components/Header";
 import Footer from './Components/Footer'
-import { Josefin_Slab, Berkshire_Swash } from 'next/font/google'
+import { Poiret_One, Berkshire_Swash, Josefin_Slab } from 'next/font/google'
 import ConditionalLayout from './Components/ConditionalLayout'
+
+const poiret0ne = Poiret_One({
+  subsets: ['latin'],
+  weight: ['400'],
+  variable: '--font-poiret-one',
+})
 
 const josefinSlab = Josefin_Slab({
   subsets: ['latin'],
-  weight: ['700'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-josefin-slab',
-})
-
-const berkshireSwash = Berkshire_Swash({
-  subsets: ['latin'],
-  weight: ['400'],
-  variable: '--font-berkshire-swash',
 })
 
 export const metadata: Metadata = {
@@ -30,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${josefinSlab.variable} ${berkshireSwash.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${poiret0ne.variable} ${josefinSlab.variable}`}>
       <body className="min-h-screen">
         <ThemeProvider>
           <ConditionalLayout>

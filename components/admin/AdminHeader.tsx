@@ -525,7 +525,7 @@ export default function AdminHeader() {
                         className="text-center text-sm text-blue-600 hover:text-blue-700 cursor-pointer justify-center"
                         onClick={() => {
                           setNotificationDropdownOpen(false);
-                          router.push('/admin/notifications');
+                          router.push('/notifications');
                         }}
                       >
                         View all notifications

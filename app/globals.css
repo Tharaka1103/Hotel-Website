@@ -7,8 +7,13 @@ html, body {
   min-height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
+  font-family: 'Josefin Slab', serif;
+  font-weight: 600;
 }
 
+h1, h2 {
+  text-transform: uppercase;
+}
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
   display: block;

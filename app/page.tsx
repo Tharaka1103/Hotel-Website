@@ -73,6 +73,63 @@ const VideoHero = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// Video Section Component for About Us and Invite sections
+const VideoSection = ({ 
+  videoSrc, 
+  children, 
+  className = "" 
+}: { 
+  videoSrc: string; 
+  children: React.ReactNode; 
+  className?: string; 
+}) => {
+  const [isPlaying, setIsPlaying] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  return (
+    <div className={`relative h-[500px] rounded-2xl overflow-hidden shadow-2xl ${className}`}>
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+      >
+        <source src={videoSrc} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      <div className="absolute inset-0 bg-black/20" />
+      
+      {/* Content overlay */}
+      {children}
+      
+      {/* Video controls */}
+      <div className="absolute bottom-4 right-4 z-10">
+        <Button 
+          onClick={togglePlay} 
+          size="icon" 
+          variant="outline" 
+          className="rounded-full border border-white/30 bg-black/20 backdrop-blur-md hover:bg-black/40"
+        >
+          {isPlaying ? <Pause className="h-4 w-4 text-white" /> : <Play className="h-4 w-4 text-white" />}
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 // Simplified Testimonial Card
 const TestimonialCard = ({ name, location, rating, text }: { 
   name: string, 
@@ -185,7 +242,7 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* About Us Section */}
+      {/* About Us Section with Video */}
       <section className="py-10 md:py-16 bg-transparent overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -203,14 +260,15 @@ export default function HomePage() {
                 Our Story
               </Badge>
               <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight">
-                Your Beach Home <span className="text-primary">Away From Home</span>
+                Welcome to <span className="text-primary">Rupa&apos;s Surf House</span>
               </h2>
               <div className="space-y-6">
                 <p className="text-xl leading-relaxed">
-                  Nestled on the pristine shores of Sri Lanka, Rupa&apos;s Surf Resort was born from a passion for the ocean and a dream to create an authentic surf experience for travelers from around the world.
+                  Located right in front of Arugam Bay&apos;s main beginners surf point, Rupa&apos;s Surf House is your home for waves, good vibes, and island adventures. Whether you&apos;re just starting out or chasing advanced breaks, our top-ranked local surf guides will take you to the best spots on Sri Lanka&apos;s east coast.
                 </p>
                 <p className="text-xl leading-relaxed">
-                  Founded in 2015 by professional surfer Rupa Hiranya, our boutique resort combines luxury accommodation with world-class surf instruction, creating the perfect balance of adventure and relaxation.
+                  Come surf, eat, relax, and feel like family.
+                  This is Rupa&apos;s. Your wave is waiting.                
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 pt-4">
                   <Button 
@@ -227,29 +285,23 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="order-1 lg:order-2 h-[500px] rounded-2xl overflow-hidden shadow-2xl relative"
+              className="order-1 lg:order-2"
             >
-              <Image
-                src="/about.jpg"
-                alt="About Us"
-                fill
-                className="object-cover"
-                priority
-              />
-              
-              {/* Stats overlay */}
-              <div className="absolute -bottom-1 -left-1 bg-white p-4 rounded-xl shadow-xl border border-blue-100 z-10">
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <p className="text-5xl font-bold text-primary">8+</p>
-                    <p className="text-black">Years Experience</p>
-                  </div>
-                  <div>
-                    <p className="text-5xl font-bold text-primary">5k+</p>
-                    <p className="text-black">Happy Guests</p>
+              <VideoSection videoSrc="/heronew.mp4">
+                {/* Stats overlay */}
+                <div className="absolute -bottom-1 -left-1 bg-white p-4 rounded-xl shadow-xl border border-blue-100 z-10">
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <p className="text-5xl font-bold text-primary">8+</p>
+                      <p className="text-black">Years Experience</p>
+                    </div>
+                    <div>
+                      <p className="text-5xl font-bold text-primary">5k+</p>
+                      <p className="text-black">Happy Guests</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </VideoSection>
             </motion.div>
           </div>
         </div>
@@ -341,8 +393,57 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* Invite Section with Video */}
       <section className="py-10 md:py-16 bg-gradient-to-b from-blue-100/60 to-transparent overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="order-2 lg:order-1"
+            >
+              <VideoSection videoSrc="/heronew.mp4" children={undefined} />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="order-1 lg:order-2"
+            >
+              <Badge 
+                variant="outline" 
+                className="mb-6 border border-primary text-black bg-blue-100 px-5 py-1.5 text-lg shadow"
+              >
+                Come to visit
+              </Badge>
+              <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight">
+                Your Home in <span className="text-primary">Arugam Bay!</span>
+              </h2>
+              <div className="space-y-6">
+                <p className="text-xl leading-relaxed">
+                  Stay in our comfy sea view rooms, enjoy delicious meals at our in-house restaurant or chill at our café. For a true taste of Sri Lanka, don&apos;t miss our authentic all-you-can-eat buffet with live music nights. We also offer scenic tours around Arugam Bay, exciting safaris, and lagoon adventures.
+                </p>
+                <p className="text-xl leading-relaxed">
+                  Come as a guest, leave as family - let&apos;s surf, explore, and enjoy together!
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                  <Button 
+                    className=" hover:bg-primary rounded-full px-8 py-6 text-lg shadow-md"
+                  >
+                    Book Now
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-10 md:py-16 bg-transparent overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge 
@@ -452,7 +553,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
 
       {/* Activities Preview Section - Simplified */}
       <section className="py-10 md:py-16 bg-background overflow-hidden">
