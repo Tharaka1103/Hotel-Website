@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const session = await getSession();
     if (!session || session.role !== 'super_admin') {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { success: false, error: 'Unauthorized' },
         { status: 401 }
       );
     }
@@ -19,7 +19,14 @@ export async function POST(request: NextRequest) {
 
     if (!email || !password || !name) {
       return NextResponse.json(
-        { error: 'Email, password, and name are required' },
+        { success: false, error: 'Email, password, and name are required' },
+        { status: 400 }
+      );
+    }
+
+    if (password.length < 6) {
+      return NextResponse.json(
+        { success: false, error: 'Password must be at least 6 characters' },
         { status: 400 }
       );
     }
@@ -27,16 +34,17 @@ export async function POST(request: NextRequest) {
     const existingAdmin = await Admin.findOne({ email });
     if (existingAdmin) {
       return NextResponse.json(
-        { error: 'Admin with this email already exists' },
+        { success: false, error: 'Admin with this email already exists' },
         { status: 400 }
       );
     }
 
     const admin = await Admin.create({
       email,
-      password,
+      password, // This will be hashed by the Admin model pre-save hook
       name,
       role: role || 'admin',
+      isActive: true,
     });
 
     return NextResponse.json({
@@ -52,7 +60,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Create admin error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     );
   }

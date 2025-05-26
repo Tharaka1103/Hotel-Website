@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
         if (!admin) {
           admin = await Admin.create({
             email: 'admin@hotel.com',
-            password: 'admin123',
+            password: 'admin123', // This will be hashed by the Admin model pre-save hook
             name: 'Super Admin',
             role: 'super_admin',
             isActive: true,
@@ -86,6 +86,17 @@ export async function POST(request: NextRequest) {
           { status: 500 }
         );
       }
+
+      return NextResponse.json({
+        success: true,
+        message: 'Login successful',
+        admin: {
+          id: admin._id,
+          email: admin.email,
+          name: admin.name,
+          role: admin.role,
+        },
+      });
     } catch (sessionError) {
       console.error('Session creation error:', sessionError);
       return NextResponse.json(
@@ -93,17 +104,6 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-
-    return NextResponse.json({
-      success: true,
-      message: 'Login successful',
-      admin: {
-        id: admin._id,
-        email: admin.email,
-        name: admin.name,
-        role: admin.role,
-      },
-    });
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(
