@@ -232,7 +232,7 @@ export default function SurfPage() {
     if (lowerFeature.includes('wifi') || lowerFeature.includes('internet')) 
       return <Wifi className="w-4 h-4 text-blue-500" />;
     if (lowerFeature.includes('parking') || lowerFeature.includes('car')) 
-      return <Car className="w-4 h-4 text-gray-600" />;
+      return <Car className="w-4 h-4 text-lime-600" />;
     if (lowerFeature.includes('breakfast') || lowerFeature.includes('coffee')) 
       return <Coffee className="w-4 h-4 text-amber-600" />;
     if (lowerFeature.includes('restaurant') || lowerFeature.includes('dining')) 
@@ -302,17 +302,13 @@ export default function SurfPage() {
           <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-cyan-800/70 to-blue-900/80" />
         </div>
         
-        <div className="relative container mx-auto px-4 sm:px-6 py-12 sm:py-24 text-center min-h-screen flex flex-col justify-center">
-          <div className="flex justify-center mb-6">
-            <Waves className="w-12 h-12 sm:w-16 sm:h-16 text-white animate-bounce" />
-          </div>
+        <div className="relative container mt-4 mx-auto px-4 sm:px-6 py-12 sm:py-24 text-center min-h-screen flex flex-col justify-center">
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-            Surf Paradise
-            <span className="block text-cyan-200">Packages</span>
+            Surf camp / House 
+            <span className="block">Packages</span>
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed px-4">
-            Discover our amazing surf packages and book your perfect getaway. 
-            Weekly stays from Sunday to Sunday in our premium oceanfront accommodations.
+            Explore our surf packages and reserve your ideal beach escape - weekly stays from sunday to sunday in premium comfort.
           </p>
           
           {/* Feature highlights */}

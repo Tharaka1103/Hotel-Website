@@ -79,7 +79,7 @@ export const Header = () => {
                 key={link.href} 
                 href={link.href}
                 className={cn(
-                  "px-3 py-2 rounded-md text-lg font-medium transition-colors duration-200",
+                  "px-3 py-2 rounded-md text-xl font-medium transition-colors duration-200",
                   scrolled 
                     ? "hover:bg-primary hover:text-white hover:rounded-full" 
                     : ""
@@ -95,7 +95,7 @@ export const Header = () => {
             <ThemeSwitch />
             <Button 
               className={cn(
-                "rounded-full transition-all duration-300",
+                "rounded-full transition-all duration-300 text-xl",
                 scrolled 
                   ? "bg-primary hover:bg-blue-600" 
                   : "bg-white/20 backdrop-blur-md hover:bg-white/30 border border-white/20"
