@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -25,10 +25,46 @@ import {
   Coffee,
   PlaneTakeoff,
   UtensilsCrossed,
+  Compass,
+  Globe,
+  GraduationCap,
+  Heart,
+  ShieldCheck,
+  Sun,
+  Trees,
+  Calendar,
+  MapPin,
+  Sparkles,
+  TrendingUp,
+  Award,
+  Zap,
+  Crown,
+  FireExtinguisher as Fire,
+  Sunrise,
+  Sunset,
+  Mountain,
+  TreePine,
+  Fish,
+  Gamepad2,
+  Music,
+  Clock,
+  Gift,
+  CheckCircle2,
+  Dumbbell
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+
+// Package interface
+interface Package {
+  _id: string;
+  title: string;
+  description: string;
+  features: string[];
+  price: number;
+}
 
 // Simplified Hero Section with Full Video Background
 const VideoHero = ({ children }: { children: React.ReactNode }) => {
@@ -170,8 +206,80 @@ const TestimonialCard = ({ name, location, rating, text }: {
   </Card>
 );
 
+// Feature icon helper function
+const getFeatureIcon = (feature: string) => {
+  const lowerFeature = feature.toLowerCase();
+  
+  if (lowerFeature.includes('wifi') || lowerFeature.includes('internet')) 
+    return <Wifi className="w-4 h-4 text-blue-500" />;
+  if (lowerFeature.includes('parking') || lowerFeature.includes('car')) 
+    return <Car className="w-4 h-4 text-lime-600" />;
+  if (lowerFeature.includes('breakfast') || lowerFeature.includes('coffee')) 
+    return <Coffee className="w-4 h-4 text-amber-600" />;
+  if (lowerFeature.includes('restaurant') || lowerFeature.includes('dining')) 
+    return <Utensils className="w-4 h-4 text-green-600" />;
+  if (lowerFeature.includes('gym') || lowerFeature.includes('fitness')) 
+    return <Dumbbell className="w-4 h-4 text-red-500" />;
+  if (lowerFeature.includes('sunrise') || lowerFeature.includes('morning')) 
+    return <Sunrise className="w-4 h-4 text-orange-500" />;
+  if (lowerFeature.includes('sunset') || lowerFeature.includes('evening')) 
+    return <Sunset className="w-4 h-4 text-purple-500" />;
+  if (lowerFeature.includes('photo') || lowerFeature.includes('camera')) 
+    return <Camera className="w-4 h-4 text-pink-500" />;
+  if (lowerFeature.includes('mountain') || lowerFeature.includes('hiking')) 
+    return <Mountain className="w-4 h-4 text-stone-600" />;
+  if (lowerFeature.includes('forest') || lowerFeature.includes('nature')) 
+    return <TreePine className="w-4 h-4 text-green-700" />;
+  if (lowerFeature.includes('fishing') || lowerFeature.includes('fish')) 
+    return <Fish className="w-4 h-4 text-blue-600" />;
+  if (lowerFeature.includes('game') || lowerFeature.includes('entertainment')) 
+    return <Gamepad2 className="w-4 h-4 text-indigo-500" />;
+  if (lowerFeature.includes('music') || lowerFeature.includes('sound')) 
+    return <Music className="w-4 h-4 text-violet-500" />;
+  if (lowerFeature.includes('security') || lowerFeature.includes('safe')) 
+    return <Shield className="w-4 h-4 text-emerald-600" />;
+  if (lowerFeature.includes('24') || lowerFeature.includes('hour')) 
+    return <Clock className="w-4 h-4 text-slate-600" />;
+  if (lowerFeature.includes('spa') || lowerFeature.includes('wellness')) 
+    return <Heart className="w-4 h-4 text-rose-500" />;
+  if (lowerFeature.includes('energy') || lowerFeature.includes('power')) 
+    return <Zap className="w-4 h-4 text-yellow-500" />;
+  if (lowerFeature.includes('gift') || lowerFeature.includes('bonus')) 
+    return <Gift className="w-4 h-4 text-teal-500" />;
+  if (lowerFeature.includes('beach') || lowerFeature.includes('ocean') || lowerFeature.includes('surf')) 
+    return <Waves className="w-4 h-4 text-cyan-500" />;
+  
+  return <CheckCircle2 className="w-4 h-4 text-primary" />;
+};
+
 // Main Page Component
 export default function HomePage() {
+  const [packages, setPackages] = useState<Package[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch packages on component mount
+  useEffect(() => {
+    fetchPackages();
+  }, []);
+
+  const fetchPackages = async () => {
+    try {
+      const response = await fetch('/api/packages');
+      const data = await response.json();
+      setPackages(data.packages || []);
+    } catch (error) {
+      console.error('Failed to fetch packages:', error);
+      toast.error('Failed to fetch packages');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Get package image
+  const getPackageImage = (index: number) => {
+    return "/surfer-blue-wave.jpg";
+  };
+
   // Images for gallery
   const galleryImages = Array(9).fill(0).map((_, i) => i % 2 === 0 ? "/beach.jpg" : "/about.jpg");
 
@@ -268,10 +376,10 @@ export default function HomePage() {
               </h2>
               <div className="space-y-6">
                 <p className="text-xl leading-relaxed">
-                  Located right in front of Arugam Bay&apos;s main beginners&apos; surf point, Rupa&apos;s Surf House is your home for waves, good vibes, and island adventures. Whether you&apos;re just starting out on your surfing journey or chasing advanced breaks, our top-ranked local surf guides will take you to the best spots on Sri Lanka&apos;s east coast.
+                  Rupa&apos;s Surf Camp, part of the legendary Rupa&apos;s Hotel, has been a trusted home for surfers since 1978 — making it one of the very first surf stays in Arugam Bay. we&apos;re proud to continue offering a laid-back, welcoming space for everyone chasing waves and good vibes.
                 </p>
                 <p className="text-xl leading-relaxed">
-                  Come surf, eat, relax, and feel like family.           
+                  We&apos;re located right in front of Arugam Bay&apos;s Baby Point — one of the best spots for beginners to catch their first waves. Whether you&apos;re just learning or ready to explore more challenging reef breaks, our local certified pro surf instructors are friendly, experienced, and stoked to show you the best waves along Sri Lanka&apos;s beautiful east coast.          
                 </p>
               </div>
             </motion.div>
@@ -302,7 +410,122 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+                        {/* Popular Surf Packages Section */}
+                        <section className="py-12 bg-gradient-to-br from-cyan-50 via-blue-50 to-primary/10 relative overflow-hidden">
+                          <div className="absolute inset-0 overflow-hidden">
+                            <div className="absolute -top-20 -right-20 w-72 h-72 bg-gradient-to-br from-primary/20 to-cyan-300/20 rounded-full blur-2xl"></div>
+                            <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-gradient-to-tr from-blue-300/20 to-primary/20 rounded-full blur-2xl"></div>
+                          </div>
+                          <div className="container mx-auto px-4 relative z-10">
+                            {/* Section Header */}
+                            <div className="text-center mb-10">
+                              <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.6 }}
+                              >
+                                <div className="flex justify-center items-center gap-2 mb-4">
+                                  <Badge 
+                                    variant="outline" 
+                                    className="border-2 border-primary bg-white/80 backdrop-blur-sm px-4 py-1 text-base font-semibold text-primary"
+                                  >
+                                    <Fire className="w-4 h-4 mr-1 text-orange-500" />
+                                    Featured Package
+                                  </Badge>
+                                </div>
+                                <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                                  Experience Paradise
+                                </h2>
+                                <p className="text-lg max-w-2xl mx-auto text-gray-700">
+                                  Discover our signature surf package designed for the ultimate wave-riding adventure
+                                </p>
+                              </motion.div>
+                            </div>
 
+                            {/* Package Display */}
+                            {loading ? (
+                              <div className="text-center py-8">
+                                <motion.div
+                                  animate={{ rotate: 360 }}
+                                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                  className="w-10 h-10 border-3 border-primary border-t-transparent rounded-full mx-auto"
+                                ></motion.div>
+                              </div>
+                            ) : packages.length > 0 ? (
+                              <div className="max-w-6xl mx-auto">
+                                <motion.div
+                                  initial={{ opacity: 0, y: 20 }}
+                                  whileInView={{ opacity: 1, y: 0 }}
+                                  viewport={{ once: true }}
+                                  transition={{ duration: 0.6 }}
+                                  className="group"
+                                >
+                                  <Card className="overflow-hidden border-0 shadow-2xl bg-white/90 backdrop-blur-sm hover:bg-white transition-all duration-300">
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+                                      {/* Left side - Image */}
+                                      <div className="h-[400px] lg:h-full relative overflow-hidden">
+                                        <Image
+                                          src={getPackageImage(0)}
+                                          alt={packages[0].title}
+                                          fill
+                                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                                        <div className="absolute bottom-4 left-4">
+                                          <Badge className="bg-white/90 text-primary px-4 py-2 text-sm font-bold">
+                                            Most Popular Choice
+                                          </Badge>
+                                        </div>
+                                      </div>
+
+                                      {/* Right side - Package Details */}
+                                      <div className="p-8 lg:p-10">
+                                        <div className="flex justify-between items-start mb-6">
+                                          <h3 className="text-3xl font-bold text-gray-900">{packages[0].title}</h3>
+                                          <div className="bg-primary text-white px-6 py-3 rounded-full font-bold text-2xl shadow-lg">
+                                            ${packages[0].price}
+                                          </div>
+                                        </div>
+
+                                        <div className="space-y-6">
+                                          <p className="text-gray-600 text-lg leading-relaxed">{packages[0].description}</p>
+                  
+                                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                            {packages[0].features.map((feature, index) => (
+                                              <div key={index} 
+                                                className="flex items-center p-4 bg-blue-50/50 rounded-xl hover:bg-blue-50 transition-colors group-hover:transform group-hover:scale-105 duration-300"
+                                              >
+                                                <div className="mr-4 p-2 bg-primary/10 rounded-full">
+                                                  {getFeatureIcon(feature)}
+                                                </div>
+                                                <span className="text-gray-700 font-medium">{feature}</span>
+                                              </div>
+                                            ))}
+                                          </div>
+
+                                          <div className="pt-6">
+                                            <Link href="/surf">
+                                              <Button className="w-full bg-gradient-to-r from-primary to-cyan-600 hover:opacity-90 text-white font-bold py-4 rounded-xl text-lg shadow-xl hover:shadow-2xl transition-all duration-300">
+                                                Book Your Adventure Now
+                                                <ArrowRight className="w-6 h-6 ml-2" />
+                                              </Button>
+                                            </Link>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </Card>
+                                </motion.div>
+                              </div>
+                            ) : (
+                              <div className="text-center py-10">
+                                <h3 className="text-2xl font-bold mb-2">Coming Soon!</h3>
+                                <p className="text-gray-600">We're preparing something special for you</p>
+                              </div>
+                            )}
+                          </div>
+                        </section>
       {/* Offerings Section */}
       <section className="py-10 md:py-16 bg-gradient-to-b from-transparent to-blue-100/60 overflow-hidden">
         <div className="container mx-auto px-4">
@@ -383,10 +606,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Invite Section with Video */}
+      {/* Why Choose Us Section */}
       <section className="py-10 md:py-16 bg-gradient-to-b from-blue-100/60 to-transparent overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -394,34 +617,101 @@ export default function HomePage() {
               transition={{ duration: 0.8 }}
               className="order-2 lg:order-1"
             >
-              <VideoSection videoSrc="/heronew.mp4" children={undefined} />
+              <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight">
+                Why Choose <span className="text-primary">Arugam bay?</span>
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="flex flex-col items-center text-center p-4 hover:bg-primary/10 rounded-lg transition-all">
+                  <Waves className="h-12 w-12 text-primary mb-3" />
+                  <h3 className="font-extrabold">Waves for Everyone</h3>
+                  <h3 className="text-sm">Whether you&apos;re just starting out or chasing barrels, Arugam Bay has surf spots for all levels.</h3>
+                </div>
+                <div className="flex flex-col items-center text-center p-4 hover:bg-primary/10 rounded-lg transition-all">
+                  <Globe className="h-12 w-12 text-primary mb-3" />
+                  <h3 className="font-extrabold">Globally Recognized</h3>
+                  <h3 className="text-sm">One of the top surf destinations in the world, loved by surfers from every corner of the globe.</h3>
+                </div>
+                <div className="flex flex-col items-center text-center p-4 hover:bg-primary/10 rounded-lg transition-all">
+                  <Compass className="h-12 w-12 text-primary mb-3" />
+                  <h3 className="font-extrabold">Surf Variety</h3>
+                  <h3 className="text-sm">Multiple breaks all within easy reach - from mellow points to punchy reef waves.</h3>
+                </div>
+                <div className="flex flex-col items-center text-center p-4 hover:bg-primary/10 rounded-lg transition-all">
+                  <Trees className="h-12 w-12 text-primary mb-3" />
+                  <h3 className="font-extrabold">Wild Nature All Around</h3>
+                  <h3 className="text-sm">From elephants to lagoons, the surrounding wildlife is like nowhere else in Sri Lanka.</h3>
+                </div>
+                <div className="flex flex-col items-center text-center p-4 hover:bg-primary/10 rounded-lg transition-all">
+                  <Palmtree className="h-12 w-12 text-primary mb-3" />
+                  <h3 className="font-extrabold">More Than Just Surf</h3>
+                  <h3 className="text-sm">Explore jungles, culture-rich villages, stunning viewpoints, parties, music & good vibes.</h3>
+                </div>
+                <div className="flex flex-col items-center text-center p-4 hover:bg-primary/10 rounded-lg transition-all">
+                  <Sun className="h-12 w-12 text-primary mb-3" />
+                  <h3 className="font-extrabold">East Coast Vibes</h3>
+                  <h3 className="text-sm">Warm, welcoming, and full of soul - the east coast has its own special rhythm.</h3>
+                </div>
+              </div>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="order-1 lg:order-2"
+              className="order-1 lg:order-2 bg-primary p-10 rounded-3xl"
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight">
-                More than just <span className="text-primary">Surfing</span>
+              <h2 className="text-2xl md:text-3xl font-bold mb-8 leading-tight">
+                Why Learn to Surf with <span className="text-primary">Rupa's Surf Camp</span>
               </h2>
               <div className="space-y-6">
-                <p className="text-xl leading-relaxed">
-                  We offer comfortable sea-view rooms, a cozy hotel restaurant, a chilled-out café, and our signature all-you-can-eat authentic Sri Lankan buffet—with live music to set the vibe. When you&apos;re not surfing, join us for scenic lagoon tours, safaris, and local adventures around Arugam Bay.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                  <Button 
-                    className=" hover:bg-primary rounded-full px-8 py-6 text-lg shadow-md"
-                  >
-                    Book Now
-                  </Button>
+                <div className="flex items-center gap-4 p-4 hover:bg-primary/10 rounded-lg transition-all">
+                  <Shield className="h-10 w-10 flex-shrink-0" />
+                  <div className="flex flex-col">
+                    <p className="text-lg font-extrabold">Closest to the surf</p>
+                    <p className="text-sm">We&apos;re right in front of the AArugam Bay&apos;s main surf point.</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 p-4 hover:bg-primary/10 rounded-lg transition-all">
+                  <Users className="h-10 w-10 flex-shrink-0" />
+                  <div className="flex flex-col">
+                    <p className="text-lg font-extrabold">Trusted since 1978</p>
+                    <p className="text-sm">One of the original surf stays in town, with a legacy of happy surfers from around the world.</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 p-4 hover:bg-primary/10 rounded-lg transition-all">
+                  <Camera className="h-10 w-10 flex-shrink-0" />
+                  <div className="flex flex-col">
+                    <p className="text-lg font-extrabold">Modern & Affordable rooms</p>
+                    <p className="text-sm">Clean, specious, sea-view cozy simple luxurious rooms with all the comfort you need after a surf sessions. </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 p-4 hover:bg-primary/10 rounded-lg transition-all">
+                  <ShieldCheck className="h-10 w-10 flex-shrink-0" />
+                  <div className="flex flex-col">
+                    <p className="text-lg font-extrabold">Legendary Food</p>
+                    <p className="text-sm">All-day Sri Lankan buffet, a buzzing café, and plenty of tasty international options.</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 p-4 hover:bg-primary/10 rounded-lg transition-all">
+                  <GraduationCap className="h-10 w-10 flex-shrink-0" />
+                  <div className="flex flex-col">
+                    <p className="text-lg font-extrabold">Certified surf instructors</p>
+                    <p className="text-sm">Young passionate local pros ready to get you riding waves safely and confidenty. </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 p-4 hover:bg-primary/10 rounded-lg transition-all">
+                  <Heart className="h-10 w-10 flex-shrink-0" />
+                  <div className="flex flex-col">
+                    <p className="text-lg font-extrabold">More than surf</p>
+                    <p className="text-sm">Live music, wildlife safaries, lagoon tours, camping and chilled-out vibes every day.</p>
+                  </div>
                 </div>
               </div>
             </motion.div>
           </div>
         </div>
       </section>
+      
       {/* Beginners Surf & Stay Section */}
       <section className="py-10 md:py-16 bg-background overflow-hidden">
         <div className="container mx-auto px-4">
