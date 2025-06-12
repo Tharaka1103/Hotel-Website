@@ -50,7 +50,8 @@ import {
   Clock,
   Gift,
   CheckCircle2,
-  Dumbbell
+  Dumbbell,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -104,17 +105,6 @@ const VideoHero = ({ children }: { children: React.ReactNode }) => {
         </div>
       </div>
       
-      {/* Video controls */}
-      <div className="absolute bottom-8 right-8 z-10">
-        <Button 
-          onClick={togglePlay} 
-          size="icon" 
-          variant="outline" 
-          className="rounded-full border border-primary bg-black/20 backdrop-blur-md hover:bg-black/40"
-        >
-          {isPlaying ? <Pause className="h-4 w-4 text-white" /> : <Play className="h-4 w-4 text-white" />}
-        </Button>
-      </div>
     </div>
   );
 };
@@ -288,76 +278,87 @@ export default function HomePage() {
       {/* Hero Section with Full Video */}
       <section id="home" className="h-screen relative">
         <VideoHero>
-          <div className="max-w-4xl mx-auto text-center">
+          <div className="max-w-4xl mx-auto text-center px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
+              className=""
             >
-              <Badge 
-                variant="outline" 
-                className="border-primary bg-primary/10 backdrop-blur-md px-6 py-1.5 text-lg font-normal mb-6 text-white"
-              >
-                Welcome to Paradise
-              </Badge>
               <motion.h1
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.8 }}
-                className="text-5xl md:text-8xl font-extrabold mb-8 drop-shadow-lg tracking-tight text-white"
+                className="text-4xl md:text-7xl font-extrabold mb-4 md:mb-6 drop-shadow-lg tracking-tight text-white customtext"
               >
-                Arugam <span className="text-primary">Bay</span>
+                Arugam Bay
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4, duration: 0.8 }}
-                className="text-xl md:text-2xl mb-12 max-w-3xl mx-auto leading-relaxed text-white/90"
+                className="text-lg md:text-xl mb-4 md:mb-6 max-w-2xl mx-auto leading-relaxed text-white/90"
               >
-                The ultimate Arugam Bay experience - Surf lessons, local tours, live music & beach front vibes.
+                Sri Lanka's surfing paradise - the iconic surf town
+              </motion.p>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.8 }}
+                className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto leading-relaxed text-white/90 customtext"
+              >
+                Rupa's Surf Camp
               </motion.p>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6, duration: 0.7 }}
-                className="flex flex-col sm:flex-row gap-4 justify-center"
+                className="flex justify-center"
               >
                 <Button 
                   size="lg"
-                  className="text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300"
+                  className="text-lg md:text-xl bg-transparent border-2 border-white text-white px-8 py-4 rounded-full shadow-xl hover:bg-primary hover:border-primary hover:text-white transition-all duration-300"
                 >
                   Book Now
-                </Button>
-                <Button 
-                  size="lg"
-                  variant="outline"
-                  className="text-xl px-10 py-6 rounded-full shadow-lg transition-all duration-300 "
-                >
-                  Explore Services
                 </Button>
               </motion.div>
             </motion.div>
           </div>
         </VideoHero>
-        
-        {/* Scroll Indicator */}
-        <motion.div 
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 cursor-pointer text-white"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 0.8 }}
-          onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
-        >
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-sm">Scroll Down</span>
-            <motion.div
-              animate={{ y: [0, 10, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity, repeatType: "loop" }}
-            >
-              <ChevronDown className="h-6 w-6" />
-            </motion.div>
+
+        <div className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm">
+          <div className="container mx-auto px-4 py-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-center gap-4 text-center md:text-left md:col-span-1.6"
+              >
+                <div className="hidden md:block">
+                  <h3 className="text-xl font-bold text-primary customtext">Arugam Bay</h3>
+                </div>
+                <p className="text-sm md:text-base text-black/90">Rich wildlife, deep-rooted Sri Lankan culture and breath-taking scenery, it's more than a surfing description - it's a once-in-a-lifetime experience.</p>
+              </motion.div>
+              
+              <div className="hidden md:flex items-center justify-center md:col-span-0.1">
+                <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                  <X className="w-6 h-6 text-black hover:text-primary transition-colors cursor-pointer" />
+                </button>
+              </div>
+              
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-center gap-4 text-center md:text-right md:col-span-1.6"
+              >
+                <p className="text-sm md:text-base text-black/90">Join Sri Lanka's best Surf Camp - from beginners to advanced surfers, we've got you covered!</p>
+                <div className="hidden md:block">
+                  <h3 className="text-xl font-bold text-primary customtext">Rupa's Surf</h3>
+                </div>
+              </motion.div>
+            </div>
           </div>
-        </motion.div>
+        </div>      
       </section>
 
       {/* About Us Section with Video */}
@@ -425,17 +426,8 @@ export default function HomePage() {
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.6 }}
                               >
-                                <div className="flex justify-center items-center gap-2 mb-4">
-                                  <Badge 
-                                    variant="outline" 
-                                    className="border-2 border-primary bg-white/80 backdrop-blur-sm px-4 py-1 text-base font-semibold text-primary"
-                                  >
-                                    <Fire className="w-4 h-4 mr-1 text-orange-500" />
-                                    Featured Package
-                                  </Badge>
-                                </div>
                                 <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-                                  Experience Paradise
+                                  Our most popular package
                                 </h2>
                                 <p className="text-lg max-w-2xl mx-auto text-gray-700">
                                   Discover our signature surf package designed for the ultimate wave-riding adventure
@@ -494,7 +486,7 @@ export default function HomePage() {
                                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                             {packages[0].features.map((feature, index) => (
                                               <div key={index} 
-                                                className="flex items-center p-4 bg-blue-50/50 rounded-xl hover:bg-blue-50 transition-colors group-hover:transform group-hover:scale-105 duration-300"
+                                                className="flex items-center p-4 bg-blue-50/50 rounded-xl border-l-2 border-primary hover:bg-blue-50 transition-colors group-hover:transform group-hover:scale-105 duration-300"
                                               >
                                                 <div className="mr-4 p-2 bg-primary/10 rounded-full">
                                                   {getFeatureIcon(feature)}
@@ -824,236 +816,6 @@ export default function HomePage() {
               </Link>
             </motion.div>
           </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-10 md:py-16 bg-transparent overflow-hidden">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 max-w-4xl mx-auto leading-tight">
-              What Our Guests <span className="text-primary">Say</span>
-            </h2>
-            <p className="text-xl max-w-3xl mx-auto ">
-              Don&apos;t just take our word for it, hear from those who have experienced our hospitality.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                name: "Sarah Johnson",
-                location: "Los Angeles, USA",
-                rating: 5,
-                text: "My first surfing experience and it was amazing! The instructors were patient and friendly, and the accommodation was perfect.",
-              },
-              {
-                name: "Marcus Torres",
-                location: "Sydney, Australia",
-                rating: 5,
-                text: "As an experienced surfer, I was blown away by the quality of waves and the convenience of the location. The team went above and beyond.",
-              },
-              {
-                name: "Emma Chen",
-                location: "Tokyo, Japan",
-                rating: 5,
-                text: "The safari tour was the highlight of my trip! Got to see elephants up close and our guide was so knowledgeable.",
-              },
-            ].map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-              >
-                <TestimonialCard {...testimonial} />
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Gallery Section - Animated Slider */}
-      <section className="py-10 md:py-16 bg-transparent overflow-hidden">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <Badge 
-              variant="outline" 
-              className="mb-6 border border-primary text-black bg-blue-100 px-5 py-1.5 text-lg shadow"
-            >
-              Our Paradise
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 max-w-4xl mx-auto leading-tight">
-              Experience <span className="text-primary">The Beauty</span>
-            </h2>
-            <p className="text-xl max-w-3xl mx-auto ">
-              Explore our breathtaking location through our gallery of stunning images.
-            </p>
-          </div>
-          
-          {/* Animated Gallery Slider */}
-          <div className="w-full overflow-hidden">
-            <motion.div
-              className="flex gap-4"
-              initial={{ x: 0 }}
-              animate={{ x: [0, -1000, 0] }}
-              transition={{
-                duration: 60,
-                ease: "linear",
-                repeat: Infinity,
-                repeatType: "loop"
-              }}
-            >
-              {galleryImages.concat(galleryImages).map((image, index) => (
-                <motion.div
-                  key={index}
-                  className="relative min-w-[300px] h-[70vh] rounded-xl overflow-hidden flex-shrink-0"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Image 
-                    src={image}
-                    alt={`Gallery image ${index}`}
-                    fill
-                    className="object-cover"
-                  />
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-          
-          <div className="mt-12 text-center">
-            <Link href={'/gallery'}>
-              <Button className="bg-primary hover:bg-blue-600 rounded-full px-8 py-6 text-lg shadow-lg">
-                View Full Gallery <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Activities Preview Section - Simplified */}
-      <section className="py-10 md:py-16 bg-background overflow-hidden">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <Badge 
-              variant="outline" 
-              className="mb-6 border border-primary text-black bg-blue-100 px-5 py-1.5 text-lg shadow"
-            >
-              Experiences
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 max-w-4xl mx-auto leading-tight">
-              More Than Just <span className="text-primary">Surfing</span>
-            </h2>
-            <p className="text-xl max-w-3xl mx-auto ">
-              Discover all the exciting activities we offer for a complete Sri Lankan experience.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            {[
-              {
-                title: "Surf Lessons",
-                description: "Learn to ride the waves with our expert instructors in private or group sessions.",
-                icon: <Waves className="h-8 w-8 text-blue-500" />,
-                image: "/beach.jpg",
-              },
-              {
-                title: "Wildlife Safari",
-                description: "Explore local national parks and encounter exotic wildlife in their natural habitat.",
-                icon: <Palmtree className="h-8 w-8 text-green-500" />,
-                image: "/about.jpg",
-              },
-              {
-                title: "Taxi Services",
-                description: "Convenient transportation to nearby attractions, airports, and local markets.",
-                icon: <Car className="h-8 w-8 text-yellow-500" />,
-                image: "/beach.jpg",
-              },
-            ].map((activity, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                className="bg-card rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 border group"
-              >
-                <div className="h-60 relative overflow-hidden">
-                  <Image
-                    src={activity.image}
-                    alt={activity.title}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                  <div className="absolute bottom-4 left-4 text-white">
-                    <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-lg bg-white/10 backdrop-blur-md">{activity.icon}</div>
-                      <h3 className="text-2xl font-bold">{activity.title}</h3>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <p className="mb-6">{activity.description}</p>
-                  <Button className="w-full rounded-full  hover:bg-primary shadow">
-                    Learn More <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Call to Action */}
-      <section className="py-10 md:py-16 bg-gradient-to-r from-primary to-primary relative overflow-hidden">
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="max-w-4xl mx-auto text-center text-white"
-          >
-            <Badge 
-              variant="outline" 
-              className="mb-6 border-white/30 bg-white/10 backdrop-blur-md px-6 py-1.5 text-lg font-normal"
-            >
-              Book Your Escape
-            </Badge>
-            <h2 className="text-4xl md:text-6xl font-bold mb-8 drop-shadow-lg leading-tight">
-              Ready for Your Perfect Beach Adventure?
-            </h2>
-            <p className="text-xl md:text-2xl mb-12 text-white/90 leading-relaxed">
-              Book your stay now and get ready for sun, surf, and unforgettable memories. 
-              Special offers available for early bookings!
-            </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
-              <Button
-                size="lg"
-                className="bg-white text-primary hover:bg-blue-50 transition-colors duration-300 text-xl px-10 py-7 rounded-full shadow-xl"
-              >
-                Book Your Stay
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="bg-transparent border-2 border-white text-white text-xl px-10 py-7 rounded-full shadow-lg hover:bg-white/10"
-              >
-                Contact Us
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-        
-        {/* Decorative elements */}
-        <div className="absolute top-1/3 left-0 transform -translate-y-1/2 pointer-events-none">
-          <div className="w-64 h-64 rounded-full bg-teal-500 blur-3xl"></div>
-        </div>
-        <div className="absolute bottom-0 right-0 pointer-events-none">
-          <div className="w-80 h-80 rounded-full bg-teal-500 blur-3xl"></div>
         </div>
       </section>
     </main>
