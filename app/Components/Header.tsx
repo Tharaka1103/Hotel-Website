@@ -11,10 +11,9 @@ import { ThemeSwitch } from "./ThemeSwitch";
 // Navigation links
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/services", label: "Services" },
+  { href: "/surf", label: "Packages" },
   { href: "/gallery", label: "Gallery" },
   { href: "/about", label: "About Us" },
-  { href: "/contact", label: "Contact" },
 ];
 
 export const Header = () => {
@@ -62,13 +61,7 @@ export const Header = () => {
                   priority
                 />
               </div>
-              <div className={cn(
-                "transition-all duration-300",
-                scrolled ? "text-primary" : "text-white"
-              )}>
-                <h1 className="text-xl font-bold">Rupa's Surf  House</h1>
-                <p className="text-xs -mt-1 opacity-90">by rupas</p>
-              </div>
+              
             </div>
           </Link>
           
@@ -93,16 +86,18 @@ export const Header = () => {
           {/* Call to Action Button and Theme Switch */}
           <div className="hidden md:flex items-center space-x-4">
             <ThemeSwitch />
-            <Button 
-              className={cn(
-                "rounded-full transition-all duration-300 text-xl",
-                scrolled 
-                  ? "bg-primary hover:bg-blue-600" 
-                  : "bg-white/20 backdrop-blur-md hover:bg-white/30 border border-white/20"
-              )}
-            >
-              Book Now
-            </Button>
+            <Link href="/contact" className="text-xl font-medium">
+              <Button 
+                className={cn(
+                  "rounded-full transition-all duration-300 text-xl",
+                  scrolled 
+                    ? "bg-primary hover:bg-blue-600" 
+                    : "bg-white/20 backdrop-blur-md hover:bg-white/30 border border-white/20"
+                )}
+              >
+                Contact Us
+              </Button>
+            </Link>
           </div>
           
           {/* Mobile Menu Button */}
@@ -138,15 +133,17 @@ export const Header = () => {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-medium hover:bg-blue-50"
+                    className="hover:text-primary px-3 py-2 rounded-md text-base font-medium hover:bg-blue-50"
                     onClick={handleNavLinkClick}
                   >
                     {link.label}
                   </Link>
                 ))}
-                <Button className="bg-blue-500 hover:bg-blue-600 rounded-full mt-4">
-                  Book Now
-                </Button>
+                <Link href="/contact" className="text-xl font-medium">
+                  <Button className="bg-blue-500 hover:bg-blue-600 rounded-full mt-4">
+                    Contact Us
+                  </Button>
+                </Link>
               </nav>
             </div>
           </motion.div>

@@ -4,19 +4,34 @@ const BookingSchema = new mongoose.Schema({
   bookingId: {
     type: String,
     required: true,
-    unique: true  // This creates the index automatically, no need for separate schema.index()
+    unique: true
   },
   packageId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Package',
     required: true
   },
-  roomNumber: {
+  personCount: {
     type: Number,
     required: true,
     min: 1,
-    max: 5
+    max: 6
   },
+  roomType: {
+    type: String,
+    required: true,
+    enum: ['room', 'dome']
+  },
+  roomNumbers: [{
+    type: Number,
+    min: 1,
+    max: 5
+  }],
+  bedNumbers: [{
+    type: Number,
+    min: 1,
+    max: 6
+  }],
   customerName: {
     type: String,
     required: true,
@@ -25,6 +40,7 @@ const BookingSchema = new mongoose.Schema({
   customerEmail: {
     type: String,
     required: true,
+    lowercase: true,
     trim: true
   },
   customerPhone: {
@@ -40,30 +56,63 @@ const BookingSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
+  pricePerPerson: {
+    type: Number,
+    required: true
+  },
+  totalPrice: {
+    type: Number,
+    required: true
+  },
+  status: {
+    type: String,
+    required: true,
+    enum: ['pending', 'confirmed', 'cancelled', 'completed'],
+    default: 'pending'
+  },
   bookingDate: {
     type: Date,
     default: Date.now
   },
-  totalPrice: {
-    type: Number,
-    required: true,
-    min: 0
-  },
-  status: {
-    type: String,
-    enum: ['pending', 'confirmed', 'cancelled', 'completed'], // Added 'confirmed' to the enum
-    default: 'confirmed'
-  },
   adminNotes: {
     type: String,
     default: ''
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
   }
-}, {
-  timestamps: true
 });
 
-// Compound index to prevent double booking
-BookingSchema.index({ roomNumber: 1, checkInDate: 1, checkOutDate: 1 });
-// Remove the duplicate bookingId index since unique: true already creates it
+// Add validation to ensure proper room/bed selection
+BookingSchema.pre('validate', function(next) {
+  if (this.roomType === 'room') {
+    if (!this.roomNumbers || this.roomNumbers.length === 0) {
+      this.invalidate('roomNumbers', 'At least one room must be selected for room type');
+    }
+    // Clear bed numbers for room type
+    this.bedNumbers = [];
+  } else if (this.roomType === 'dome') {
+    if (!this.bedNumbers || this.bedNumbers.length === 0) {
+      this.invalidate('bedNumbers', 'At least one bed must be selected for dome type');
+    }
+    if (this.bedNumbers && this.bedNumbers.length !== this.personCount) {
+      this.invalidate('bedNumbers', `Number of beds (${this.bedNumbers.length}) must match person count (${this.personCount})`);
+    }
+    // Clear room numbers for dome type
+    this.roomNumbers = [];
+  }
+  next();
+});
+
+// Update the updatedAt field before saving
+BookingSchema.pre('save', function(next) {
+  this.updatedAt = new Date();
+  next();
+});
 
 export default mongoose.models.Booking || mongoose.model('Booking', BookingSchema);

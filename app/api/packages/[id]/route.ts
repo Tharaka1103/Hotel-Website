@@ -20,7 +20,8 @@ export async function PUT(
         title,
         description,
         features,
-        price: Number(price)
+        price: Number(price),
+        pricePerPerson: Number(price)
       },
       { new: true }
     );
@@ -35,6 +36,7 @@ export async function PUT(
     return NextResponse.json({ error: 'Failed to update package' }, { status: 500 });
   }
 }
+
 export async function DELETE(
   request: NextRequest
 ) {

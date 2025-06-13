@@ -34,7 +34,10 @@ import {
   Shield,
   Heart,
   Zap,
-  Gift
+  Gift,
+  Home,
+  Bed,
+  Users
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter, useParams } from 'next/navigation';
@@ -47,13 +50,18 @@ interface BookingDetails {
   packageDescription: string;
   packagePrice: number;
   packageFeatures: string[];
-  roomNumber: number;
+  personCount: number;
+  roomType: 'room' | 'dome';
+  roomNumbers: number[];
+  bedNumbers: number[];
   customerName: string;
   customerEmail: string;
   customerPhone: string;
   checkInDate: string;
   checkOutDate: string;
   bookingDate: string;
+  totalPrice: number;
+  pricePerPerson: number;
   status: string;
   adminNotes?: string;
 }
@@ -348,10 +356,10 @@ export default function BookingPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <MapPin className="w-4 h-4 text-primary" />
+                      <Users className="w-4 h-4 text-primary" />
                       <div>
-                        <p className="text-sm text-muted-foreground">Room Number</p>
-                        <p className="font-semibold">Room {booking.roomNumber}</p>
+                        <p className="text-sm text-muted-foreground">Number of Persons</p>
+                        <p className="font-semibold">{booking.personCount} person{booking.personCount > 1 ? 's' : ''}</p>
                       </div>
                     </div>
                   </div>
@@ -372,9 +380,29 @@ export default function BookingPage() {
                     </div>
                   </div>
                 </div>
-                
+
+                {/* Accommodation Details */}
                 <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border border-blue-200">
-                  <p className="text-center text-blue-800 font-semibold">
+                  <div className="flex items-center gap-3 mb-2">
+                    {booking.roomType === 'room' ? (
+                      <Home className="w-5 h-5 text-blue-600" />
+                    ) : (
+                      <Bed className="w-5 h-5 text-blue-600" />
+                    )}
+                    <span className="font-semibold text-blue-800">
+                      {booking.roomType === 'room' ? 'Double Room(s)' : 'Dome Accommodation'}
+                    </span>
+                  </div>
+                  <p className="text-blue-700 text-sm">
+                    {booking.roomType === 'room' 
+                      ? `Room${booking.roomNumbers.length > 1 ? 's' : ''}: ${booking.roomNumbers.join(', ')} (${booking.roomNumbers.length * 2} beds total)`
+                      : `Bed${booking.bedNumbers.length > 1 ? 's' : ''}: ${booking.bedNumbers.join(', ')} in Dome`
+                    }
+                  </p>
+                </div>
+                
+                <div className="mt-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+                  <p className="text-center text-green-800 font-semibold">
                     🏄‍♂️ 7-Day Surf Adventure Experience
                   </p>
                 </div>
@@ -392,7 +420,7 @@ export default function BookingPage() {
               <CardContent className="p-4 sm:p-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {booking.packageFeatures.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 bg-background hover:shadow-md transition-shadow">
+                    <div key={index} className="flex items-center gap-3 p-3 bg-background hover:shadow-md transition-shadow rounded-lg">
                       {getFeatureIcon(feature)}
                       <span className="text-sm font-medium">{feature}</span>
                     </div>
@@ -424,26 +452,35 @@ export default function BookingPage() {
               <CardContent className="p-6">
                 <div className="text-center mb-6">
                   <h3 className="text-xl font-bold mb-2">Total Amount</h3>
-                  <div className="text-4xl font-bold">${booking.packagePrice}</div>
+                  <div className="text-4xl font-bold">${booking.totalPrice}</div>
                   <p className="text-blue-100 text-sm mt-2">7-day stay included</p>
                 </div>
                 
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between items-center border-b border-white/20 pb-2">
-                    <span>Package Price</span>
-                    <span className="font-semibold">${booking.packagePrice}</span>
+                    <span>Price per person</span>
+                    <span className="font-semibold">${booking.pricePerPerson || booking.packagePrice}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-white/20 pb-2">
+                    <span>Number of persons</span>
+                    <span className="font-semibold">{booking.personCount}</span>
                   </div>
                   <div className="flex justify-between items-center border-b border-white/20 pb-2">
                     <span>Duration</span>
                     <span className="font-semibold">7 Days</span>
                   </div>
                   <div className="flex justify-between items-center border-b border-white/20 pb-2">
-                    <span>Room</span>
-                    <span className="font-semibold">Room {booking.roomNumber}</span>
+                    <span>Accommodation</span>
+                    <span className="font-semibold">
+                      {booking.roomType === 'room' 
+                        ? `${booking.roomNumbers.length} Room${booking.roomNumbers.length > 1 ? 's' : ''}`
+                        : `${booking.bedNumbers.length} Bed${booking.bedNumbers.length > 1 ? 's' : ''}`
+                      }
+                    </span>
                   </div>
                   <div className="flex justify-between items-center pt-2">
                     <span className="font-bold">Total</span>
-                    <span className="font-bold text-lg">${booking.packagePrice}</span>
+                    <span className="font-bold text-lg">${booking.totalPrice}</span>
                   </div>
                 </div>
               </CardContent>
@@ -489,15 +526,15 @@ export default function BookingPage() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="text-sm ">Booking Created</span>
+                    <span className="text-sm">Booking Created</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className={`w-3 h-3 rounded-full ${booking.status === 'confirmed' || booking.status === 'completed' ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                    <span className="text-sm ">Booking Confirmed</span>
+                    <span className="text-sm">Booking Confirmed</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className={`w-3 h-3 rounded-full ${booking.status === 'completed' ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                    <span className="text-sm ">Experience Completed</span>
+                    <span className="text-sm">Experience Completed</span>
                   </div>
                 </div>
                 <div className="mt-4 p-3 bg-background rounded-lg">
@@ -517,6 +554,17 @@ export default function BookingPage() {
             <p className="text-blue-100 text-lg mb-4">
               Your amazing surf adventure starts on {formatDate(booking.checkInDate)}
             </p>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 mb-4">
+              <p className="text-blue-100 text-sm mb-2">
+                <strong>Accommodation Details:</strong>
+              </p>
+              <p className="text-blue-200 text-sm">
+                {booking.roomType === 'room' 
+                  ? `You'll be staying in Room${booking.roomNumbers.length > 1 ? 's' : ''} ${booking.roomNumbers.join(', ')} with ${booking.roomNumbers.length * 2} beds for ${booking.personCount} person${booking.personCount > 1 ? 's' : ''}.`
+                  : `You'll be staying in the Dome with Bed${booking.bedNumbers.length > 1 ? 's' : ''} ${booking.bedNumbers.join(', ')} for ${booking.personCount} person${booking.personCount > 1 ? 's' : ''}.`
+                }
+              </p>
+            </div>
             <p className="text-blue-200 text-sm">
               We'll send you a confirmation email with detailed check-in instructions and packing tips.
             </p>

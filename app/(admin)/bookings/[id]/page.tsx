@@ -37,7 +37,14 @@ import {
   Shield,
   Heart,
   Zap,
-  Gift
+  Gift,
+  Home,
+  Bed,
+  Users,
+  DollarSign,
+  CreditCard,
+  Building,
+  Info
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -51,13 +58,18 @@ interface BookingDetails {
   packageDescription: string;
   packagePrice: number;
   packageFeatures: string[];
-  roomNumber: number;
+  personCount: number;
+  roomType: 'room' | 'dome';
+  roomNumbers: number[];
+  bedNumbers: number[];
   customerName: string;
   customerEmail: string;
   customerPhone: string;
   checkInDate: string;
   checkOutDate: string;
   bookingDate: string;
+  totalPrice: number;
+  pricePerPerson: number;
   status: string;
   adminNotes?: string;
 }
@@ -145,30 +157,30 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 shadow-lg';
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 shadow-lg';
       case 'cancelled':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-gradient-to-r from-red-500 to-rose-500 text-white border-0 shadow-lg';
       case 'completed':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white border-0 shadow-lg';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-gradient-to-r from-gray-500 to-slate-500 text-white border-0 shadow-lg';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return <CheckCircle2 className="w-4 h-4" />;
+        return <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />;
       case 'pending':
-        return <Clock className="w-4 h-4" />;
+        return <Clock className="w-4 h-4 sm:w-5 sm:h-5" />;
       case 'cancelled':
-        return <XCircle className="w-4 h-4" />;
+        return <XCircle className="w-4 h-4 sm:w-5 sm:h-5" />;
       case 'completed':
-        return <CheckCircle2 className="w-4 h-4" />;
+        return <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />;
       default:
-        return <AlertTriangle className="w-4 h-4" />;
+        return <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" />;
     }
   };
 
@@ -219,357 +231,463 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4">Loading booking details...</p>
+      <AdminLayout>
+        <div className="flex items-center justify-center min-h-screen bg-background">
+          <div className="text-center space-y-4">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent mx-auto"></div>
+            <div className="space-y-2">
+              <div className="h-4 bg-gray-200 rounded animate-pulse w-48 mx-auto"></div>
+              <div className="h-3 bg-gray-200 rounded animate-pulse w-32 mx-auto"></div>
+            </div>
+          </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   if (error || !booking) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 p-4 sm:p-6 lg:p-8">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="bg-white rounded-lg p-8 shadow-lg">
-            <div className="text-red-500 text-6xl mb-4">⚠️</div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">Booking Not Found</h1>
-            <p className="text-gray-600 mb-6">
-              {error || 'The booking you are looking for does not exist or has been removed.'}
-            </p>
-            <Link href="/bookings">
-              <Button className="bg-gradient-to-r from-primary to-cyan-600 hover:from-primary/90 hover:to-cyan-600/90">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Admin
-              </Button>
-            </Link>
+      <AdminLayout>
+        <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 p-4 sm:p-6 lg:p-8">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="bg-white rounded-2xl p-8 shadow-2xl border-l-4 border-red-500">
+              <div className="text-red-500 text-6xl mb-6">🚨</div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">Booking Not Found</h1>
+              <p className="text-gray-600 mb-8 text-lg">
+                {error || 'The booking you are looking for does not exist or has been removed.'}
+              </p>
+              <Link href="/bookings">
+                <Button className="bg-gradient-to-r from-primary to-cyan-600 hover:from-primary/90 hover:to-cyan-600/90 px-8 py-3 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+                  <ArrowLeft className="w-5 h-5 mr-3" />
+                  Back to Admin Dashboard
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
     <AdminLayout>
-    <div className="min-h-screen bg-background p-4 sm:p-6 lg:p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8">
-          <Link href="/bookings">
-            <Button
-              variant="outline"
-              className="mb-4 sm:mb-0 flex items-center gap-2 hover:bg-primary hover:text-white transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Admin
-            </Button>
-          </Link>
-          <div className="text-center sm:text-right">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary flex items-center gap-2">
-              <Settings className="w-6 h-6 sm:w-8 sm:h-8" />
-              Admin - Booking Management
-            </h1>
-            <p className="text-muted-foreground mt-2">Review and manage booking details</p>
-          </div>
-        </div>
-
-        {/* Booking ID and Status */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center gap-4 mb-4">
-            <div className={`flex items-center gap-2 px-4 py-2 rounded-full border ${getStatusColor(booking.status)}`}>
-              {getStatusIcon(booking.status)}
-              <span className="font-semibold">{booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}</span>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-8 gap-4">
+            <Link href="/bookings">
+              <Button
+                variant="outline"
+                className="flex items-center gap-3 px-6 py-3 rounded-full border-2 hover:bg-primary hover:text-white transition-all duration-300 shadow-md"
+              >
+                <ArrowLeft className="w-5 h-5" />
+                <span className="font-semibold">Back to Dashboard</span>
+              </Button>
+            </Link>
+            <div className="text-center lg:text-right">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-cyan-600 bg-clip-text text-transparent flex items-center gap-3">
+                <Settings className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
+                Admin Control Panel
+              </h1>
+              <p className="text-muted-foreground mt-3 text-lg">Manage booking details and customer information</p>
             </div>
           </div>
-          <p className="text-lg sm:text-xl font-semibold">
-            Booking ID: {booking.bookingId}
-          </p>
-        </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          {/* Booking Details */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Customer Information */}
-            <Card className="shadow-lg border-0 bg-card backdrop-blur-sm">
-              <CardHeader className="bg-gradient-to-r from-primary to-cyan-600 text-white rounded-t-lg">
-                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-                  <User className="w-5 h-5" />
-                  Customer Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 sm:p-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <User className="w-4 h-4 text-primary" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Full Name</p>
-                        <p className="font-semibold">{booking.customerName}</p>
+          {/* Status Banner */}
+          <div className="mb-8">
+            <div className="text-center">
+              <div className={`inline-flex items-center gap-3 px-8 py-4 rounded-2xl shadow-2xl ${getStatusColor(booking.status)} transform hover:scale-105 transition-all duration-300`}>
+                {getStatusIcon(booking.status)}
+                <span className="text-xl font-bold">{booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}</span>
+              </div>
+              <div className="mt-4 space-y-1">
+                <p className="text-2xl font-bold text-gray-800">Booking ID: {booking.bookingId}</p>
+                <p className="text-gray-600">Booked on {formatDate(booking.bookingDate)}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+            {/* Main Content */}
+            <div className="xl:col-span-3 space-y-8">
+              {/* Package Information - Highlighted */}
+              <Card className="shadow-2xl border-0 bg-gradient-to-br from-primary/5 via-cyan-50 to-blue-50 overflow-hidden">
+                <CardHeader className="bg-gradient-to-r from-primary to-cyan-600 text-white p-6">
+                  <CardTitle className="flex items-center gap-3 text-2xl font-bold">
+                    <Waves className="w-8 h-8" />
+                    Package Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 sm:p-8">
+                  <div className="space-y-6">
+                    <div className="text-center border-b pb-6">
+                      <h2 className="text-3xl sm:text-4xl font-bold text-primary mb-3">{booking.packageTitle}</h2>
+                      <p className="text-gray-600 text-lg leading-relaxed">{booking.packageDescription}</p>
+                      <div className="mt-4 inline-flex items-center bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-3 rounded-full shadow-lg">
+                        <DollarSign className="w-5 h-5 mr-2" />
+                        <span className="text-xl font-bold">${booking.packagePrice} per person</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <Mail className="w-4 h-4 text-primary" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Email</p>
-                        <p className="font-semibold text-sm break-all">{booking.customerEmail}</p>
+                    
+                    <div>
+                      <h4 className="font-bold text-xl mb-4 flex items-center text-gray-800">
+                        <Star className="w-6 h-6 mr-3 text-yellow-500" />
+                        Package Features
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {booking.packageFeatures.map((feature, index) => (
+                          <div key={index} className="flex items-center gap-3 p-4 bg-white hover:shadow-lg transition-all duration-300 rounded-xl border border-gray-100">
+                            {getFeatureIcon(feature)}
+                            <span className="font-medium text-gray-700">{feature}</span>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <Phone className="w-4 h-4 text-primary" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Phone</p>
-                        <p className="font-semibold">{booking.customerPhone}</p>
+                </CardContent>
+              </Card>
+
+              {/* Customer Information - Highlighted */}
+              <Card className="shadow-2xl border-0 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 overflow-hidden">
+                <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-600 text-white p-6">
+                  <CardTitle className="flex items-center gap-3 text-2xl font-bold">
+                    <User className="w-8 h-8" />
+                    Customer Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 sm:p-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-md border-l-4 border-green-500">
+                        <div className="p-3 bg-green-100 rounded-full">
+                          <User className="w-6 h-6 text-green-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500 font-medium">Full Name</p>
+                          <p className="text-xl font-bold text-gray-800">{booking.customerName}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-md border-l-4 border-blue-500">
+                        <div className="p-3 bg-blue-100 rounded-full">
+                          <Mail className="w-6 h-6 text-blue-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-gray-500 font-medium">Email Address</p>
+                          <p className="text-lg font-semibold text-gray-800 break-words">{booking.customerEmail}</p>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <Calendar className="w-4 h-4 text-primary" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Booking Date</p>
-                        <p className="font-semibold">{formatDate(booking.bookingDate)}</p>
+                    
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-md border-l-4 border-purple-500">
+                        <div className="p-3 bg-purple-100 rounded-full">
+                          <Phone className="w-6 h-6 text-purple-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500 font-medium">Phone Number</p>
+                          <p className="text-xl font-bold text-gray-800">{booking.customerPhone}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-md border-l-4 border-orange-500">
+                        <div className="p-3 bg-orange-100 rounded-full">
+                          <Users className="w-6 h-6 text-orange-600" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500 font-medium">Party Size</p>
+                          <p className="text-xl font-bold text-gray-800">{booking.personCount} person{booking.personCount > 1 ? 's' : ''}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            {/* Booking Details */}
-            <Card className="shadow-lg border-0 bg-card backdrop-blur-sm">
-              <CardHeader className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-t-lg">
-                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-                  <MapPin className="w-5 h-5" />
-                  Booking Details
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 sm:p-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {/* Accommodation & Dates - Highlighted */}
+              <Card className="shadow-2xl border-0 bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 overflow-hidden">
+                <CardHeader className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6">
+                  <CardTitle className="flex items-center gap-3 text-2xl font-bold">
+                    <Building className="w-8 h-8" />
+                    Accommodation & Schedule
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 sm:p-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Accommodation Details */}
+                    <div className="space-y-6">
+                      <div className="text-center p-6 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-2xl shadow-xl">
+                        {booking.roomType === 'room' ? (
+                          <Home className="w-12 h-12 mx-auto mb-4" />
+                        ) : (
+                          <Bed className="w-12 h-12 mx-auto mb-4" />
+                        )}
+                        <h3 className="text-2xl font-bold mb-2">
+                          {booking.roomType === 'room' ? 'Double Room(s)' : 'Dome Accommodation'}
+                        </h3>
+                        <div className="text-lg opacity-90">
+                          {booking.roomType === 'room' ? (
+                            <div>
+                              <p className="font-semibold">Room{booking.roomNumbers.length > 1 ? 's' : ''}: {booking.roomNumbers.join(', ')}</p>
+                              <p className="text-sm mt-1">({booking.roomNumbers.length * 2} beds total)</p>
+                            </div>
+                          ) : (
+                            <div>
+                              <p className="font-semibold">Bed{booking.bedNumbers.length > 1 ? 's' : ''}: {booking.bedNumbers.join(', ')}</p>
+                              <p className="text-sm mt-1">(Dome accommodation)</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Date Information */}
+                    <div className="space-y-4">
+                      <div className="p-4 bg-white rounded-xl shadow-md border-l-4 border-green-500">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="p-2 bg-green-100 rounded-full">
+                            <Calendar className="w-5 h-5 text-green-600" />
+                          </div>
+                          <span className="font-semibold text-gray-700">Check-in</span>
+                        </div>
+                        <p className="text-lg font-bold text-gray-800 ml-10">{formatDate(booking.checkInDate)}</p>
+                      </div>
+                      
+                      <div className="p-4 bg-white rounded-xl shadow-md border-l-4 border-red-500">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="p-2 bg-red-100 rounded-full">
+                            <Calendar className="w-5 h-5 text-red-600" />
+                          </div>
+                          <span className="font-semibold text-gray-700">Check-out</span>
+                        </div>
+                        <p className="text-lg font-bold text-gray-800 ml-10">{formatDate(booking.checkOutDate)}</p>
+                      </div>
+                      
+                      <div className="p-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl shadow-lg">
+                        <div className="text-center">
+                          <Clock className="w-8 h-8 mx-auto mb-2" />
+                          <p className="font-bold text-lg">7-Day Surf Adventure</p>
+                          <p className="text-sm opacity-90">Sunday to Sunday</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Pricing Information - Highlighted */}
+              <Card className="shadow-2xl border-0 bg-gradient-to-br from-yellow-50 via-orange-50 to-red-50 overflow-hidden">
+                <CardHeader className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white p-6">
+                  <CardTitle className="flex items-center gap-3 text-2xl font-bold">
+                    <CreditCard className="w-8 h-8" />
+                    Pricing Breakdown
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 sm:p-8">
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                      <div className="text-center p-6 bg-white rounded-xl shadow-lg border-2 border-gray-100">
+                        <DollarSign className="w-10 h-10 mx-auto mb-3 text-green-600" />
+                        <p className="text-sm text-gray-500 font-medium">Price per Person</p>
+                        <p className="text-2xl font-bold text-gray-800">${booking.pricePerPerson}</p>
+                      </div>
+                      
+                      <div className="text-center p-6 bg-white rounded-xl shadow-lg border-2 border-gray-100">
+                        <Users className="w-10 h-10 mx-auto mb-3 text-blue-600" />
+                        <p className="text-sm text-gray-500 font-medium">Number of Persons</p>
+                        <p className="text-2xl font-bold text-gray-800">{booking.personCount}</p>
+                      </div>
+                      
+                      <div className="text-center p-6 bg-gradient-to-br from-green-500 to-emerald-500 text-white rounded-xl shadow-xl">
+                        <CreditCard className="w-10 h-10 mx-auto mb-3" />
+                        <p className="text-sm opacity-90 font-medium">Total Amount</p>
+                        <p className="text-3xl font-bold">${booking.totalPrice}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="p-6 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-2xl border border-indigo-200">
+                      <div className="text-center">
+                        <Info className="w-8 h-8 mx-auto mb-3 text-indigo-600" />
+                        <p className="text-indigo-800 font-semibold text-lg">Payment Details</p>
+                        <p className="text-indigo-700 mt-2">
+                          ${booking.pricePerPerson} × {booking.personCount} person{booking.personCount > 1 ? 's' : ''} = ${booking.totalPrice}
+                        </p>
+                        <p className="text-sm text-indigo-600 mt-1">7-day accommodation included</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Admin Controls Sidebar */}
+            <div className="xl:col-span-1 space-y-6">
+              {/* Status Management */}
+              <Card className="shadow-xl border-0 bg-gradient-to-br from-gray-50 to-slate-100 sticky top-6">
+                <CardHeader className="bg-gradient-to-r from-gray-700 to-slate-700 text-white p-4">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Settings className="w-5 h-5" />
+                    Admin Controls
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Booking Status
+                    </label>
+                    <Select value={status} onValueChange={setStatus}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pending">
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-yellow-500" />
+                            Pending
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="confirmed">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-green-500" />
+                            Confirmed
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="cancelled">
+                          <div className="flex items-center gap-2">
+                            <XCircle className="w-4 h-4 text-red-500" />
+                            Cancelled
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="completed">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-blue-500" />
+                            Completed
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Admin Notes
+                    </label>
+                    <Textarea
+                      value={adminNotes}
+                      onChange={(e) => setAdminNotes(e.target.value)}
+                      placeholder="Add internal notes about this booking..."
+                      className="min-h-[100px] resize-vertical"
+                    />
+                  </div>
+
+                  <Button
+                    onClick={updateBooking}
+                    disabled={updating}
+                    className="w-full bg-gradient-to-r from-primary to-cyan-600 hover:from-primary/90 hover:to-cyan-600/90 text-white font-semibold py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
+                    {updating ? (
+                      <div className="flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                        Updating...
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Save className="w-4 h-4" />
+                        Update Booking
+                      </div>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Quick Stats */}
+              <Card className="shadow-xl border-0 bg-gradient-to-br from-blue-50 to-indigo-100">
+                <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4">
+                  <CardTitle className="text-lg">Quick Stats</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm">
+                      <span className="text-sm font-medium text-gray-600">Duration</span>
+                      <span className="font-bold text-blue-600">7 Days</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm">
+                      <span className="text-sm font-medium text-gray-600">Accommodation</span>
+                      <span className="font-bold text-purple-600">
+                        {booking.roomType === 'room' 
+                          ? `${booking.roomNumbers.length} Room${booking.roomNumbers.length > 1 ? 's' : ''}`
+                          : `${booking.bedNumbers.length} Bed${booking.bedNumbers.length > 1 ? 's' : ''}`
+                        }
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm">
+                      <span className="text-sm font-medium text-gray-600">Total Beds</span>
+                      <span className="font-bold text-green-600">
+                        {booking.roomType === 'room' 
+                          ? booking.roomNumbers.length * 2
+                          : booking.bedNumbers.length
+                        }
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Booking Timeline */}
+              <Card className="shadow-xl border-0 bg-gradient-to-br from-purple-50 to-pink-100">
+                <CardHeader className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4">
+                  <CardTitle className="text-lg">Timeline</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4">
                   <div className="space-y-4">
                     <div className="flex items-start gap-3">
-                      <Waves className="w-5 h-5 text-primary mt-1" />
+                      <div className="w-3 h-3 bg-green-500 rounded-full mt-2"></div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Package</p>
-                        <p className="font-bold text-lg text-primary">{booking.packageTitle}</p>
-                        <p className="text-sm text-muted-foreground mt-1">{booking.packageDescription}</p>
+                        <p className="font-semibold text-sm">Booking Created</p>
+                        <p className="text-xs text-gray-500">{formatDate(booking.bookingDate)}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <MapPin className="w-4 h-4 text-primary" />
+                    
+                    <div className="flex items-start gap-3">
+                      <div className={`w-3 h-3 rounded-full mt-2 ${
+                        booking.status === 'confirmed' || booking.status === 'completed' 
+                          ? 'bg-green-500' 
+                          : 'bg-gray-300'
+                      }`}></div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Room Number</p>
-                        <p className="font-semibold">Room {booking.roomNumber}</p>
+                        <p className="font-semibold text-sm">Booking Confirmed</p>
+                        <p className="text-xs text-gray-500">
+                          {booking.status === 'confirmed' || booking.status === 'completed' 
+                            ? 'Confirmed' 
+                            : 'Pending confirmation'
+                          }
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start gap-3">
+                      <div className={`w-3 h-3 rounded-full mt-2 ${
+                        booking.status === 'completed' 
+                          ? 'bg-green-500' 
+                          : 'bg-gray-300'
+                      }`}></div>
+                      <div>
+                        <p className="font-semibold text-sm">Experience Completed</p>
+                        <p className="text-xs text-gray-500">
+                          {booking.status === 'completed' 
+                            ? 'Completed successfully' 
+                            : 'Awaiting completion'
+                          }
+                        </p>
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <Calendar className="w-4 h-4 text-green-600" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Check-in</p>
-                        <p className="font-semibold">{formatDate(booking.checkInDate)}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Calendar className="w-4 h-4 text-red-600" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Check-out</p>
-                        <p className="font-semibold">{formatDate(booking.checkOutDate)}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="mt-6 p-4 bg-background">
-                  <p className="text-center font-semibold">
-                    🏄‍♂️ 7-Day Surf Adventure Experience
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Package Features */}
-            <Card className="shadow-lg border-0 bg-card backdrop-blur-sm">
-              <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-t-lg">
-                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-                  <Star className="w-5 h-5" />
-                  Package Features
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 sm:p-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {booking.packageFeatures.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 bg-background hover:shadow-md transition-shadow">
-                      {getFeatureIcon(feature)}
-                      <span className="text-sm font-medium">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Admin Controls Sidebar */}
-          <div className="space-y-6">
-            {/* Price Summary */}
-            <Card className="shadow-lg border-0 bg-gradient-to-br from-primary to-cyan-600 text-white">
-              <CardContent className="p-6">
-                <div className="text-center mb-6">
-                  <h3 className="text-xl font-bold mb-2">Total Amount</h3>
-                  <div className="text-4xl font-bold">${booking.packagePrice}</div>
-                  <p className="text-blue-100 text-sm mt-2">7-day stay included</p>
-                </div>
-                
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between items-center border-b border-white/20 pb-2">
-                    <span>Package Price</span>
-                    <span className="font-semibold">${booking.packagePrice}</span>
-                  </div>
-                  <div className="flex justify-between items-center border-b border-white/20 pb-2">
-                    <span>Duration</span>
-                    <span className="font-semibold">7 Days</span>
-                  </div>
-                  <div className="flex justify-between items-center border-b border-white/20 pb-2">
-                    <span>Room</span>
-                    <span className="font-semibold">Room {booking.roomNumber}</span>
-                  </div>
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="font-bold">Total</span>
-                    <span className="font-bold text-lg">${booking.packagePrice}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Admin Controls */}
-            <Card className="shadow-lg border-0 bg-card backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Settings className="w-5 h-5 text-primary" />
-                  Admin Controls
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Booking Status</label>
-                  <Select value={status} onValueChange={setStatus}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="confirmed">Confirmed</SelectItem>
-                      <SelectItem value="cancelled">Cancelled</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Admin Notes</label>
-                  <Textarea
-                    value={adminNotes}
-                    onChange={(e) => setAdminNotes(e.target.value)}
-                    placeholder="Add internal notes about this booking..."
-                    rows={4}
-                    className="resize-none"
-                  />
-                </div>
-
-                <Button
-                  onClick={updateBooking}
-                  disabled={updating}
-                  className="w-full bg-gradient-to-r from-primary to-cyan-600 hover:from-primary/90 hover:to-cyan-600/90 text-white font-semibold py-3 flex items-center gap-2"
-                >
-                  {updating ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      Updating...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4" />
-                      Update Booking
-                    </>
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Quick Actions */}
-            <Card className="shadow-lg border-0 bg-card backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-lg">Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button
-                  variant="outline"
-                  className="w-full flex items-center gap-2 bg-green-600 text-white hover:bg-green-500 hover:text-white"
-                  onClick={() => setStatus('confirmed')}
-                >
-                  <CheckCircle2 className="w-4 h-4" />
-                  Confirm Booking
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full flex items-center gap-2 bg-red-600 text-white hover:bg-red-500 hover:text-white"
-                  onClick={() => setStatus('cancelled')}
-                >
-                  <XCircle className="w-4 h-4" />
-                  Cancel Booking
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-500 hover:text-white"
-                  onClick={() => setStatus('completed')}
-                >
-                  <CheckCircle2 className="w-4 h-4" />
-                  Mark Complete
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Customer Link */}
-            <Card className="shadow-lg border-0 bg-card">
-              <CardContent className="p-6 text-center">
-                <h3 className="font-bold mb-3">Customer View</h3>
-                <p className="text-sm mb-4">
-                  View this booking from customer perspective
-                </p>
-                <Link href={`/surf/${booking.bookingId}`}>
-                  <Button
-                    variant="outline"
-                    className="w-full hover:text-white flex items-center gap-2"
-                  >
-                    <User className="w-4 h-4" />
-                    Customer View
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
-
-        {/* Admin Notes Display */}
-        {booking.adminNotes && (
-          <div className="mt-8">
-            <Card className="shadow-lg border-0 bg-yellow-50 border-yellow-200">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg text-yellow-800">
-                  <AlertTriangle className="w-5 h-5" />
-                  Current Admin Notes
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-yellow-700 whitespace-pre-wrap">{booking.adminNotes}</p>
-              </CardContent>
-            </Card>
-          </div>
-        )}
       </div>
-    </div>
     </AdminLayout>
   );
 }

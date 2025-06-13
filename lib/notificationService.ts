@@ -112,24 +112,127 @@ export class NotificationService {
 
   // Helper methods for specific notification types
   static async createBookingNotification(type: 'booking_created' | 'booking_updated' | 'booking_cancelled', booking: any) {
-    const titles = {
-      booking_created: 'New Booking Created',
-      booking_updated: 'Booking Updated',
-      booking_cancelled: 'Booking Cancelled'
-    };
+    try {
+      const titles = {
+        booking_created: 'New Booking Created',
+        booking_updated: 'Booking Updated',
+        booking_cancelled: 'Booking Cancelled'
+      };
 
-    const messages = {
-      booking_created: `New booking for ${booking.customerName} - Room ${booking.roomNumber}`,
-      booking_updated: `Booking for ${booking.customerName} has been updated`,
-      booking_cancelled: `Booking for ${booking.customerName} has been cancelled`
-    };
+      // Create accommodation details string
+      const getAccommodationDetails = (booking: any) => {
+        if (booking.roomType === 'room') {
+          const roomCount = booking.roomNumbers?.length || 0;
+          const roomList = booking.roomNumbers?.join(', ') || '';
+          return roomCount > 1 
+            ? `Rooms ${roomList} (${roomCount * 2} beds total)`
+            : `Room ${roomList} (2 beds)`;
+        } else if (booking.roomType === 'dome') {
+          const bedCount = booking.bedNumbers?.length || 0;
+          const bedList = booking.bedNumbers?.join(', ') || '';
+          return bedCount > 1
+            ? `Dome - Beds ${bedList} (${bedCount} beds)`
+            : `Dome - Bed ${bedList}`;
+        }
+        return 'Unknown accommodation';
+      };
 
-    return this.createNotification({
-      type,
-      title: titles[type],
-      message: messages[type],
-      bookingId: booking._id,
-      priority: type === 'booking_created' ? 'high' : 'medium'
-    });
+      const accommodationDetails = getAccommodationDetails(booking);
+
+      const messages = {
+        booking_created: `New booking for ${booking.customerName} - ${accommodationDetails} | Check-in: ${new Date(booking.checkInDate).toLocaleDateString()} | Total: $${booking.totalPrice}`,
+        booking_updated: `Booking for ${booking.customerName} has been updated - ${accommodationDetails} | Status: ${booking.status}`,
+        booking_cancelled: `Booking for ${booking.customerName} has been cancelled - ${accommodationDetails} | Was scheduled for: ${new Date(booking.checkInDate).toLocaleDateString()}`
+      };
+
+      return this.createNotification({
+        type,
+        title: titles[type],
+        message: messages[type],
+        bookingId: booking._id,
+        priority: type === 'booking_created' ? 'high' : 'medium'
+      });
+    } catch (error) {
+      console.error('Error creating booking notification:', error);
+      throw error;
+    }
+  }
+
+  // Helper method for system notifications
+  static async createSystemNotification(title: string, message: string, priority: 'low' | 'medium' | 'high' = 'medium') {
+    try {
+      return this.createNotification({
+        type: 'system',
+        title,
+        message,
+        priority
+      });
+    } catch (error) {
+      console.error('Error creating system notification:', error);
+      throw error;
+    }
+  }
+
+  // Helper method to create notifications for booking reminders
+  static async createBookingReminder(booking: any, reminderType: 'checkin_tomorrow' | 'checkout_today' | 'overdue') {
+    try {
+      const titles = {
+        checkin_tomorrow: 'Check-in Reminder',
+        checkout_today: 'Check-out Reminder',
+        overdue: 'Overdue Booking'
+      };
+
+      const messages = {
+        checkin_tomorrow: `${booking.customerName} is checking in tomorrow - ${booking.roomType === 'room' ? `Room${booking.roomNumbers?.length > 1 ? 's' : ''} ${booking.roomNumbers?.join(', ')}` : `Dome - Bed${booking.bedNumbers?.length > 1 ? 's' : ''} ${booking.bedNumbers?.join(', ')}`}`,
+        checkout_today: `${booking.customerName} is checking out today - ${booking.roomType === 'room' ? `Room${booking.roomNumbers?.length > 1 ? 's' : ''} ${booking.roomNumbers?.join(', ')}` : `Dome - Bed${booking.bedNumbers?.length > 1 ? 's' : ''} ${booking.bedNumbers?.join(', ')}`}`,
+        overdue: `${booking.customerName}'s booking is overdue - ${booking.roomType === 'room' ? `Room${booking.roomNumbers?.length > 1 ? 's' : ''} ${booking.roomNumbers?.join(', ')}` : `Dome - Bed${booking.bedNumbers?.length > 1 ? 's' : ''} ${booking.bedNumbers?.join(', ')}`}`
+      };
+
+      return this.createNotification({
+        type: 'system',
+        title: titles[reminderType],
+        message: messages[reminderType],
+        bookingId: booking._id,
+        priority: reminderType === 'overdue' ? 'high' : 'medium'
+      });
+    } catch (error) {
+      console.error('Error creating booking reminder:', error);
+      throw error;
+    }
+  }
+
+  // Bulk operations
+  static async deleteOldNotifications(daysOld = 30) {
+    try {
+      await dbConnect();
+      
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - daysOld);
+
+      const result = await Notification.deleteMany({
+        createdAt: { $lt: cutoffDate },
+        isRead: true
+      });
+
+      return result.deletedCount;
+    } catch (error) {
+      console.error('Error deleting old notifications:', error);
+      throw error;
+    }
+  }
+
+  // Get notifications for a specific booking
+  static async getBookingNotifications(bookingId: string) {
+    try {
+      await dbConnect();
+      
+      const notifications = await Notification.find({ bookingId })
+        .sort({ createdAt: -1 });
+
+      return notifications;
+    } catch (error) {
+      console.error('Error fetching booking notifications:', error);
+      throw error;
+    }
   }
 }

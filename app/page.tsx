@@ -373,7 +373,7 @@ export default function HomePage() {
               className="order-2 lg:order-1"
             >
               <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight">
-                Welcome to <span className="text-primary">Rupa&apos;s Surf House</span>
+                Welcome to <span className="text-primary">Rupa&apos;s Surf Camp</span>
               </h2>
               <div className="space-y-6">
                 <p className="text-xl leading-relaxed">

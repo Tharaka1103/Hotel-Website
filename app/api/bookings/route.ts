@@ -40,22 +40,73 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON data' }, { status: 400 });
     }
 
-    const { packageId, customerName, customerEmail, customerPhone, checkInDate, roomNumber } = requestData;
+    const { 
+      packageId, 
+      personCount, 
+      roomType, 
+      roomNumbers = [], 
+      bedNumbers = [], 
+      customerName, 
+      customerEmail, 
+      customerPhone, 
+      checkInDate 
+    } = requestData;
 
-    console.log('Received booking data:', { packageId, customerName, customerEmail, customerPhone, checkInDate, roomNumber });
+    console.log('Received booking data:', requestData);
 
     // Validate required fields
-    if (!packageId || !customerName || !customerEmail || !customerPhone || !checkInDate || !roomNumber) {
+    if (!packageId || !personCount || !roomType || !customerName || !customerEmail || !customerPhone || !checkInDate) {
       return NextResponse.json({ 
         error: 'All fields are required',
-        received: { packageId: !!packageId, customerName: !!customerName, customerEmail: !!customerEmail, customerPhone: !!customerPhone, checkInDate: !!checkInDate, roomNumber: !!roomNumber }
+        received: { 
+          packageId: !!packageId, 
+          personCount: !!personCount, 
+          roomType: !!roomType,
+          customerName: !!customerName, 
+          customerEmail: !!customerEmail, 
+          customerPhone: !!customerPhone, 
+          checkInDate: !!checkInDate 
+        }
       }, { status: 400 });
     }
 
-    // Validate room number
-    const roomNum = Number(roomNumber);
-    if (isNaN(roomNum) || roomNum < 1 || roomNum > 5) {
-      return NextResponse.json({ error: 'Room number must be between 1 and 5' }, { status: 400 });
+    // Validate person count
+    const persons = Number(personCount);
+    if (isNaN(persons) || persons < 1 || persons > 6) {
+      return NextResponse.json({ error: 'Person count must be between 1 and 6' }, { status: 400 });
+    }
+
+    // Validate room type
+    if (!['room', 'dome'].includes(roomType)) {
+      return NextResponse.json({ error: 'Room type must be either "room" or "dome"' }, { status: 400 });
+    }
+
+    // Validate room/bed selection based on type
+    if (roomType === 'room') {
+      if (!Array.isArray(roomNumbers) || roomNumbers.length === 0) {
+        return NextResponse.json({ error: 'At least one room must be selected' }, { status: 400 });
+      }
+      // Check if rooms can accommodate all persons
+      const totalBeds = roomNumbers.length * 2;
+      if (totalBeds < persons) {
+        return NextResponse.json({ error: 'Selected rooms do not have enough beds for all persons' }, { status: 400 });
+      }
+      // Validate room numbers
+      for (const roomNum of roomNumbers) {
+        if (isNaN(Number(roomNum)) || roomNum < 1 || roomNum > 5) {
+          return NextResponse.json({ error: 'Invalid room number. Must be between 1 and 5' }, { status: 400 });
+        }
+      }
+    } else if (roomType === 'dome') {
+      if (!Array.isArray(bedNumbers) || bedNumbers.length !== persons) {
+        return NextResponse.json({ error: `Exactly ${persons} bed${persons > 1 ? 's' : ''} must be selected for dome accommodation` }, { status: 400 });
+      }
+      // Validate bed numbers
+      for (const bedNum of bedNumbers) {
+        if (isNaN(Number(bedNum)) || bedNum < 1 || bedNum > 6) {
+          return NextResponse.json({ error: 'Invalid bed number. Must be between 1 and 6' }, { status: 400 });
+        }
+      }
     }
 
     // Validate check-in date
@@ -104,56 +155,108 @@ export async function POST(request: NextRequest) {
     const checkOut = new Date(checkIn);
     checkOut.setDate(checkOut.getDate() + 7); // 7-day stay
 
-    // Check if room is available for the selected dates
-    const existingBooking = await Booking.findOne({
-      roomNumber: roomNum,
-      status: { $in: ['confirmed', 'pending'] },
-      $or: [
-        {
-          checkInDate: { $lte: checkIn },
-          checkOutDate: { $gt: checkIn }
-        },
-        {
-          checkInDate: { $lt: checkOut },
-          checkOutDate: { $gte: checkOut }
-        },
-        {
-          checkInDate: { $gte: checkIn },
-          checkOutDate: { $lte: checkOut }
-        },
-        {
-          checkInDate: { $lte: checkIn },
-          checkOutDate: { $gte: checkOut }
-        }
-      ]
-    });
+    // Check availability for rooms/beds for the selected dates
+    if (roomType === 'room') {
+      // Check room availability
+      for (const roomNum of roomNumbers) {
+        const existingBooking = await Booking.findOne({
+          roomType: 'room',
+          roomNumbers: roomNum,
+          status: { $in: ['confirmed', 'pending'] },
+          $or: [
+            {
+              checkInDate: { $lte: checkIn },
+              checkOutDate: { $gt: checkIn }
+            },
+            {
+              checkInDate: { $lt: checkOut },
+              checkOutDate: { $gte: checkOut }
+            },
+            {
+              checkInDate: { $gte: checkIn },
+              checkOutDate: { $lte: checkOut }
+            },
+            {
+              checkInDate: { $lte: checkIn },
+              checkOutDate: { $gte: checkOut }
+            }
+          ]
+        });
 
-    if (existingBooking) {
-      return NextResponse.json({ 
-        error: 'Room is not available for selected dates. Please choose a different room or date.' 
-      }, { status: 400 });
+        if (existingBooking) {
+          return NextResponse.json({ 
+            error: `Room ${roomNum} is not available for selected dates. Please choose different rooms or dates.` 
+          }, { status: 400 });
+        }
+      }
+    } else if (roomType === 'dome') {
+      // Check bed availability in dome
+      for (const bedNum of bedNumbers) {
+        const existingBooking = await Booking.findOne({
+          roomType: 'dome',
+          bedNumbers: bedNum,
+          status: { $in: ['confirmed', 'pending'] },
+          $or: [
+            {
+              checkInDate: { $lte: checkIn },
+              checkOutDate: { $gt: checkIn }
+            },
+            {
+              checkInDate: { $lt: checkOut },
+              checkOutDate: { $gte: checkOut }
+            },
+            {
+              checkInDate: { $gte: checkIn },
+              checkOutDate: { $lte: checkOut }
+            },
+            {
+              checkInDate: { $lte: checkIn },
+              checkOutDate: { $gte: checkOut }
+            }
+          ]
+        });
+
+        if (existingBooking) {
+          return NextResponse.json({ 
+            error: `Bed ${bedNum} in dome is not available for selected dates. Please choose different beds or dates.` 
+          }, { status: 400 });
+        }
+      }
     }
 
     // Generate unique booking ID
     const bookingId = `SP${Date.now()}${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
 
-    // Create booking
-    const booking = await Booking.create({
+    // Calculate total price
+    const pricePerPerson = packageDetails.price;
+    const totalPrice = pricePerPerson * persons;
+
+    // Create booking with proper field names
+    const bookingData = {
       bookingId,
       packageId,
-      roomNumber: roomNum,
+      personCount: persons,
+      roomType,
+      roomNumbers: roomType === 'room' ? roomNumbers : [],
+      bedNumbers: roomType === 'dome' ? bedNumbers : [],
       customerName: customerName.trim(),
       customerEmail: customerEmail.toLowerCase().trim(),
       customerPhone: cleanPhone,
       checkInDate: checkIn,
       checkOutDate: checkOut,
-      totalPrice: packageDetails.price,
+      pricePerPerson,
+      totalPrice,
       status: 'pending',
       bookingDate: new Date(),
       adminNotes: '',
       createdAt: new Date(),
       updatedAt: new Date()
-    });
+    };
+
+    console.log('Creating booking with data:', bookingData);
+
+    // Create booking
+    const booking = await Booking.create(bookingData);
 
     // Populate the booking with package details
     const populatedBooking = await Booking.findById(booking._id).populate('packageId');
@@ -181,6 +284,15 @@ export async function POST(request: NextRequest) {
     if (error.code === 11000) {
       return NextResponse.json({ 
         error: 'A booking with this information already exists' 
+      }, { status: 400 });
+    }
+
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map((err: any) => err.message);
+      return NextResponse.json({ 
+        error: 'Validation failed',
+        details: validationErrors
       }, { status: 400 });
     }
 

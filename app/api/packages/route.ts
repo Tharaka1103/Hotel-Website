@@ -30,7 +30,8 @@ export async function POST(request: NextRequest) {
       title,
       description,
       features,
-      price: Number(price)
+      price: Number(price), // Price per person
+      pricePerPerson: Number(price) // Explicitly store as per person price
     });
 
     return NextResponse.json({ package: packageData }, { status: 201 });
