@@ -1103,7 +1103,7 @@ export default function HomePage() {
       </section>
       
       {/* Popular Package Section */}
-      <section className="py-16 md:px-5 bg-white">
+      <section className="py-16 md:px-5 px-5 bg-white">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1261,8 +1261,8 @@ export default function HomePage() {
             >
               <div className="space-y-8 bg-white/95 backdrop-blur-sm rounded-3xl p-4 shadow-xl">
                 <div className="">
-                  <div className="flex items-center gap-6 overflow-x-auto pb-4">
-                    <div className="gap-6 flex flex-col pl-5">
+                  <div className="flex flex-col md:flex-row items-center gap-6 overflow-x-auto pb-4">
+                    <div className="gap-6 flex flex-col w-full md:w-auto md:pl-5">
                       <motion.p 
                         initial={{ opacity: 0, x: -30 }}
                         whileInView={{ opacity: 1, x: 0 }}
@@ -1277,7 +1277,7 @@ export default function HomePage() {
                         initial="initial"
                         whileInView="animate"
                         viewport={{ once: true }}
-                        className="flex flex-row gap-6 flex-wrap justify-center"
+                        className="flex flex-row gap-4 md:gap-6 flex-wrap justify-center px-2 md:px-0"
                       >
                         {[
                           { icon: "/icons/wifi.png", text: "HIGH SPEED Wi-Fi", description: "Stay connected with our high-speed internet access throughout your stay", type: "Free Services" },
@@ -1294,7 +1294,7 @@ export default function HomePage() {
                             className="perspective-1000"
                           >
                             <motion.div
-                              className="relative w-24 h-32 cursor-pointer"
+                              className="relative w-20 md:w-24 h-28 md:h-32 cursor-pointer"
                               initial={false}
                               whileHover={{ rotateY: 180, scale: 1.05 }}
                               style={{ transformStyle: "preserve-3d" }}
@@ -1308,7 +1308,7 @@ export default function HomePage() {
                                 <motion.div 
                                   whileHover={{ rotate: 360 }}
                                   transition={{ duration: 0.8 }}
-                                  className="relative w-16 h-16 mb-2"
+                                  className="relative w-12 md:w-16 h-12 md:h-16 mb-2"
                                 >
                                   <Image
                                     src={service.icon}
@@ -1317,7 +1317,7 @@ export default function HomePage() {
                                     className="object-contain"
                                   />
                                 </motion.div>
-                                <span className="text-sm font-semibold text-gray-700 text-center">{service.text}</span>
+                                <span className="text-xs md:text-sm font-semibold text-gray-700 text-center">{service.text}</span>
                               </motion.div>
                               
                               {/* Back of card */}
@@ -1325,14 +1325,14 @@ export default function HomePage() {
                                 className="absolute w-full h-full p-2 bg-primary/10 rounded-lg flex items-center justify-center backface-hidden"
                                 style={{ transform: "rotateY(180deg)" }}
                               >
-                                <p className="text-xs text-gray-700 text-center">{service.description}</p>
+                                <p className="text-[10px] md:text-xs text-gray-700 text-center">{service.description}</p>
                               </div>
                             </motion.div>
                           </motion.div>
                         ))}
                       </motion.div>
                     </div>
-                    <div className="gap-6 flex flex-col pl-5">
+                    <div className="gap-6 flex flex-col w-full md:w-auto md:pl-5 mt-8 md:mt-0">
                       <motion.p 
                         initial={{ opacity: 0, x: 30 }}
                         whileInView={{ opacity: 1, x: 0 }}
@@ -1347,7 +1347,7 @@ export default function HomePage() {
                         initial="initial"
                         whileInView="animate"
                         viewport={{ once: true }}
-                        className="flex flex-row gap-6 border-l-2 border-primary pl-10 flex-wrap justify-center"
+                        className="flex flex-row gap-4 md:gap-6 border-t-2 md:border-t-0 md:border-l-2 border-primary pt-6 md:pt-0 md:pl-10 flex-wrap justify-center px-2 md:px-0"
                       >
                         {[
                           { icon: "/icons/car.png", text: "AIRPORT PICKUP & DROPOFF", description: "Convenient door-to-door transfer service from and to the airport", type: "Extra Services" },
@@ -1359,7 +1359,7 @@ export default function HomePage() {
                             className="perspective-1000"
                           >
                             <motion.div
-                              className="relative w-24 h-32 cursor-pointer"
+                              className="relative w-20 md:w-24 h-28 md:h-32 cursor-pointer"
                               initial={false}
                               whileHover={{ rotateY: 180, scale: 1.05 }}
                               style={{ transformStyle: "preserve-3d" }}
@@ -1373,7 +1373,7 @@ export default function HomePage() {
                                 <motion.div 
                                   whileHover={{ rotate: 360 }}
                                   transition={{ duration: 0.8 }}
-                                  className="relative w-16 h-16 mb-2"
+                                  className="relative w-12 md:w-16 h-12 md:h-16 mb-2"
                                 >
                                   <Image
                                     src={service.icon}
@@ -1382,7 +1382,7 @@ export default function HomePage() {
                                     className="object-contain"
                                   />
                                 </motion.div>
-                                <span className="text-sm font-semibold text-gray-700 text-center">{service.text}</span>
+                                <span className="text-xs md:text-sm font-semibold text-gray-700 text-center">{service.text}</span>
                               </motion.div>
                               
                               {/* Back of card */}
@@ -1390,7 +1390,7 @@ export default function HomePage() {
                                 className="absolute w-full h-full p-2 bg-primary/10 rounded-lg flex items-center justify-center backface-hidden"
                                 style={{ transform: "rotateY(180deg)" }}
                               >
-                                <p className="text-xs text-gray-700 text-center">{service.description}</p>
+                                <p className="text-[10px] md:text-xs text-gray-700 text-center">{service.description}</p>
                               </div>
                             </motion.div>
                           </motion.div>
