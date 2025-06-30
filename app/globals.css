@@ -7,8 +7,7 @@ html, body {
   min-height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  font-family: 'Josefin Slab', serif;
-  font-weight: 600;
+  font-family: 'montserrat', serif;
 }
 
 h1, h2 {
@@ -17,6 +16,10 @@ h1, h2 {
 
 .customtext{
     font-family: 'tanMeringue', sans-serif;
+    font-weight: 1000;
+}
+.tanHeading{
+    font-family: 'tanHeading', sans-serif;
     font-weight: 1000;
 }
 .custom-scrollbar::-webkit-scrollbar {
@@ -61,7 +64,7 @@ h1, h2 {
     --text-foreground: #1c1c1c;
     --popover: #FFFFFF;
     --popover-foreground: #0A0A0B;
-    --primary: #009387;
+    --primary: #2fa6ab;
     --primary-foreground: #FFF1F2;
     --secondary: #F4F4F5;
     --secondary-foreground: #18181B;
@@ -89,7 +92,7 @@ h1, h2 {
     --sidebar-border: #E5E7EB;
     --sidebar-ring: #3B82F6;
   }
-
+/*
   .dark {
     --background: #141414;
     --foreground: #F2F2F2;
@@ -126,7 +129,7 @@ h1, h2 {
     --sidebar-accent-foreground: #F4F4F5;
     --sidebar-border: #27272A;
     --sidebar-ring: #3B82F6;
-  }
+  }*/
 }
 
 @layer base {

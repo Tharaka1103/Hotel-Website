@@ -3,7 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from './Components/ThemeProvider'
 import Header from "./Components/Header";
 import Footer from './Components/Footer'
-import { Poiret_One, Berkshire_Swash, Josefin_Slab } from 'next/font/google'
+import { Poiret_One, Berkshire_Swash, Montserrat } from 'next/font/google'
 import localFont from 'next/font/local'
 import ConditionalLayout from './Components/ConditionalLayout'
 
@@ -13,10 +13,10 @@ const poiret0ne = Poiret_One({
   variable: '--font-poiret-one',
 })
 
-const josefinSlab = Josefin_Slab({
+const montserrat = Montserrat({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
-  variable: '--font-josefin-slab',
+  variable: '--font-montserrat',
 })
 
 const tanMeringue = localFont({
@@ -35,7 +35,22 @@ const tanMeringue = localFont({
   variable: '--font-tan-meringue',
   display: 'swap',
 })
-
+const tanHeading = localFont({
+  src: [
+    {
+      path: './fonts/TANHEADLINE-Regular.otf',
+      weight: '700',
+      style: 'normal',
+    },
+    {
+      path: './fonts/TANHEADLINE-Regular.ttf',
+      weight: '900',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-tan-heading',
+  display: 'swap',
+})
 export const metadata: Metadata = {
   title: "Rupa's Serf - Hotel & Resort",
   description: "Experience luxury and comfort at our oceanfront hotel with world-class amenities",
@@ -48,7 +63,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${poiret0ne.variable} ${josefinSlab.variable} ${tanMeringue.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${poiret0ne.variable} ${montserrat.variable} ${tanMeringue.variable} ${tanHeading.variable}`}>
       <body className="min-h-screen">
         <ThemeProvider>
           <ConditionalLayout>

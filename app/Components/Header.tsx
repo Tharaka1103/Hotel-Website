@@ -7,13 +7,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ThemeSwitch } from "./ThemeSwitch";
 // Navigation links
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/surf", label: "Packages" },
   { href: "/gallery", label: "Gallery" },
-  { href: "/about", label: "About Us" },
 ];
 
 export const Header = () => {
@@ -61,7 +59,6 @@ export const Header = () => {
                   priority
                 />
               </div>
-              
             </div>
           </Link>
           
@@ -85,7 +82,6 @@ export const Header = () => {
           
           {/* Call to Action Button and Theme Switch */}
           <div className="hidden md:flex items-center space-x-4">
-            <ThemeSwitch />
             <Link href="/contact" className="text-xl font-medium">
               <Button 
                 className={cn(
@@ -102,7 +98,6 @@ export const Header = () => {
           
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center space-x-4">
-            <ThemeSwitch />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu"
