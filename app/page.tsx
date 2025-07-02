@@ -125,11 +125,11 @@ interface Package {
 }
 
 // Scroll-based Floating Image Component
-const FloatingScrollImage = ({ 
-  src, 
-  alt, 
-  className = "", 
-  scrollRange = [0, 1], 
+const FloatingScrollImage = ({
+  src,
+  alt,
+  className = "",
+  scrollRange = [0, 1],
   yRange = [0, -100],
   xRange = [0, 0],
   rotateRange = [0, 0],
@@ -169,11 +169,14 @@ const FloatingScrollImage = ({
     </motion.div>
   );
 };
-
 // Image Slider Component
 const ImageSlider = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
 
   // Image data with titles and descriptions
   const images = [
@@ -216,148 +219,283 @@ const ImageSlider = () => {
 
   // Auto-play functionality
   useEffect(() => {
-    if (isAutoPlaying) {
+    if (isAutoPlaying && !isDragging) {
       const interval = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % images.length);
-      }, 4000);
+      }, 5000);
       return () => clearInterval(interval);
     }
-  }, [isAutoPlaying, images.length]);
+  }, [isAutoPlaying, isDragging, images.length]);
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % images.length);
     setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 3000);
   };
 
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
     setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 3000);
   };
 
   const goToSlide = (index: number) => {
     setCurrentIndex(index);
     setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 3000);
   };
 
+  // Enhanced touch handlers for smooth swipe functionality
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+    setIsDragging(true);
+    setIsAutoPlaying(false);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (!touchStart) return;
+
+    const currentTouch = e.targetTouches[0].clientX;
+    const diff = touchStart - currentTouch;
+
+    setTouchEnd(currentTouch);
+    setDragOffset(diff);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) {
+      setIsDragging(false);
+      setDragOffset(0);
+      setTimeout(() => setIsAutoPlaying(true), 1000);
+      return;
+    }
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      nextSlide();
+    } else if (isRightSwipe) {
+      prevSlide();
+    }
+
+    setIsDragging(false);
+    setDragOffset(0);
+    setTimeout(() => setIsAutoPlaying(true), 1000);
+  };
+
+  // Mouse events for desktop drag support
+  const onMouseDown = (e: React.MouseEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.clientX);
+    setIsDragging(true);
+    setIsAutoPlaying(false);
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!touchStart || !isDragging) return;
+
+    const diff = touchStart - e.clientX;
+    setTouchEnd(e.clientX);
+    setDragOffset(diff);
+  };
+
+  const onMouseUp = () => {
+    if (!touchStart || !touchEnd) {
+      setIsDragging(false);
+      setDragOffset(0);
+      setTimeout(() => setIsAutoPlaying(true), 1000);
+      return;
+    }
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      nextSlide();
+    } else if (isRightSwipe) {
+      prevSlide();
+    }
+
+    setIsDragging(false);
+    setDragOffset(0);
+    setTimeout(() => setIsAutoPlaying(true), 1000);
+  };
+
+  const getPrevIndex = () => (currentIndex - 1 + images.length) % images.length;
+  const getNextIndex = () => (currentIndex + 1) % images.length;
+
   return (
-    <div className="relative w-full max-w-7xl mx-auto">
+    <div className="relative w-full max-w-7xl mx-auto px-4">
       {/* Main Slider Container */}
-      <div className="relative h-[300px] md:h-[500px] lg:h-[600px] overflow-hidden">
-        <div className="flex items-center justify-center h-full">
-          {images.map((image, index) => {
-            const isActive = index === currentIndex;
-            const isPrev = index === (currentIndex - 1 + images.length) % images.length;
-            const isNext = index === (currentIndex + 1) % images.length;
-            const isVisible = isActive || isPrev || isNext;
+      <div
+        className="relative overflow-hidden cursor-grab active:cursor-grabbing"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+        onMouseLeave={onMouseUp}
+        onMouseEnter={() => !isDragging && setIsAutoPlaying(false)}
+        onMouseOut={() => !isDragging && setIsAutoPlaying(true)}
+      >
+        <div
+          className="flex items-center justify-center relative transition-transform duration-300 ease-out"
+          style={{
+            transform: isDragging ? `translateX(-${dragOffset * 0.5}px)` : 'translateX(0)',
+          }}
+        >
 
-            if (!isVisible) return null;
-
-            return (
-              <motion.div
-                key={index}
-                className={`absolute transition-all duration-700 ease-in-out cursor-pointer ${
-                  isActive 
-                    ? 'z-30 scale-100 opacity-100' 
-                    : isPrev 
-                    ? 'z-20 scale-[0.6] sm:scale-[0.65] md:scale-75 opacity-40 -translate-x-16 sm:-translate-x-24 md:-translate-x-48 lg:-translate-x-64' 
-                    : isNext 
-                    ? 'z-20 scale-[0.6] sm:scale-[0.65] md:scale-75 opacity-40 translate-x-16 sm:translate-x-24 md:translate-x-48 lg:translate-x-64'
-                    : 'z-10 scale-50 opacity-0'
-                }`}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ 
-                  opacity: isActive ? 1 : isVisible ? 0.4 : 0,
-                  scale: isActive ? 1 : isVisible ? 0.75 : 0.5,
-                  x: isNext ? 250 : isPrev ? -250 : 0
-                }}
-                transition={{ duration: 0.7, ease: "easeInOut" }}
-                onClick={() => !isActive && goToSlide(index)}
-                onMouseEnter={() => setIsAutoPlaying(false)}
-                onMouseLeave={() => setIsAutoPlaying(true)}
-              >
-                <div className={`relative rounded-2xl overflow-hidden shadow-2xl group ${
-                  isActive 
-                    ? 'w-[280px] h-[180px] sm:w-[320px] sm:h-[220px] md:w-[500px] md:h-[400px] lg:w-[600px] lg:h-[400px] xl:w-[700px] xl:h-[450px]' 
-                    : 'w-[200px] h-[120px] sm:w-[250px] sm:h-[160px] md:w-[400px] md:h-[300px] lg:w-[500px] lg:h-[350px] xl:w-[600px] xl:h-[400px]'
-                }`}>
-                  <Image
-                    src={image.src}
-                    alt={image.title}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    priority={index < 3}
-                  />
-                  
-                  {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                  
-                  {/* Content Overlay - Only show on active image */}
-                  {isActive && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3, duration: 0.5 }}
-                      className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 md:p-6 text-white"
-                    >
-                      <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-1 sm:mb-2 drop-shadow-lg">
-                        {image.title}
-                      </h3>
-                      <p className="text-xs sm:text-sm md:text-base text-gray-200 drop-shadow line-clamp-2 md:line-clamp-none">
-                        {image.description}
-                      </p>
-                    </motion.div>
-                  )}
-                  
-                  {/* Hover Effect for Non-Active Images */}
-                  {!isActive && (
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 sm:p-3">
-                        <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6 text-primary" />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-
-        {/* Navigation Buttons */}
-        <div className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-40">
-          <Button
+          {/* Previous Image - Left Side */}
+          <div
+            className="absolute left-0 md:left-8 lg:left-16 z-10 cursor-pointer transform transition-all duration-300 ease-out hover:scale-105 select-none"
             onClick={prevSlide}
-            size="icon"
-            variant="outline"
-            className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full bg-white/90 backdrop-blur-sm border-2 hover:bg-primary hover:text-white transition-all duration-300 shadow-lg"
           >
-            <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-          </Button>
-        </div>
-        
-        <div className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-40">
-          <Button
+            <div className="relative w-[120px] h-[180px] md:w-[200px] md:h-[280px] lg:w-[250px] lg:h-[350px] rounded-2xl overflow-hidden shadow-xl opacity-70 hover:opacity-90 transition-all duration-300">
+              <Image
+                src={images[getPrevIndex()].src}
+                alt={images[getPrevIndex()].title}
+                fill
+                className="object-cover transition-transform duration-300"
+                draggable={false}
+              />
+              <div className="absolute inset-0 bg-black/20" />
+
+              {/* Overlay Icon */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+                  <ChevronLeft className="w-6 h-6 text-primary" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Current Image - Center */}
+          <div className="relative z-20">
+            <div
+              className="relative w-[280px] h-[210px] md:w-[400px] md:h-[300px] lg:w-[500px] lg:h-[375px] xl:w-[600px] xl:h-[450px] rounded-3xl overflow-hidden shadow-2xl transition-all duration-300 ease-out"
+              style={{
+                transform: isDragging ? `scale(0.98)` : 'scale(1)',
+              }}
+            >
+              <Image
+                src={images[currentIndex].src}
+                alt={images[currentIndex].title}
+                fill
+                className="object-cover transition-all duration-500 ease-out"
+                priority
+                draggable={false}
+              />
+
+              {/* Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+
+              {/* Content Overlay */}
+              <div
+                className="absolute bottom-0 left-0 right-0 p-4 md:p-6 lg:p-8 text-white transition-all duration-300"
+                style={{
+                  opacity: isDragging ? 0.7 : 1,
+                }}
+              >
+                <p className="text-sm md:text-base lg:text-lg text-gray-200 drop-shadow leading-relaxed">
+                  {images[currentIndex].description}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Next Image - Right Side */}
+          <div
+            className="absolute right-0 md:right-8 lg:right-16 z-10 cursor-pointer transform transition-all duration-300 ease-out hover:scale-105 select-none"
             onClick={nextSlide}
-            size="icon"
-            variant="outline"
-            className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full bg-white/90 backdrop-blur-sm border-2 hover:bg-primary hover:text-white transition-all duration-300 shadow-lg"
           >
-            <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-          </Button>
+            <div className="relative w-[120px] h-[180px] md:w-[200px] md:h-[280px] lg:w-[250px] lg:h-[350px] rounded-2xl overflow-hidden shadow-xl opacity-70 hover:opacity-90 transition-all duration-300">
+              <Image
+                src={images[getNextIndex()].src}
+                alt={images[getNextIndex()].title}
+                fill
+                className="object-cover transition-transform duration-300"
+                draggable={false}
+              />
+              <div className="absolute inset-0 bg-black/20" />
+
+              {/* Overlay Icon */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+                  <ChevronRight className="w-6 h-6 text-primary" />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Dots Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-3 z-40">
-          {images.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === currentIndex 
-                  ? 'bg-primary scale-125 shadow-lg' 
-                  : 'bg-white/50 hover:bg-white/80'
+        {/* Navigation Buttons - Desktop Only */}
+        <div className="hidden md:block">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 z-30">
+            <Button
+              onClick={prevSlide}
+              size="icon"
+              variant="outline"
+              className="w-12 h-12 lg:w-14 lg:h-14 rounded-full bg-white/95 backdrop-blur-sm border-2 hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              <ChevronLeft className="w-5 h-5 lg:w-6 lg:h-6" />
+            </Button>
+          </div>
+
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 z-30">
+            <Button
+              onClick={nextSlide}
+              size="icon"
+              variant="outline"
+              className="w-12 h-12 lg:w-14 lg:h-14 rounded-full bg-white/95 backdrop-blur-sm border-2 hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              <ChevronRight className="w-5 h-5 lg:w-6 lg:h-6" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Drag Progress Indicator */}
+        {isDragging && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30">
+            <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg">
+              <span className="text-xs font-medium text-gray-700">
+                {dragOffset > minSwipeDistance ? '← Next' : dragOffset < -minSwipeDistance ? 'Prev →' : 'Swipe'}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Dots Indicator */}
+      <div className="flex justify-center space-x-3 mt-8">
+        {images.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => goToSlide(index)}
+            className={`transition-all duration-300 rounded-full ${index === currentIndex
+              ? 'w-8 h-3 bg-primary shadow-lg'
+              : 'w-3 h-3 bg-gray-300 hover:bg-gray-400'
               }`}
-            />
-          ))}
+          />
+        ))}
+      </div>
+
+      {/* Mobile Swipe Indicator - Enhanced */}
+      <div className="md:hidden text-center mt-4">
+        <div className="flex items-center justify-center gap-3 bg-gray-50/80 backdrop-blur-sm rounded-full px-4 py-2 mx-auto w-fit">
+          <div className="flex items-center gap-1 text-gray-600">
+            <ChevronLeft className="w-4 h-4" />
+            <span className="text-sm font-medium">Swipe</span>
+            <ChevronRight className="w-4 h-4" />
+          </div>
+          <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+          <span className="text-xs text-gray-500">Tap sides to navigate</span>
         </div>
       </div>
     </div>
@@ -365,12 +503,13 @@ const ImageSlider = () => {
 };
 
 
+
 // Enhanced Video Hero Section with Floating Images
 const VideoHero = ({ children }: { children: React.ReactNode }) => {
   const [isPlaying, setIsPlaying] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { scrollY } = useScroll();
-  
+
   const togglePlay = () => {
     if (videoRef.current) {
       if (isPlaying) {
@@ -396,7 +535,7 @@ const VideoHero = ({ children }: { children: React.ReactNode }) => {
         Your browser does not support the video tag.
       </video>
       <div className="absolute inset-0 bg-black/40" />
-      
+
       {/* Floating Surfboard - Large and Prominent */}
       <FloatingScrollImage
         src="/images/surfboard.png"
@@ -408,7 +547,7 @@ const VideoHero = ({ children }: { children: React.ReactNode }) => {
         scaleRange={[1, 1.2]}
         opacityRange={[0.8, 1]}
       />
-      
+
       {/* Floating Leaf 1 - Top Left */}
       <FloatingScrollImage
         src="/images/leaf1.png"
@@ -421,7 +560,7 @@ const VideoHero = ({ children }: { children: React.ReactNode }) => {
         scaleRange={[1, 1.1]}
         opacityRange={[0.7, 1]}
       />
-      
+
       {/* Content in front of video */}
       <div className="absolute inset-0 flex items-center justify-center z-40">
         <div className="container mx-auto px-4">
@@ -433,18 +572,18 @@ const VideoHero = ({ children }: { children: React.ReactNode }) => {
 };
 
 // Video Section Component for About Us and Invite sections
-const VideoSection = ({ 
-  videoSrc, 
-  children, 
-  className = "" 
-}: { 
-  videoSrc: string; 
-  children: React.ReactNode; 
-  className?: string; 
+const VideoSection = ({
+  videoSrc,
+  children,
+  className = ""
+}: {
+  videoSrc: string;
+  children: React.ReactNode;
+  className?: string;
 }) => {
   const [isPlaying, setIsPlaying] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
-  
+
   const togglePlay = () => {
     if (videoRef.current) {
       if (isPlaying) {
@@ -470,16 +609,16 @@ const VideoSection = ({
         Your browser does not support the video tag.
       </video>
       <div className="absolute inset-0 bg-black/20" />
-      
+
       {/* Content overlay */}
       {children}
-      
+
       {/* Video controls */}
       <div className="absolute bottom-4 right-4 z-10">
-        <Button 
-          onClick={togglePlay} 
-          size="icon" 
-          variant="outline" 
+        <Button
+          onClick={togglePlay}
+          size="icon"
+          variant="outline"
           className="rounded-full border border-white/30 bg-black/20 backdrop-blur-md hover:bg-black/40"
         >
           {isPlaying ? <Pause className="h-4 w-4 text-white" /> : <Play className="h-4 w-4 text-white" />}
@@ -517,11 +656,11 @@ const highlights = [
 ]
 
 // Simplified Testimonial Card with Enhanced Animation
-const TestimonialCard = ({ name, location, rating, text }: { 
-  name: string, 
-  location: string, 
-  rating: number, 
-  text: string 
+const TestimonialCard = ({ name, location, rating, text }: {
+  name: string,
+  location: string,
+  rating: number,
+  text: string
 }) => (
   <motion.div
     whileHover={{ y: -10, scale: 1.02 }}
@@ -529,14 +668,14 @@ const TestimonialCard = ({ name, location, rating, text }: {
   >
     <Card className="bg-card border-none shadow-xl hover:shadow-2xl transition-shadow duration-300 rounded-2xl h-full overflow-hidden">
       <CardHeader className="pb-2">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
           className="flex items-center gap-4"
         >
-          <motion.div 
+          <motion.div
             whileHover={{ scale: 1.1, rotate: 360 }}
             transition={{ duration: 0.3 }}
             className="h-14 w-14 rounded-full overflow-hidden border-2 border-blue-200 shadow bg-blue-100 flex items-center justify-center"
@@ -550,7 +689,7 @@ const TestimonialCard = ({ name, location, rating, text }: {
         </motion.div>
       </CardHeader>
       <CardContent>
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: -20 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
@@ -570,7 +709,7 @@ const TestimonialCard = ({ name, location, rating, text }: {
             </motion.div>
           ))}
         </motion.div>
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -587,46 +726,46 @@ const TestimonialCard = ({ name, location, rating, text }: {
 // Feature icon helper function
 const getFeatureIcon = (feature: string) => {
   const lowerFeature = feature.toLowerCase();
-  
-  if (lowerFeature.includes('wifi') || lowerFeature.includes('internet')) 
+
+  if (lowerFeature.includes('wifi') || lowerFeature.includes('internet'))
     return <Wifi className="w-4 h-4 text-blue-500" />;
-  if (lowerFeature.includes('parking') || lowerFeature.includes('car')) 
+  if (lowerFeature.includes('parking') || lowerFeature.includes('car'))
     return <Car className="w-4 h-4 text-lime-600" />;
-  if (lowerFeature.includes('breakfast') || lowerFeature.includes('coffee')) 
+  if (lowerFeature.includes('breakfast') || lowerFeature.includes('coffee'))
     return <Coffee className="w-4 h-4 text-amber-600" />;
-  if (lowerFeature.includes('restaurant') || lowerFeature.includes('dining')) 
+  if (lowerFeature.includes('restaurant') || lowerFeature.includes('dining'))
     return <Utensils className="w-4 h-4 text-green-600" />;
-  if (lowerFeature.includes('gym') || lowerFeature.includes('fitness')) 
+  if (lowerFeature.includes('gym') || lowerFeature.includes('fitness'))
     return <Dumbbell className="w-4 h-4 text-red-500" />;
-  if (lowerFeature.includes('sunrise') || lowerFeature.includes('morning')) 
+  if (lowerFeature.includes('sunrise') || lowerFeature.includes('morning'))
     return <Sunrise className="w-4 h-4 text-orange-500" />;
-  if (lowerFeature.includes('sunset') || lowerFeature.includes('evening')) 
+  if (lowerFeature.includes('sunset') || lowerFeature.includes('evening'))
     return <Sunset className="w-4 h-4 text-purple-500" />;
-  if (lowerFeature.includes('photo') || lowerFeature.includes('camera')) 
+  if (lowerFeature.includes('photo') || lowerFeature.includes('camera'))
     return <Camera className="w-4 h-4 text-pink-500" />;
-  if (lowerFeature.includes('mountain') || lowerFeature.includes('hiking')) 
+  if (lowerFeature.includes('mountain') || lowerFeature.includes('hiking'))
     return <Mountain className="w-4 h-4 text-stone-600" />;
-  if (lowerFeature.includes('forest') || lowerFeature.includes('nature')) 
+  if (lowerFeature.includes('forest') || lowerFeature.includes('nature'))
     return <TreePine className="w-4 h-4 text-green-700" />;
-  if (lowerFeature.includes('fishing') || lowerFeature.includes('fish')) 
+  if (lowerFeature.includes('fishing') || lowerFeature.includes('fish'))
     return <Fish className="w-4 h-4 text-blue-600" />;
-  if (lowerFeature.includes('game') || lowerFeature.includes('entertainment')) 
+  if (lowerFeature.includes('game') || lowerFeature.includes('entertainment'))
     return <Gamepad2 className="w-4 h-4 text-indigo-500" />;
-  if (lowerFeature.includes('music') || lowerFeature.includes('sound')) 
+  if (lowerFeature.includes('music') || lowerFeature.includes('sound'))
     return <Music className="w-4 h-4 text-violet-500" />;
-  if (lowerFeature.includes('security') || lowerFeature.includes('safe')) 
+  if (lowerFeature.includes('security') || lowerFeature.includes('safe'))
     return <Shield className="w-4 h-4 text-emerald-600" />;
-  if (lowerFeature.includes('24') || lowerFeature.includes('hour')) 
+  if (lowerFeature.includes('24') || lowerFeature.includes('hour'))
     return <Clock className="w-4 h-4 text-slate-600" />;
   if (lowerFeature.includes('spa') || lowerFeature.includes('wellness'))
     return <Heart className="w-4 h-4 text-rose-500" />;
-  if (lowerFeature.includes('energy') || lowerFeature.includes('power')) 
+  if (lowerFeature.includes('energy') || lowerFeature.includes('power'))
     return <Zap className="w-4 h-4 text-yellow-500" />;
-  if (lowerFeature.includes('gift') || lowerFeature.includes('bonus')) 
+  if (lowerFeature.includes('gift') || lowerFeature.includes('bonus'))
     return <Gift className="w-4 h-4 text-teal-500" />;
-  if (lowerFeature.includes('beach') || lowerFeature.includes('ocean') || lowerFeature.includes('surf')) 
+  if (lowerFeature.includes('beach') || lowerFeature.includes('ocean') || lowerFeature.includes('surf'))
     return <Waves className="w-4 h-4 text-cyan-500" />;
-  
+
   return <CheckCircle2 className="w-4 h-4 text-primary" />;
 };
 
@@ -704,7 +843,7 @@ export default function HomePage() {
                   whileHover={{ scale: 1.05, y: -5 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Button 
+                  <Button
                     size="lg"
                     className="text-lg md:text-xl bg-transparent border-2 border-white text-white px-8 py-4 rounded-full shadow-xl hover:bg-primary hover:border-primary hover:text-white transition-all duration-300 relative overflow-hidden group"
                   >
@@ -723,7 +862,7 @@ export default function HomePage() {
         </VideoHero>
 
         {/* Bottom Info Bar */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2, duration: 0.6 }}
@@ -731,7 +870,7 @@ export default function HomePage() {
         >
           <div className="container mx-auto px-4 py-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 1.4, duration: 0.5 }}
@@ -742,17 +881,17 @@ export default function HomePage() {
                 </div>
                 <p className="text-sm md:text-base text-black/90">Rich wildlife, deep-rooted Sri Lankan culture and breath-taking scenery, it's more than a surfing description - it's a once-in-a-lifetime experience.</p>
               </motion.div>
-              
+
               <div className="hidden md:flex items-center justify-center md:col-span-0.1">
-                <motion.button 
+                <motion.button
                   whileHover={{ scale: 1.1, rotate: 180 }}
                   className="p-2 rounded-full hover:bg-gray-100 transition-colors"
                 >
                   <X className="w-6 h-6 text-black hover:text-primary transition-colors cursor-pointer" />
                 </motion.button>
               </div>
-              
-              <motion.div 
+
+              <motion.div
                 initial={{ opacity: 0, x: 30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 1.6, duration: 0.5 }}
@@ -765,7 +904,7 @@ export default function HomePage() {
               </motion.div>
             </div>
           </div>
-        </motion.div>      
+        </motion.div>
       </section>
 
       {/* About Us Section with Video and Floating Leaf */}
@@ -780,7 +919,7 @@ export default function HomePage() {
               transition={{ duration: 0.8 }}
               className="order-2 lg:order-1"
             >
-              <motion.h2 
+              <motion.h2
                 initial={{ opacity: 0, x: -30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -790,7 +929,7 @@ export default function HomePage() {
                 Welcome to <span className="text-primary">Rupa&apos;s Surf Camp</span>
               </motion.h2>
               <div className="space-y-6 text-justify">
-                <motion.p 
+                <motion.p
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -799,14 +938,14 @@ export default function HomePage() {
                 >
                   Rupa&apos;s Surf Camp, part of the legendary Rupa&apos;s Hotel, has been a trusted home for surfers since 1978 — making it one of the very first surf stays in Arugam Bay. we&apos;re proud to continue offering a laid-back, welcoming space for everyone chasing waves and good vibes.
                 </motion.p>
-                <motion.p 
+                <motion.p
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.6, duration: 0.6 }}
                   className="text-xl leading-relaxed"
                 >
-                  We&apos;re located right in front of Arugam Bay&apos;s Baby Point — one of the best spots for beginners to catch their first waves. Whether you&apos;re just learning or ready to explore more challenging reef breaks, our local certified pro surf instructors are friendly, experienced, and stoked to show you the best waves along Sri Lanka&apos;s beautiful east coast.          
+                  We&apos;re located right in front of Arugam Bay&apos;s Baby Point — one of the best spots for beginners to catch their first waves. Whether you&apos;re just learning or ready to explore more challenging reef breaks, our local certified pro surf instructors are friendly, experienced, and stoked to show you the best waves along Sri Lanka&apos;s beautiful east coast.
                 </motion.p>
               </div>
             </motion.div>
@@ -818,11 +957,11 @@ export default function HomePage() {
               className="order-1 lg:order-2 relative"
             >
               <div className="relative w-full h-[500px]">
-                
-              <VideoSection videoSrc="/heronew.mp4">
-                <div>
-                </div>
-              </VideoSection>
+
+                <VideoSection videoSrc="/heronew.mp4">
+                  <div>
+                  </div>
+                </VideoSection>
                 <div className="absolute top-1 -left-20 w-1/2 h-1/2">
                   <FloatingScrollImage
                     src="/images/flower1.png"
@@ -837,7 +976,7 @@ export default function HomePage() {
       </section>
 
       {/* Special About Arugam Bay Section */}
-      <motion.section 
+      <motion.section
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
@@ -851,7 +990,7 @@ export default function HomePage() {
           transition={{ duration: 0.6 }}
           className="text-center max-w-4xl mx-auto relative z-20"
         >
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -860,7 +999,7 @@ export default function HomePage() {
           >
             What&apos;s so special about
           </motion.h2>
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -883,7 +1022,7 @@ export default function HomePage() {
             priority
           />
         </div>
-        
+
         <motion.div
           variants={staggerContainer}
           initial="initial"
@@ -902,14 +1041,14 @@ export default function HomePage() {
             >
               <Card className="bg-transparent border-none hover:shadow-xl transition-all text-white h-full group">
                 <CardContent className="p-4 sm:p-6 flex flex-col sm:flex-row items-start gap-3 sm:gap-4 h-full">
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.1, rotate: 10 }}
                     className="p-2 sm:p-3 rounded-full shrink-0 group-hover:bg-white/10 transition-all duration-300"
                   >
                     {item.icon}
                   </motion.div>
                   <div className="flex-1">
-                    <motion.h3 
+                    <motion.h3
                       initial={{ opacity: 0, x: -20 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
@@ -918,7 +1057,7 @@ export default function HomePage() {
                     >
                       {item.title}
                     </motion.h3>
-                    <motion.p 
+                    <motion.p
                       initial={{ opacity: 0, x: -20 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
@@ -941,7 +1080,7 @@ export default function HomePage() {
         <FloatingScrollImage
           src="/images/leaf1.png"
           alt="Leaf 1"
-          className="top-20 left-4 sm:left-10 lg:left-20 w-24 sm:w-40 md:w-56 lg:w-72 xl:w-96 h-24 sm:h-40 md:h-56 lg:h-72 xl:h-96 z-10"
+          className="top-60 left-4 sm:left-10 lg:left-20 w-24 sm:w-40 md:w-56 lg:w-72 xl:w-96 h-24 sm:h-40 md:h-56 lg:h-72 xl:h-96 z-30"
           scrollRange={[1200, 2200]}
           yRange={[0, -200]}
           xRange={[0, 100]}
@@ -958,21 +1097,21 @@ export default function HomePage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="text-2xl md:text-4xl font-bold leading-tight customtext mb-6"
+              className="text-2xl md:text-4xl font-bold leading-tight customtext mb-6  z-50"
             >
               Why learn to surf with <span className="text-primary">Rupa's Surf Camp?</span>
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.4, duration: 0.6 }}
-              className="text-xl text-gray-600 max-w-3xl mx-auto"
+              className="text-xl text-gray-600 max-w-3xl mx-auto  z-50"
             >
               Experience the best surfing education with our professional instructors and perfect conditions
             </motion.p>
@@ -981,7 +1120,7 @@ export default function HomePage() {
           <ImageSlider />
         </div>
       </section>
-      
+
       {/* All Awesome Stuff Section with Enhanced Videos */}
       <section className="py-16 px-6 md:px-20 bg-background relative overflow-hidden">
         <motion.div
@@ -991,7 +1130,7 @@ export default function HomePage() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12 relative z-20"
         >
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -1000,7 +1139,7 @@ export default function HomePage() {
           >
             All the Awesome Stuff at <span className="text-primary">Rupa's</span>
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -1040,12 +1179,12 @@ export default function HomePage() {
               >
                 <source src={video.src} type="video/mp4" />
               </video>
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 whileHover={{ opacity: 1 }}
                 className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent transition-opacity duration-300"
               >
-                <motion.div 
+                <motion.div
                   initial={{ y: 20, opacity: 0 }}
                   whileHover={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.1 }}
@@ -1059,7 +1198,7 @@ export default function HomePage() {
           ))}
         </motion.div>
       </section>
-      
+
       {/* Most Popular Package Section with Floating Elements */}
       <section className="py-16 md:px-5 bg-white relative overflow-hidden">
         {/* Floating Leaf 2 - Different Position */}
@@ -1082,7 +1221,7 @@ export default function HomePage() {
           transition={{ duration: 0.6 }}
           className="relative z-20"
         >
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -1090,21 +1229,21 @@ export default function HomePage() {
             className="text-center mb-12"
           >
             <h2 className="text-3xl md:text-4xl font-bold customtext">
-              Most Popular <span className="text-primary">Surf Camp </span> Package            
+              Most Popular <span className="text-primary">Surf Camp </span> Package
             </h2>
             <p className="text-xl mt-4 text-gray-600">
               The package our guests love the most — surf every day, eat well, explore wildlife and soak up the Arugam Bay vibe.
             </p>
           </motion.div>
-      
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.4, duration: 0.6 }}
             className="flex flex-col md:flex-row justify-between items-center mb-5"
           >
-            <motion.div 
+            <motion.div
               whileHover={{ scale: 1.05 }}
               className="text-3xl font-bold text-primary mb-6 md:mb-0 tanHeading"
             >
@@ -1123,8 +1262,8 @@ export default function HomePage() {
               </motion.div>
             </div>
           </motion.div>
-      
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -1173,9 +1312,9 @@ export default function HomePage() {
                     className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300"
                   >
                     <div className="p-6">
-                      <motion.div 
+                      <motion.div
                         initial={{ scale: 0 }}
-                        whileInView={{ scale: 1  }}
+                        whileInView={{ scale: 1 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1, duration: 0.5, type: "spring" }}
                         className="text-6xl font-bold text-primary mb-2 flex flex-row items-center"
@@ -1190,7 +1329,7 @@ export default function HomePage() {
                           />
                         </div>
                       </motion.div>
-                      <motion.p 
+                      <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -1199,7 +1338,7 @@ export default function HomePage() {
                       >
                         {item.title}
                       </motion.p>
-                      <motion.p 
+                      <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -1214,7 +1353,7 @@ export default function HomePage() {
               </motion.div>
             </div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -1225,7 +1364,7 @@ export default function HomePage() {
                 <div className="">
                   <div className="flex flex-col md:flex-row items-center gap-6 overflow-x-auto pb-4">
                     <div className="gap-6 flex flex-col w-full md:w-auto px-2 md:pl-5">
-                      <motion.p 
+                      <motion.p
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
@@ -1250,8 +1389,8 @@ export default function HomePage() {
                           { icon: "/icons/cool.png", text: "ICE BATH RECOVERY", description: "Rejuvenate with our ice bath facilities after surfing sessions", type: "Free Services" },
                           { icon: "/icons/sunset.png", text: "BEACHFRONT LOUNGE", description: "Exclusive access to our comfortable beachfront lounge area", type: "Free Services" },
                         ].map((service, index) => (
-                          <motion.div 
-                            key={index} 
+                          <motion.div
+                            key={index}
                             variants={staggerItem}
                             className="perspective-1000"
                           >
@@ -1264,7 +1403,7 @@ export default function HomePage() {
                             >
                               {/* Front of card */}
                               <div className="absolute w-full h-full flex flex-col items-center backface-hidden">
-                                <motion.div 
+                                <motion.div
                                   whileHover={{ scale: 1.1 }}
                                   className="relative w-12 md:w-16 h-12 md:h-16 mb-2"
                                 >
@@ -1277,9 +1416,9 @@ export default function HomePage() {
                                 </motion.div>
                                 <span className="text-xs md:text-sm font-semibold text-gray-700 text-center">{service.text}</span>
                               </div>
-                              
+
                               {/* Back of card */}
-                              <div 
+                              <div
                                 className="absolute w-full h-full p-2 bg-primary/10 rounded-lg flex items-center justify-center backface-hidden"
                                 style={{ transform: "rotateY(180deg)" }}
                               >
@@ -1291,7 +1430,7 @@ export default function HomePage() {
                       </motion.div>
                     </div>
                     <div className="gap-6 flex flex-col w-full md:w-auto px-2 md:pl-5 mt-8 md:mt-0">
-                      <motion.p 
+                      <motion.p
                         initial={{ opacity: 0, x: 20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
@@ -1311,8 +1450,8 @@ export default function HomePage() {
                           { icon: "/icons/car.png", text: "AIRPORT PICKUP & DROPOFF", description: "Convenient door-to-door transfer service from and to the airport", type: "Extra Services" },
                           { icon: "/icons/bbq.png", text: "SUNSET BARBEQUE", description: "Enjoy delicious BBQ meals while watching beautiful sunsets", type: "Extra Services" }
                         ].map((service, index) => (
-                          <motion.div 
-                            key={index} 
+                          <motion.div
+                            key={index}
                             variants={staggerItem}
                             className="perspective-1000"
                           >
@@ -1325,7 +1464,7 @@ export default function HomePage() {
                             >
                               {/* Front of card */}
                               <div className="absolute w-full h-full flex flex-col items-center backface-hidden">
-                                <motion.div 
+                                <motion.div
                                   whileHover={{ scale: 1.1 }}
                                   className="relative w-12 md:w-16 h-12 md:h-16 mb-2"
                                 >
@@ -1338,9 +1477,9 @@ export default function HomePage() {
                                 </motion.div>
                                 <span className="text-xs md:text-sm font-semibold text-gray-700 text-center">{service.text}</span>
                               </div>
-                              
+
                               {/* Back of card */}
-                              <div 
+                              <div
                                 className="absolute w-full h-full p-2 bg-primary/10 rounded-lg flex items-center justify-center backface-hidden"
                                 style={{ transform: "rotateY(180deg)" }}
                               >
@@ -1367,486 +1506,628 @@ export default function HomePage() {
           </motion.div>
         </motion.div>
       </section>
-      
-      {/* Offerings Section with Floating Leaf */}
-      <section className="py-10 md:py-16 bg-gradient-to-b from-transparent to-blue-100/60 overflow-hidden relative">
-        {/* Floating Leaf 1 - Top Right */}
-        <FloatingScrollImage
-          src="/images/leaf1.png"
-          alt="Leaf 1"
-          className="top-10 left-4 sm:right-10 lg:right-20 w-32 sm:w-48 md:w-64 lg:w-96 xl:w-[32rem] h-32 sm:h-48 md:h-64 lg:h-96 xl:h-[32rem] z-50 inset-0"
-          scrollRange={[2000, 6000]}
-          yRange={[0, -240]}
-          xRange={[0, -160]}
-          rotateRange={[0, -90]}
-          scaleRange={[1, 1.5]}
-          opacityRange={[0.6, 1]}
-        />
 
-        <div className="container mx-auto px-4 relative z-20">
-          <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <motion.h2 
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2, duration: 0.6 }}
-              className="text-3xl md:text-4xl font-bold mb-6 max-w-4xl mx-auto leading-tight customtext"
+      <section className="w-full py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="container mx-auto px-4"
+        >
+          <div className="text-center mb-12">
+            <motion.h2
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-3xl md:text-4xl font-bold text-primary customtext mb-4"
             >
-              Everything <span className="text-primary">We Provide</span>
+              Accommodation Options
             </motion.h2>
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4, duration: 0.6 }}
-              className="text-xl max-w-3xl mx-auto"
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-lg text-gray-600 max-w-2xl mx-auto"
             >
-              From comfortable accommodations to exciting adventures, we have everything you need for an amazing stay.
+              Choose between our shared dorms for a social vibe or private rooms for added comfort and privacy. All options are just steps from the waves and designed for relaxation after a day in the surf.
             </motion.p>
-          </motion.div>
-          
+          </div>
+
           <motion.div
-            variants={staggerContainer}
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto"
           >
-            {[
-              {
-                title: "Rooms & Rates",
-                description: "Crazy, simple luxury rooms just 50m from the beach - with sea views right in front of the bay.",
-                icon: <Users className="h-10 w-10 text-blue-500" />,
-                image: "/about.jpg",
-                link: "/rooms",
-              },
-              {
-                title: "Surf Camp Packs",
-                description: "lessons and guiding for all levels with top local pros at the best East Coast surf spo.",
-                icon: <Waves className="h-10 w-10 text-red-500" />,
-                image: "/beach.jpg",
-                link: "/surf",
-              },
-              {
-                title: "Safari & Tours",
-                description: "Explore national parks, scenic lagoons, and the hidden beauty of Arugam Bay with us.",
-                icon: <Palmtree className="h-10 w-10 text-green-500" />,
-                image: "/about.jpg",
-                link: "/safari",
-              },
-              {
-                title: "Restaurant & Local buffet",
-                description: "Authentic Sri lankan food, beachside vibes, and all-you-can-eat buffet with live music.",
-                icon: <Utensils className="h-10 w-10 text-yellow-500" />,
-                image: "/beach.jpg",
-                link: "/restaurant",
-              },
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                variants={staggerItem}
-                whileHover={{ y: -10, scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className="group relative bg-card rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border"
-              >
-                <div className="h-60 relative overflow-hidden">
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              className="card bg-white rounded-3xl shadow-lg border-2 border-primary overflow-hidden p-5"
+              initial={{ x: -100 }}
+              animate={{ x: 0 }}
+            >
+              <div className="relative h-64">
+                <motion.div
+                  animate={{ opacity: [1, 0, 0, 0, 1] }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0"
+                >
                   <Image
-                    src={item.image}
-                    alt={item.title}
+                    src="/images/proom1.jpg"
+                    alt="Luxury Suite View 1"
                     fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="object-cover transition-opacity duration-500  rounded-3xl"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <motion.div 
+                </motion.div>
+                <motion.div
+                  animate={{ opacity: [0, 1, 0, 0, 0] }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src="/images/proom2.jpg"
+                    alt="Luxury Suite View 2"
+                    fill
+                    className="object-cover transition-opacity duration-500  rounded-3xl"
+                  />
+                </motion.div>
+                <motion.div
+                  animate={{ opacity: [0, 0, 1, 0, 0] }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src="/images/proom3.jpg"
+                    alt="Luxury Suite View 3"
+                    fill
+                    className="object-cover transition-opacity duration-500  rounded-3xl"
+                  />
+                </motion.div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-4">Private Double</h3>
+                <ul className="space-y-2">
+                  <li className="flex items-center text-gray-700">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Air Conditioning</span>
+                  </li>
+                  <li className="flex items-center text-gray-700">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Spacious Bathroom with Hot Water</span>
+                  </li>
+                  <li className="flex items-center text-gray-700">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Handcrafted Furniture</span>
+                  </li>
+                  <li className="flex items-center text-gray-700">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Garden View Sitting Area</span>
+                  </li>
+                  <li className="flex items-center text-gray-700">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Wi-Fi</span>
+                  </li>
+                  <li className="flex items-center text-gray-700">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Towels & Toiletries</span>
+                  </li>
+                  <li className="flex items-center text-gray-700">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Daily Room Cleaning</span>
+                  </li>
+                  <li className="flex items-center text-gray-700">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Surfboard Storage</span>
+                  </li>
+                </ul>
+              </div>
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              className="card bg-white rounded-3xl shadow-lg border-2 border-primary overflow-hidden p-5"
+              initial={{ x: -100 }}
+              animate={{ x: 0 }}
+            >
+              <div className="relative h-64">
+                <motion.div
+                  animate={{ opacity: [1, 0, 0, 0, 1] }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src="/images/image1.jpg"
+                    alt="Luxury Suite View 1"
+                    fill
+                    className="object-cover transition-opacity duration-500  rounded-3xl"
+                  />
+                </motion.div>
+                <motion.div
+                  animate={{ opacity: [0, 1, 0, 0, 0] }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src="/images/image3.jpg"
+                    alt="Luxury Suite View 2"
+                    fill
+                    className="object-cover transition-opacity duration-500  rounded-3xl"
+                  />
+                </motion.div>
+                <motion.div
+                  animate={{ opacity: [0, 0, 1, 0, 0] }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src="/images/image4.jpg"
+                    alt="Luxury Suite View 3"
+                    fill
+                    className="object-cover transition-opacity duration-500  rounded-3xl"
+                  />
+                </motion.div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-4">Shared Dorm Beds</h3>
+                <ul className="space-y-2">
+                  <li className="flex items-center text-gray-700">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Comfy bunk bed with clean linens and towel</span>
+                  </li>
+                  <li className="flex items-center text-gray-700">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Air Conditioning Spacious Bathroom with Hot Water</span>
+                  </li>
+                  <li className="flex items-center text-gray-700">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Hot water showers</span>
+                  </li>
+                  <li className="flex items-center text-gray-700">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Shared bathroom (cleaned daily)</span>
+                  </li>
+                  <li className="flex items-center text-gray-700">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Wi-Fi</span>
+                  </li>
+                  <li className="flex items-center text-gray-700">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Private Locker</span>
+                  </li>
+                  <li className="flex items-center text-gray-700">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Surfboard Storage</span>
+                  </li>
+                  <li className="flex items-center text-gray-700">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Daily room cleaning</span>
+                  </li>
+                </ul>
+              </div>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      </section>
+      <section className="py-8 sm:py-12 md:py-16 bg-white">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="container mx-auto px-4 sm:px-6"
+        >
+          <div className="flex flex-col lg:flex-row items-center gap-6 sm:gap-8 lg:gap-12 mb-6 sm:mb-8 lg:mb-10">
+            <motion.div
+              initial={{ x: -100, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="w-full lg:w-1/2"
+            >
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold customtext text-primary mb-4 sm:mb-6">The Food Experience at the Camp</h2>
+              <p className="text-base sm:text-lg text-gray-700 leading-relaxed text-justify">
+                Get ready to eat like a local! Our daily unlimited buffets are packed with authentic Sri Lankan flavors and change every day, so there's always something new to try. From creamy curries and spicy sambols to fresh tropical fruits, it's a tasty adventure at every meal. Whether you're fueling up after a surf session or just here for the food, you're in for a delicious ride.
+              </p>
+            </motion.div>
+            <motion.div
+              initial={{ x: 100, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="w-full lg:w-1/2 relative h-[250px] sm:h-[300px] md:h-[400px]"
+            >
+              <Image
+                src="/images/image1.jpg"
+                alt="Culinary Experience"
+                fill
+                className="object-cover"
+              />
+            </motion.div>
+          </div>
+
+          <div className="flex flex-col-reverse lg:flex-row items-center gap-6 sm:gap-8 lg:gap-12">
+            <motion.div
+              initial={{ x: -100, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="w-full lg:w-1/2 relative h-[250px] sm:h-[300px] md:h-[400px]"
+            >
+              <Image
+                src="/images/image2.jpg"
+                alt="Local Cuisine"
+                fill
+                className="object-cover"
+              />
+            </motion.div>
+            <motion.div
+              initial={{ x: 100, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="w-full lg:w-1/2"
+            >
+              <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-4 sm:mb-6 text-justify">
+                When you're craving something beyond rice and curry, we've got you covered. Head over to Rupa's, our laid-back international restaurant, serving up everything from juicy burgers to fresh seafood and comfort food from around the world. And for your daily dose of beachside bliss, our cozy café is the go-to spot for smoothie bowls, proper coffee, and tropical drinks that taste like vacation in a cup. Whether you're refueling after a surf or just chilling out, there's always something tasty waiting.
+              </p>
+
+            </motion.div>
+          </div>
+        </motion.div>
+      </section>
+      <section className="relative py-16" style={{
+        backgroundImage: "url('/images/review.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}>
+        <div className="absolute inset-0 bg-black/10"></div>
+        <motion.div
+          initial={{ y: 50, opacity: 0 }}
+          whileInView={{ y: 0, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="relative container mx-auto px-4"
+        >
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center text-white customtext mb-4">
+            What our guests say!
+          </h2>
+          <p className="text-lg md:text-xl text-center text-white/90 max-w-2xl mx-auto mb-12">
+            Hear from surfers, travelers, and new friends who’ve lived the Rupa’s experience.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-8 items-center justify-center mt-20">
+            {/* First Review Card */}
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="w-full bg-white rounded-3xl p-6 relative"
+            >
+              <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
+                <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white">
+                  <Image
+                    src="/images/client1.jpg"
+                    alt="Guest 1"
+                    width={96}
+                    height={96}
+                    className="object-cover"
+                  />
+                </div>
+              </div>
+              <div className="mt-8 text-center">
+                <div className="flex justify-center mt-4">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-gray-600 mt-2">"I came for the waves but found so much more — amazing energy, soulful sunsets, and the kindest crew. The surf theory sessions really helped, and I’ll never forget the bonfire nights."</p>
+                <p className="font-bold text-gray-800">— Anika Stein, 31, yoga teacher from Berlin</p>
+              </div>
+            </motion.div>
+
+            {/* Middle Review Card (Larger) */}
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="w-full bg-white rounded-3xl p-8 relative lg:scale-110 z-10"
+            >
+              <div className="absolute -top-14 left-1/2 transform -translate-x-1/2">
+                <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white">
+                  <Image
+                    src="/images/client1.jpg"
+                    alt="Guest 2"
+                    width={112}
+                    height={112}
+                    className="object-cover"
+                  />
+                </div>
+              </div>
+              <div className="mt-8 text-center">
+                <div className="flex justify-center mt-4">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-gray-600 mt-2">“I came for the waves, stayed for the chaos — and left with better balance (on the board and in life). The instructors were total legends, the food slapped, and the sunsets? Unreal. I didn’t know I needed a wildlife safari between surf sessions, but now I want leopards with my vacation. Rupa’s knows how to mix chill vibes with real adventure. 11/10 — would paddle out (and party) again.”</p>
+                <p className=" font-bold text-gray-800">— Lola D., global thrill-seeker & sun-chaser</p>
+              </div>
+            </motion.div>
+
+            {/* Third Review Card */}
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="w-full bg-white rounded-3xl p-6 relative"
+            >
+              <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
+                <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white">
+                  <Image
+                    src="/images/client1.jpg"
+                    alt="Guest 3"
+                    width={96}
+                    height={96}
+                    className="object-cover"
+                  />
+                </div>
+              </div>
+              <div className="mt-8 text-center">
+                <div className="flex justify-center mt-4">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-gray-600 mt-2">"First time surfing and I actually stood up on day one — the instructors were chill but knew their stuff. The food was unreal, and the lagoon tour was the perfect midweek reset. This place hits different."</p>
+                <p className="font-bold text-gray-800">— Jake Rivers, 26, freelance designer from Melbourne</p>
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+      </section>
+      <section className="relative py-16 bg-gray-50">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="container mx-auto px-4"
+        >
+          <div className="flex flex-col lg:flex-row gap-8">
+            <div className="lg:w-3/4 relative">
+              <Image
+                src="/images/map.png"
+                alt="Location Map"
+                width={1200}
+                height={675}
+                className="rounded-3xl object-cover w-full aspect-auto"
+              />
+              <div className="mt-8 space-y-4 max-w-[700px]">
+                {/* Contact Cards Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Email Card */}
+                  <motion.a
+                    href="mailto:contact@rupassurf.com"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: index * 0.1, duration: 0.6 }}
-                    className="absolute bottom-4 left-4 text-white"
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    className="group relative overflow-hidden bg-gradient-to-br from-blue-50 to-cyan-50 hover:from-blue-100 hover:to-cyan-100 border border-blue-200 rounded-2xl p-6 transition-all duration-300 shadow-lg hover:shadow-xl"
                   >
-                    <h3 className="text-2xl font-bold drop-shadow">{item.title}</h3>
-                  </motion.div>
-                </div>
-                <div className="p-6 flex flex-col h-[calc(100%-15rem)]">
-                  <motion.div 
-                    whileHover={{ scale: 1.1, rotate: 10 }}
-                    className="mb-4 p-3 rounded-lg w-fit bg-blue-50 shadow-md"
-                  >
-                    {item.icon}
-                  </motion.div>
-                  <p className="mb-6 flex-grow">{item.description}</p>
-                  <Link href={item.link}>
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Button
-                        className="hover:bg-primary transition-colors duration-300 rounded-full px-6 py-3 w-full shadow-md"
-                      >
-                        Explore <ArrowRight className="ml-2 h-5 w-5" />
-                      </Button>
-                    </motion.div>
-                  </Link>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Why Choose Us Section with Floating Surfboard */}
-      <section className="py-10 md:py-16 bg-gradient-to-b from-blue-100/60 to-transparent overflow-hidden relative">
-    
-        <div className="container mx-auto px-4 relative z-20">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="order-2 lg:order-1"
-            >
-              <motion.h2 
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2, duration: 0.6 }}
-                className="text-3xl md:text-4xl font-bold mb-8 leading-tight customtext"
-              >
-                Why Choose <span className="text-primary">Arugam bay?</span>
-              </motion.h2>
-              <motion.div
-                variants={staggerContainer}
-                initial="initial"
-                whileInView="animate"
-                viewport={{ once: true }}
-                className="grid grid-cols-1 md:grid-cols-3 gap-6"
-              >
-                {[
-                  {
-                    icon: <Waves className="h-12 w-12 text-primary mb-3" />,
-                    title: "Waves for Everyone",
-                    description: "Whether you're just starting out or chasing barrels, Arugam Bay has surf spots for all levels."
-                  },
-                  {
-                    icon: <Globe className="h-12 w-12 text-primary mb-3" />,
-                    title: "Globally Recognized",
-                    description: "One of the top surf destinations in the world, loved by surfers from every corner of the globe."
-                  },
-                  {
-                    icon: <Compass className="h-12 w-12 text-primary mb-3" />,
-                    title: "Surf Variety",
-                    description: "Multiple breaks all within easy reach - from mellow points to punchy reef waves."
-                  },
-                  {
-                    icon: <Trees className="h-12 w-12 text-primary mb-3" />,
-                    title: "Wild Nature All Around",
-                    description: "From elephants to lagoons, the surrounding wildlife is like nowhere else in Sri Lanka."
-                  },
-                  {
-                    icon: <Palmtree className="h-12 w-12 text-primary mb-3" />,
-                    title: "More Than Just Surf",
-                    description: "Explore jungles, culture-rich villages, stunning viewpoints, parties, music & good vibes."
-                  },
-                  {
-                    icon: <Sun className="h-12 w-12 text-primary mb-3" />,
-                    title: "East Coast Vibes",
-                    description: "Warm, welcoming, and full of soul - the east coast has its own special rhythm."
-                  }
-                ].map((item, index) => (
-                  <motion.div
-                    key={index}
-                    variants={staggerItem}
-                    whileHover={{ scale: 1.05, y: -5 }}
-                    className="flex flex-col items-center text-center p-4 hover:bg-primary/10 rounded-lg transition-all cursor-pointer"
-                  >
-                    <motion.div
-                      whileHover={{ scale: 1.2, rotate: 10 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      {item.icon}
-                    </motion.div>
-                    <h3 className="font-extrabold mb-2">{item.title}</h3>
-                    <p className="text-sm">{item.description}</p>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="order-1 lg:order-2 bg-primary p-10 rounded-3xl text-white"
-            >
-              <motion.h2 
-                initial={{ opacity: 0, x: 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2, duration: 0.6 }}
-                className="text-2xl md:text-3xl font-bold mb-8 leading-tight customtext"
-              >
-                Why Learn to Surf with <span className="text-white">Rupa's Surf Camp</span>
-              </motion.h2>
-              <motion.div
-                variants={staggerContainer}
-                initial="initial"
-                whileInView="animate"
-                viewport={{ once: true }}
-                className="space-y-6"
-              >
-                {[
-                  {
-                    icon: <Shield className="h-10 w-10 flex-shrink-0 text-white" />,
-                    title: "Closest to the surf",
-                    description: "We're right in front of the Arugam Bay's main surf point."
-                  },
-                  {
-                    icon: <Users className="h-10 w-10 flex-shrink-0 text-white" />,
-                    title: "Trusted since 1978",
-                    description: "One of the original surf stays in town, with a legacy of happy surfers from around the world."
-                  },
-                  {
-                    icon: <Camera className="h-10 w-10 flex-shrink-0 text-white" />,
-                    title: "Modern & Affordable rooms",
-                    description: "Clean, spacious, sea-view cozy simple luxurious rooms with all the comfort you need after a surf session."
-                  },
-                  {
-                    icon: <ShieldCheck className="h-10 w-10 flex-shrink-0 text-white" />,
-                    title: "Legendary Food",
-                    description: "All-day Sri Lankan buffet, a buzzing café, and plenty of tasty international options."
-                  },
-                  {
-                    icon: <GraduationCap className="h-10 w-10 flex-shrink-0 text-white" />,
-                    title: "Certified surf instructors",
-                    description: "Young passionate local pros ready to get you riding waves safely and confidently."
-                  },
-                  {
-                    icon: <Heart className="h-10 w-10 flex-shrink-0 text-white" />,
-                    title: "More than surf",
-                    description: "Live music, wildlife safaris, lagoon tours, camping and chilled-out vibes every day."
-                  }
-                ].map((item, index) => (
-                  <motion.div
-                    key={index}
-                    variants={staggerItem}
-                    whileHover={{ scale: 1.02, x: 10 }}
-                    className="flex items-center gap-4 p-4 hover:bg-white/10 rounded-lg transition-all cursor-pointer"
-                  >
-                    <motion.div
-                      whileHover={{ scale: 1.2, rotate: 15 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      {item.icon}
-                    </motion.div>
-                    <div className="flex flex-col">
-                      <p className="text-lg font-extrabold">{item.title}</p>
-                      <p className="text-sm text-white/90">{item.description}</p>
+                    <div className="flex items-center space-x-4">
+                      <div className="relative">
+                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                          <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-600 group-hover:text-gray-800 transition-colors duration-300">Email Us</p>
+                        <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-300 truncate">
+                          rupassurfcamp.gmail.com
+                        </p>
+                      </div>
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </div>
                     </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-      
-      {/* Beginners Surf & Stay Section with Final Floating Elements */}
-      <section className="py-10 md:py-16 bg-background overflow-hidden relative">
-        {/* Final Floating Leaf 2 - Bottom Left */}
-        <FloatingScrollImage
-          src="/images/leaf2.png"
-          alt="Leaf 2"
-          className="bottom-10 left-4 sm:left-10 lg:left-20 w-24 sm:w-32 md:w-48 lg:w-64 xl:w-80 h-24 sm:h-32 md:h-48 lg:h-64 xl:h-80 z-10"
-          scrollRange={[4600, 5600]}
-          yRange={[0, 150]}
-          xRange={[0, 100]}
-          rotateRange={[0, 75]}
-          scaleRange={[1, 1.4]}
-          opacityRange={[0.5, 1]}
-        />
+                  </motion.a>
 
-        <div className="container mx-auto px-4 relative z-20">
-          <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <motion.h2 
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2, duration: 0.6 }}
-              whileHover={{ scale: 1.05 }}
-              className="text-3xl md:text-4xl font-bold mb-6 transition-transform customtext"
-            >
-              Beginners <span className="text-primary animate-pulse">Surf & Stay</span> Packages
-            </motion.h2>
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4, duration: 0.6 }}
-              className="text-xl max-w-3xl mx-auto hover:text-primary transition-colors"
-            >
-              Start your surfing journey with our comprehensive packages designed for beginners
-            </motion.p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 items-start">
-            {/* Left Side - Main Features */}
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className=""
-            >
-              {[
-                {
-                  icon: <Waves className="h-12 w-12 text-primary hover:animate-bounce" />,
-                  title: "Surf Guiding"
-                },
-                {
-                  icon: <Users className="h-12 w-12 text-primary hover:animate-bounce" />,
-                  title: "Surf theory class"
-                },
-                {
-                  icon: <Camera className="h-12 w-12 text-primary hover:animate-bounce" />,
-                  title: "Video analysis & photos"
-                },
-                {
-                  icon: <UtensilsCrossed className="h-12 w-12 text-primary hover:animate-bounce" />,
-                  title: "Unlimited local buffet"
-                }
-              ].map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1, duration: 0.6 }}
-                  whileHover={{ scale: 1.05, x: 10 }}
-                  className="flex items-start space-x-6 p-6 hover:bg-primary/10 rounded-2xl transition-all cursor-pointer"
-                >
-                  <motion.div
-                    whileHover={{ scale: 1.2, rotate: 15 }}
-                    transition={{ duration: 0.3 }}
+                  {/* Website Card */}
+                  <motion.a
+                    href="https://www.rupassurf.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    className="group relative overflow-hidden bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border border-purple-200 rounded-2xl p-6 transition-all duration-300 shadow-lg hover:shadow-xl"
                   >
-                    {item.icon}
-                  </motion.div>
-                  <div>
-                    <h3 className="text-xl font-bold m-2 uppercase hover:text-primary transition-colors">{item.title}</h3>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className=""
-            >
-              {[
-                {
-                  icon: <Coffee className="h-12 w-12 text-primary hover:animate-bounce" />,
-                  title: "breakfasts"
-                },
-                {
-                  icon: <Bath className="h-12 w-12 text-primary hover:animate-bounce" />,
-                  title: "ice bath"
-                },
-                {
-                  icon: <Wifi className="h-12 w-12 text-primary hover:animate-bounce" />,
-                  title: "internet"
-                },
-                {
-                  icon: <Car className="h-12 w-12 text-primary hover:animate-bounce" />,
-                  title: "Transportation & surf equipments"
-                }
-              ].map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 + 0.4, duration: 0.6 }}
-                  whileHover={{ scale: 1.05, x: 10 }}
-                  className="flex items-start space-x-6 p-6 hover:bg-primary/10 rounded-2xl transition-all cursor-pointer"
-                >
-                  <motion.div
-                    whileHover={{ scale: 1.2, rotate: 15 }}
-                    transition={{ duration: 0.3 }}
+                    <div className="flex items-center space-x-4">
+                      <div className="relative">
+                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                          <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                          </svg>
+                        </div>
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-400 rounded-full border-2 border-white animate-bounce"></div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-600 group-hover:text-gray-800 transition-colors duration-300">Visit Website</p>
+                        <p className="text-sm font-semibold text-gray-900 group-hover:text-purple-600 transition-colors duration-300 truncate">
+                          www.rupassurf.com
+                        </p>
+                      </div>
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </div>
+                    </div>
+                  </motion.a>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Phone Card - Full Width */}
+                  <motion.a
+                    href="tel:+94771234567"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    className="group relative overflow-hidden bg-gradient-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 border border-green-200 rounded-2xl p-6 transition-all duration-300 shadow-lg hover:shadow-xl block w-full"
                   >
-                    {item.icon}
-                  </motion.div>
-                  <div>
-                    <h3 className="text-xl font-bold m-2 uppercase hover:text-primary transition-colors">{item.title}</h3>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
+                    <div className="flex items-center space-x-4">
+                      <div className="relative">
+                        <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                          <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                          </svg>
+                        </div>
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full border-2 border-white animate-pulse"></div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-600 group-hover:text-gray-800 transition-colors duration-300">Call Us Directly</p>
+                        <p className="text-lg font-semibold text-gray-900 group-hover:text-green-600 transition-colors duration-300">
+                          +94 762332355
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">Available 24/7 for bookings & inquiries</p>
+                      </div>
+                      <div className="hidden sm:flex items-center space-x-2">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.a>
 
-            {/* Right Side - Additional Features */}
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className=""
-            >
-              <motion.div 
-                whileHover={{ scale: 1.02, y: -5 }}
-                className="p-8 bg-primary/5 rounded-3xl hover:bg-primary/10 transition-all"
-              >
-                <h4 className="text-2xl font-semibold mb-6 text-primary">Extra Options:</h4>
-                <ul className="space-y-4">
-                  {[
-                    "Safari in national park",
-                    "Sunset BBQ"
-                  ].map((option, index) => (
-                    <motion.li 
-                      key={index}
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: index * 0.1, duration: 0.5 }}
-                      whileHover={{ x: 10, scale: 1.02 }}
-                      className="flex items-center space-x-2 transition-transform cursor-pointer"
-                    >
-                      <motion.span 
-                        whileHover={{ scale: 1.5 }}
-                        className="text-primary"
-                      >
-                        •
-                      </motion.span>
-                      <span>{option}</span>
-                    </motion.li>
-                  ))}
-                </ul>
-              </motion.div>
-              <Link href="/surf">
-                <motion.div
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button className="w-full mt-8 hover:bg-primary rounded-full px-8 py-6 text-lg shadow-lg transition-all duration-300 hover:shadow-xl">
-                    Book Package Now
-                  </Button>
-                </motion.div>
-              </Link>
-            </motion.div>
+                  {/* Location Card - Full Width */}
+                  <motion.a
+                    href="https://maps.google.com/?q=123+Beach+Road,+Arugam+Bay,+Sri+Lanka"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: 0.4 }}
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    className="group relative overflow-hidden bg-gradient-to-r from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100 border border-orange-200 rounded-2xl p-6 transition-all duration-300 shadow-lg hover:shadow-xl block w-full"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className="relative">
+                        <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                          <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                        </div>
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-400 rounded-full border-2 border-white animate-bounce"></div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-600 group-hover:text-gray-800 transition-colors duration-300">Find Us Here</p>
+                        <p className="text-base font-semibold text-gray-900 group-hover:text-orange-600 transition-colors duration-300">
+                          Beach road, Arugam Bay 32500
+                        </p>
+                        <p className="text-sm text-gray-600 mt-1">Sri Lanka • Right on the beach</p>
+                      </div>
+                      <div className="hidden sm:flex items-center space-x-2">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.a>
+                </div>
+
+              </div>
+            </div>
+
+            <div className="lg:w-4/12 lg:absolute lg:right-20 lg:top-2/4 lg:transform lg:-translate-y-1/2">
+              <div className="bg-primary p-8 rounded-3xl shadow-lg backdrop-blur-lg bg-opacity-95">
+                <div className="text-center mb-12">
+                  <h2 className="text-2xl font-bold text-white customtext">Talk to Us</h2>
+                </div>
+                <form className="space-y-6">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-white mb-1">
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Your name"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-white mb-1">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="your@email.com"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="mobile" className="block text-sm font-medium text-white mb-1">
+                      Mobile
+                    </label>
+                    <input
+                      type="mobile"
+                      id="mobile"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Your mobile number"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium text-white mb-1">
+                      Message
+                    </label>
+                    <textarea
+                      id="message"
+                      rows={4}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Your message..."
+                    ></textarea>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-ful text-white font-bold py-3 px-6 rounded-full hover:bg-blue-600 border-2 border-white transition duration-300"
+                  >
+                    Send Message
+                  </button>
+                </form>
+              </div>
+            </div>
           </div>
-        </div>
+        </motion.div>
       </section>
+
     </main>
   );
 }
