@@ -4,6 +4,65 @@ import Booking from '@/models/Booking';
 import Package from '@/models/Package';
 import { NotificationService } from '@/lib/notificationService';
 
+// Hardcoded packages to match frontend
+const HARDCODED_PACKAGES = {
+  "basic-surf-pack": {
+    _id: "basic-surf-pack",
+    title: "Basic Surf Pack",
+    description: "Perfect for beginners or casual surfers, this package includes everything you need to get started.",
+    features: [
+      "7 nights accommodation (Dorm or Private Room)",
+      "Breakfast x 7",
+      "5 x Unlimited Local Buffet (Lunch or Dinner)",
+      "Surf course 6 x 1.5 hours",
+      "Surf equipment (2 hours x 2 Daily)",
+      "Transport to surf spots",
+      "Surf theory",
+      "2 video analysis sessions",
+      "2 ice bath recovery sessions"
+    ],
+    price: 699
+  },
+  "surf-and-safari-retreat": {
+    _id: "surf-and-safari-retreat",
+    title: "Surf & Safari Retreat",
+    description: "A balanced mix of surf, nature and relaxation, this retreat is for those wanting more than just waves.",
+    features: [
+      "7 nights accommodation (Dorm or Private Room)",
+      "Breakfast x 7",
+      "5 x Unlimited Local Buffet (Lunch or Dinner)",
+      "Surf course 5 x 1.5 hours",
+      "Surf equipment (2 hours x 2 Daily)",
+      "Transport to surf spots",
+      "Surf theory",
+      "2 video analysis sessions",
+      "5 ice bath recovery sessions",
+      "1 x surf skate session",
+      "Kumana Safari (Half Day)",
+      "Sunset Lagoon Tour",
+      "Sunset BBQ"
+    ],
+    price: 750
+  },
+  "surf-guiding-pack": {
+    _id: "surf-guiding-pack",
+    title: "Surf Guiding Pack",
+    description: "Tailored for seasoned surfers, this premium option offers expert-guided surf trips, in-depth analysis, and daily briefings.",
+    features: [
+      "7 nights accommodation (Dorm or Private Room)",
+      "Breakfast x 7",
+      "5 x Unlimited Local Buffet (Lunch or Dinner)",
+      "Meet your new surf buddies and feel part of the crew instantly",
+      "Surf the top local spots with a knowledgeable local guide",
+      "Transportation included to all surf spots - no rental car required.",
+      "5 days of surf guiding, with 2 sessions each day",
+      "Daily updates on surf spots and conditions",
+      "3 video analysis sessions"
+    ],
+    price: 1200
+  }
+};
+
 export async function GET(request: NextRequest) {
   try {
     await dbConnect();
@@ -16,12 +75,21 @@ export async function GET(request: NextRequest) {
         packageId,
         status: { $in: ['confirmed', 'pending'] },
         checkOutDate: { $gte: new Date() }
-      }).populate('packageId');
+      });
     } else {
-      bookings = await Booking.find().populate('packageId').sort({ createdAt: -1 });
+      bookings = await Booking.find().sort({ createdAt: -1 });
     }
 
-    return NextResponse.json({ bookings });
+    // Manually populate package data for each booking
+    const populatedBookings = bookings.map(booking => {
+      const packageData = HARDCODED_PACKAGES[booking.packageId as keyof typeof HARDCODED_PACKAGES];
+      return {
+        ...booking.toObject(),
+        packageId: packageData || { title: 'Unknown Package', price: 0 }
+      };
+    });
+
+    return NextResponse.json({ bookings: populatedBookings });
   } catch (error) {
     console.error('Error fetching bookings:', error);
     return NextResponse.json({ error: 'Failed to fetch bookings' }, { status: 500 });
@@ -146,8 +214,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Name must be at least 2 characters' }, { status: 400 });
     }
 
-    // Get package details
-    const packageDetails = await Package.findById(packageId);
+    // Get package details from hardcoded packages
+    const packageDetails = HARDCODED_PACKAGES[packageId as keyof typeof HARDCODED_PACKAGES];
     if (!packageDetails) {
       return NextResponse.json({ error: 'Package not found' }, { status: 404 });
     }
@@ -227,8 +295,16 @@ export async function POST(request: NextRequest) {
     // Generate unique booking ID
     const bookingId = `SP${Date.now()}${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
 
-    // Calculate total price
-    const pricePerPerson = packageDetails.price;
+    // Calculate total price based on room type
+    let pricePerPerson;
+    if (roomType === 'room') {
+      pricePerPerson = 750; // Room price per person
+    } else if (roomType === 'dome') {
+      pricePerPerson = 500; // Dome price per person
+    } else {
+      pricePerPerson = packageDetails.price; // Default package price
+    }
+
     const totalPrice = pricePerPerson * persons;
 
     // Create booking with proper field names
@@ -258,8 +334,11 @@ export async function POST(request: NextRequest) {
     // Create booking
     const booking = await Booking.create(bookingData);
 
-    // Populate the booking with package details
-    const populatedBooking = await Booking.findById(booking._id).populate('packageId');
+    // Since we're using hardcoded packages, we'll manually populate the package data
+    const populatedBooking = {
+      ...booking.toObject(),
+      packageId: packageDetails
+    };
 
     // Create notification for new booking (with error handling)
     try {
@@ -347,19 +426,26 @@ export async function PUT(request: NextRequest) {
       searchCriteria,
       updateData,
       { new: true }
-    ).populate('packageId');
+    );
 
     if (!booking) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
+    // Manually populate package data
+    const packageData = HARDCODED_PACKAGES[booking.packageId as keyof typeof HARDCODED_PACKAGES];
+    const populatedBooking = {
+      ...booking.toObject(),
+      packageId: packageData || { title: 'Unknown Package', price: 0 }
+    };
+
     // Create notification for booking update (with error handling)
     try {
       if (NotificationService && typeof NotificationService.createBookingNotification === 'function') {
         if (status === 'cancelled') {
-          await NotificationService.createBookingNotification('booking_cancelled', booking);
+          await NotificationService.createBookingNotification('booking_cancelled', populatedBooking);
         } else if (status) {
-          await NotificationService.createBookingNotification('booking_updated', booking);
+          await NotificationService.createBookingNotification('booking_updated', populatedBooking);
         }
       }
     } catch (notificationError) {
@@ -367,7 +453,7 @@ export async function PUT(request: NextRequest) {
     }
 
     return NextResponse.json({ 
-      booking,
+      booking: populatedBooking,
       message: 'Booking updated successfully!'
     });
 
@@ -393,7 +479,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Booking ID is required' }, { status: 400 });
     }
     
-    const booking = await Booking.findOne(searchCriteria).populate('packageId');
+    const booking = await Booking.findOne(searchCriteria);
     
     if (!booking) {
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
@@ -411,10 +497,17 @@ export async function DELETE(request: NextRequest) {
 
     await Booking.findOneAndDelete(searchCriteria);
 
+    // Manually populate package data for notification
+    const packageData = HARDCODED_PACKAGES[booking.packageId as keyof typeof HARDCODED_PACKAGES];
+    const populatedBooking = {
+      ...booking.toObject(),
+      packageId: packageData || { title: 'Unknown Package', price: 0 }
+    };
+
     // Create notification for booking deletion (with error handling)
     try {
       if (NotificationService && typeof NotificationService.createBookingNotification === 'function') {
-        await NotificationService.createBookingNotification('booking_cancelled', booking);
+        await NotificationService.createBookingNotification('booking_cancelled', populatedBooking);
       }
     } catch (notificationError) {
       console.error('Error creating notification:', notificationError);
@@ -425,7 +518,7 @@ export async function DELETE(request: NextRequest) {
       deletedBooking: {
         bookingId: booking.bookingId,
         customerName: booking.customerName,
-        packageTitle: booking.packageId?.title
+        packageTitle: packageData?.title || 'Unknown Package'
       }
     });
 

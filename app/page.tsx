@@ -1159,9 +1159,9 @@ export default function HomePage() {
         >
           {[
             { src: "/heronew.mp4", title: "Perfect Waves", description: "Experience world-class waves perfect for both beginners and pros" },
-            { src: "/heronew.mp4", title: "Sunset Surfing", description: "Catch the perfect wave while the sun sets in paradise" },
-            { src: "/heronew.mp4", title: "Pro Techniques", description: "Learn from the best surfers in Arugambay" },
-            { src: "/heronew.mp4", title: "Beach Vibes", description: "Immerse yourself in the laid-back surfing culture" }
+            { src: "/video1.mp4", title: "Sunset Surfing", description: "Catch the perfect wave while the sun sets in paradise" },
+            { src: "/video2.mp4", title: "Pro Techniques", description: "Learn from the best surfers in Arugambay" },
+            { src: "/video3.mp4", title: "Beach Vibes", description: "Immerse yourself in the laid-back surfing culture" }
           ].map((video, index) => (
             <motion.div
               key={index}
@@ -1179,21 +1179,12 @@ export default function HomePage() {
               >
                 <source src={video.src} type="video/mp4" />
               </video>
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileHover={{ opacity: 1 }}
-                className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent transition-opacity duration-300"
-              >
-                <motion.div
-                  initial={{ y: 20, opacity: 0 }}
-                  whileHover={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.1 }}
-                  className="absolute bottom-0 left-0 right-0 p-4 text-white"
-                >
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute bottom-0 left-0 right-0 p-4 text-white opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
                   <h3 className="text-xl font-bold mb-2">{video.title}</h3>
                   <p className="text-sm text-gray-200">{video.description}</p>
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
             </motion.div>
           ))}
         </motion.div>
@@ -1256,9 +1247,11 @@ export default function HomePage() {
                 </Button>
               </motion.div>
               <motion.div whileHover={{ scale: 1.05 }}>
-                <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white rounded-full transition-all duration-300">
-                  Explore packages
-                </Button>
+                <Link href="/surf">
+                  <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white rounded-full transition-all duration-300">
+                    Explore packages
+                  </Button>
+                </Link>
               </motion.div>
             </div>
           </motion.div>
@@ -1311,7 +1304,7 @@ export default function HomePage() {
                     whileHover={{ scale: 1.02, y: -5 }}
                     className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300"
                   >
-                    <div className="p-6">
+                    <div className="p-6 flex flex-col items-center">
                       <motion.div
                         initial={{ scale: 0 }}
                         whileInView={{ scale: 1 }}
@@ -1319,8 +1312,8 @@ export default function HomePage() {
                         transition={{ delay: index * 0.1, duration: 0.5, type: "spring" }}
                         className="text-6xl font-bold text-primary mb-2 flex flex-row items-center"
                       >
-                        {item.number && <span>{item.number} <span className="font-normal ml-4"> x</span></span>}
-                        <div className="relative h-20 w-20 ml-5">
+                        {item.number && <span>{item.number} <span className="font-normal ml-4 mr-4"> x</span></span>}
+                        <div className="relative h-20 w-20">
                           <Image
                             src={item.icon}
                             alt="Package feature"
@@ -1343,7 +1336,7 @@ export default function HomePage() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1 + 0.4, duration: 0.5 }}
-                        className="text-gray-600 text-sm"
+                        className="text-gray-600 text-sm text-justify"
                       >
                         {item.description}
                       </motion.p>
@@ -1968,7 +1961,7 @@ export default function HomePage() {
                         <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-400 rounded-full border-2 border-white animate-bounce"></div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-600 group-hover:text-gray-800 transition-colors duration-300">Visit Website</p>
+                        <p className="text-sm font-medium text-gray-600 group-hover:text-gray-800 transition-colors duration-300">Visit Us</p>
                         <p className="text-sm font-semibold text-gray-900 group-hover:text-purple-600 transition-colors duration-300 truncate">
                           www.rupassurf.com
                         </p>
@@ -2002,11 +1995,10 @@ export default function HomePage() {
                         <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full border-2 border-white animate-pulse"></div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-600 group-hover:text-gray-800 transition-colors duration-300">Call Us Directly</p>
+                        <p className="text-sm font-medium text-gray-600 group-hover:text-gray-800 transition-colors duration-300">Call Us</p>
                         <p className="text-lg font-semibold text-gray-900 group-hover:text-green-600 transition-colors duration-300">
                           +94 762332355
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">Available 24/7 for bookings & inquiries</p>
                       </div>
                       <div className="hidden sm:flex items-center space-x-2">
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -2041,11 +2033,10 @@ export default function HomePage() {
                         <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-400 rounded-full border-2 border-white animate-bounce"></div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-600 group-hover:text-gray-800 transition-colors duration-300">Find Us Here</p>
+                        <p className="text-sm font-medium text-gray-600 group-hover:text-gray-800 transition-colors duration-300">Find Us</p>
                         <p className="text-base font-semibold text-gray-900 group-hover:text-orange-600 transition-colors duration-300">
                           Beach road, Arugam Bay 32500
                         </p>
-                        <p className="text-sm text-gray-600 mt-1">Sri Lanka • Right on the beach</p>
                       </div>
                       <div className="hidden sm:flex items-center space-x-2">
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">

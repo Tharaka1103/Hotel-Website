@@ -6,7 +6,7 @@ import Footer from './Components/Footer'
 import { Poiret_One, Berkshire_Swash, Montserrat } from 'next/font/google'
 import localFont from 'next/font/local'
 import ConditionalLayout from './Components/ConditionalLayout'
-
+import {ToastProvider} from '@/contexts/toast-context'
 const poiret0ne = Poiret_One({
   subsets: ['latin'],
   weight: ['400'],
@@ -67,7 +67,9 @@ export default function RootLayout({
       <body className="min-h-screen">
         <ThemeProvider>
           <ConditionalLayout>
+            <ToastProvider>
             {children}
+            </ToastProvider>
           </ConditionalLayout>
         </ThemeProvider>
       </body>

@@ -7,8 +7,7 @@ const BookingSchema = new mongoose.Schema({
     unique: true
   },
   packageId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Package',
+    type: String,
     required: true
   },
   personCount: {
