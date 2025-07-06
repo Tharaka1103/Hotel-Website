@@ -177,18 +177,19 @@ const ImageSlider = () => {
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Image data with titles and descriptions
   const images = [
     {
       src: "/images/image1.jpg",
-      title: "Luxurious Room Interior",
-      description: "Modern, comfortable rooms with premium amenities and stunning ocean views"
+      title: "Closest to the surf",
+      description: "We're right in front of the Arugam Bay's main surf point."
     },
     {
       src: "/images/image2.jpg",
-      title: "Freedom Outside",
-      description: "Explore the beautiful surroundings and enjoy outdoor activities at your leisure"
+      title: "Trusted since 1978",
+      description: "One of the original surf stays in town, with a legacy of happy surfers from around the world."
     },
     {
       src: "/images/image3.jpg",
@@ -197,58 +198,72 @@ const ImageSlider = () => {
     },
     {
       src: "/images/image4.jpg",
-      title: "Best Bathware Facilities",
-      description: "Modern bathrooms with premium fixtures, hot water, and luxurious amenities for your comfort"
+      title: "Modern & Affordable rooms",
+      description: "Clean, specious,  rooms with all the creature comforts you need after a surf session."
     },
     {
       src: "/images/image5.jpg",
-      title: "Calm Location",
-      description: "Situated in a peaceful and tranquil environment perfect for relaxation"
+      title: "Legendary Food",
+      description: "All-day Sri Lankan buffet, a buzzing café, and plenty of tasty international options."
     },
     {
       src: "/images/image6.jpg",
-      title: "Professional Instructors",
-      description: "ISA certified surf coaches with years of experience in teaching all skill levels"
+      title: "Certified surf instructors",
+      description: "Young passionate local pros ready to get you riding waves safely and confidently."
     },
     {
       src: "/images/image7.jpg",
-      title: "Cultural Experience",
-      description: "Learn about local surf culture and the rich heritage of Arugam Bay"
+      title: "More than surf",
+      description: "Live music, wildlife safari, lagoon tours, camping and  many other unique experiences."
     }
   ];
 
   // Auto-play functionality
   useEffect(() => {
-    if (isAutoPlaying && !isDragging) {
+    if (isAutoPlaying && !isDragging && !isTransitioning) {
       const interval = setInterval(() => {
-        setCurrentIndex((prev) => (prev + 1) % images.length);
+        handleSlideChange((prev) => (prev + 1) % images.length);
       }, 5000);
       return () => clearInterval(interval);
     }
-  }, [isAutoPlaying, isDragging, images.length]);
+  }, [isAutoPlaying, isDragging, isTransitioning, images.length]);
+
+  const handleSlideChange = (newIndex: number | ((prev: number) => number)) => {
+    if (isTransitioning) return;
+    
+    setIsTransitioning(true);
+    setCurrentIndex(newIndex);
+    
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 800);
+  };
 
   const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % images.length);
+    handleSlideChange((prev) => (prev + 1) % images.length);
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 3000);
   };
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+    handleSlideChange((prev) => (prev - 1 + images.length) % images.length);
     setIsAutoPlaying(false);
     setTimeout(() => setIsAutoPlaying(true), 3000);
   };
 
   const goToSlide = (index: number) => {
-    setCurrentIndex(index);
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 3000);
+    if (index !== currentIndex) {
+      handleSlideChange(index);
+      setIsAutoPlaying(false);
+      setTimeout(() => setIsAutoPlaying(true), 3000);
+    }
   };
 
   // Enhanced touch handlers for smooth swipe functionality
   const minSwipeDistance = 50;
 
   const onTouchStart = (e: React.TouchEvent) => {
+    if (isTransitioning) return;
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
     setIsDragging(true);
@@ -256,7 +271,7 @@ const ImageSlider = () => {
   };
 
   const onTouchMove = (e: React.TouchEvent) => {
-    if (!touchStart) return;
+    if (!touchStart || isTransitioning) return;
 
     const currentTouch = e.targetTouches[0].clientX;
     const diff = touchStart - currentTouch;
@@ -266,7 +281,7 @@ const ImageSlider = () => {
   };
 
   const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) {
+    if (!touchStart || !touchEnd || isTransitioning) {
       setIsDragging(false);
       setDragOffset(0);
       setTimeout(() => setIsAutoPlaying(true), 1000);
@@ -290,6 +305,7 @@ const ImageSlider = () => {
 
   // Mouse events for desktop drag support
   const onMouseDown = (e: React.MouseEvent) => {
+    if (isTransitioning) return;
     setTouchEnd(null);
     setTouchStart(e.clientX);
     setIsDragging(true);
@@ -297,7 +313,7 @@ const ImageSlider = () => {
   };
 
   const onMouseMove = (e: React.MouseEvent) => {
-    if (!touchStart || !isDragging) return;
+    if (!touchStart || !isDragging || isTransitioning) return;
 
     const diff = touchStart - e.clientX;
     setTouchEnd(e.clientX);
@@ -305,7 +321,7 @@ const ImageSlider = () => {
   };
 
   const onMouseUp = () => {
-    if (!touchStart || !touchEnd) {
+    if (!touchStart || !touchEnd || isTransitioning) {
       setIsDragging(false);
       setDragOffset(0);
       setTimeout(() => setIsAutoPlaying(true), 1000);
@@ -345,92 +361,100 @@ const ImageSlider = () => {
         onMouseEnter={() => !isDragging && setIsAutoPlaying(false)}
         onMouseOut={() => !isDragging && setIsAutoPlaying(true)}
       >
-        <div
-          className="flex items-center justify-center relative transition-transform duration-300 ease-out"
-          style={{
-            transform: isDragging ? `translateX(-${dragOffset * 0.5}px)` : 'translateX(0)',
-          }}
-        >
-
+        <div className="flex items-center justify-center relative">
           {/* Previous Image - Left Side */}
           <div
-            className="absolute left-0 md:left-8 lg:left-16 z-10 cursor-pointer transform transition-all duration-300 ease-out hover:scale-105 select-none"
+            className="absolute left-0 sm:left-4 md:left-8 lg:left-16 z-10 cursor-pointer select-none"
             onClick={prevSlide}
           >
-            <div className="relative w-[120px] h-[180px] md:w-[200px] md:h-[280px] lg:w-[250px] lg:h-[350px] rounded-2xl overflow-hidden shadow-xl opacity-70 hover:opacity-90 transition-all duration-300">
+            <div className="relative w-[80px] h-[120px] sm:w-[100px] sm:h-[150px] md:w-[200px] md:h-[280px] lg:w-[250px] lg:h-[350px] rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden shadow-xl opacity-85 hover:opacity-95 transition-opacity duration-300">
               <Image
                 src={images[getPrevIndex()].src}
                 alt={images[getPrevIndex()].title}
                 fill
-                className="object-cover transition-transform duration-300"
+                className="object-cover"
                 draggable={false}
               />
-              <div className="absolute inset-0 bg-black/20" />
-
-              {/* Overlay Icon */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-                <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
-                  <ChevronLeft className="w-6 h-6 text-primary" />
-                </div>
-              </div>
+              <div className="absolute inset-0 bg-black/10" />
             </div>
           </div>
 
           {/* Current Image - Center */}
           <div className="relative z-20">
             <div
-              className="relative w-[280px] h-[210px] md:w-[400px] md:h-[300px] lg:w-[500px] lg:h-[375px] xl:w-[600px] xl:h-[450px] rounded-3xl overflow-hidden shadow-2xl transition-all duration-300 ease-out"
+              className="relative w-[200px] h-[150px] sm:w-[240px] sm:h-[180px] md:w-[400px] md:h-[300px] lg:w-[500px] lg:h-[375px] xl:w-[600px] xl:h-[450px] rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl"
               style={{
-                transform: isDragging ? `scale(0.98)` : 'scale(1)',
+                transform: isDragging 
+                  ? `translateX(${-dragOffset * 0.3}px) scale(0.98) rotateY(${dragOffset * 0.02}deg)`
+                  : isTransitioning 
+                    ? 'translateX(0px) scale(1.02) rotateY(0deg)'
+                    : 'translateX(0px) scale(1) rotateY(0deg)',
+                transition: isDragging 
+                  ? 'transform 0.1s ease-out' 
+                  : isTransitioning 
+                    ? 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease-out'
+                    : 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                opacity: isDragging ? 0.9 : isTransitioning ? 0.95 : 1,
+                transformStyle: 'preserve-3d',
+                perspective: '1000px'
               }}
             >
               <Image
                 src={images[currentIndex].src}
                 alt={images[currentIndex].title}
                 fill
-                className="object-cover transition-all duration-500 ease-out"
+                className="object-cover"
                 priority
                 draggable={false}
+                style={{
+                  transform: isTransitioning ? 'scale(1.05)' : 'scale(1)',
+                  transition: 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+                }}
               />
 
               {/* Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/50" />
 
-              {/* Content Overlay */}
+              {/* Title Overlay - Top Center */}
               <div
-                className="absolute bottom-0 left-0 right-0 p-4 md:p-6 lg:p-8 text-white transition-all duration-300"
+                className="absolute top-0 left-0 right-0 p-2 sm:p-3 md:p-6 lg:p-8 text-white text-center"
                 style={{
-                  opacity: isDragging ? 0.7 : 1,
+                  opacity: isDragging ? 0.7 : isTransitioning ? 0.9 : 1,
+                  transform: isTransitioning ? 'translateY(-10px)' : 'translateY(0px)',
+                  transition: 'opacity 0.3s ease-out, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}
               >
-                <p className="text-sm md:text-base lg:text-lg text-gray-200 drop-shadow leading-relaxed">
+                <h3 className="text-xs sm:text-sm md:text-lg lg:text-xl xl:text-2xl font-bold drop-shadow-lg mb-1 sm:mb-2 bg-primary rounded-lg sm:rounded-2xl md:rounded-3xl px-2 sm:px-3 md:px-5 py-1 sm:py-2 inline-block tanHeading">
+                  {images[currentIndex].title}
+                </h3>
+              </div>
+
+              {/* Description Overlay - Bottom */}
+              <div
+                className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 md:p-6 lg:p-8 text-white"
+              >
+                <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-200 drop-shadow leading-relaxed text-center line-clamp-2 sm:line-clamp-none">
                   {images[currentIndex].description}
                 </p>
               </div>
+
             </div>
           </div>
 
           {/* Next Image - Right Side */}
           <div
-            className="absolute right-0 md:right-8 lg:right-16 z-10 cursor-pointer transform transition-all duration-300 ease-out hover:scale-105 select-none"
+            className="absolute right-0 sm:right-4 md:right-8 lg:right-16 z-10 cursor-pointer select-none"
             onClick={nextSlide}
           >
-            <div className="relative w-[120px] h-[180px] md:w-[200px] md:h-[280px] lg:w-[250px] lg:h-[350px] rounded-2xl overflow-hidden shadow-xl opacity-70 hover:opacity-90 transition-all duration-300">
+            <div className="relative w-[80px] h-[120px] sm:w-[100px] sm:h-[150px] md:w-[200px] md:h-[280px] lg:w-[250px] lg:h-[350px] rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden shadow-xl opacity-85 hover:opacity-95 transition-opacity duration-300">
               <Image
                 src={images[getNextIndex()].src}
                 alt={images[getNextIndex()].title}
                 fill
-                className="object-cover transition-transform duration-300"
+                className="object-cover"
                 draggable={false}
               />
-              <div className="absolute inset-0 bg-black/20" />
-
-              {/* Overlay Icon */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-                <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
-                  <ChevronRight className="w-6 h-6 text-primary" />
-                </div>
-              </div>
+              <div className="absolute inset-0 bg-black/10" />
             </div>
           </div>
         </div>
@@ -443,6 +467,7 @@ const ImageSlider = () => {
               size="icon"
               variant="outline"
               className="w-12 h-12 lg:w-14 lg:h-14 rounded-full bg-white/95 backdrop-blur-sm border-2 hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-lg hover:shadow-xl"
+              disabled={isTransitioning}
             >
               <ChevronLeft className="w-5 h-5 lg:w-6 lg:h-6" />
             </Button>
@@ -454,22 +479,13 @@ const ImageSlider = () => {
               size="icon"
               variant="outline"
               className="w-12 h-12 lg:w-14 lg:h-14 rounded-full bg-white/95 backdrop-blur-sm border-2 hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-lg hover:shadow-xl"
+              disabled={isTransitioning}
             >
               <ChevronRight className="w-5 h-5 lg:w-6 lg:h-6" />
             </Button>
           </div>
         </div>
 
-        {/* Drag Progress Indicator */}
-        {isDragging && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30">
-            <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg">
-              <span className="text-xs font-medium text-gray-700">
-                {dragOffset > minSwipeDistance ? '← Next' : dragOffset < -minSwipeDistance ? 'Prev →' : 'Swipe'}
-              </span>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Dots Indicator */}
@@ -478,10 +494,15 @@ const ImageSlider = () => {
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`transition-all duration-300 rounded-full ${index === currentIndex
-              ? 'w-8 h-3 bg-primary shadow-lg'
-              : 'w-3 h-3 bg-gray-300 hover:bg-gray-400'
-              }`}
+            disabled={isTransitioning}
+            className={`transition-all duration-500 rounded-full ${
+              index === currentIndex
+                ? 'w-10 h-4 bg-primary shadow-lg transform scale-110'
+                : 'w-4 h-4 bg-gray-300 hover:bg-gray-400 hover:scale-105'
+            }`}
+            style={{
+              transform: index === currentIndex && isTransitioning ? 'scale(1.2)' : undefined,
+            }}
           />
         ))}
       </div>
@@ -501,7 +522,6 @@ const ImageSlider = () => {
     </div>
   );
 };
-
 
 
 // Enhanced Video Hero Section with Floating Images
@@ -605,30 +625,31 @@ const VideoSection = ({
 
 const highlights = [
   {
-    icon: <LucideWaves className="w-20 h-20 text-white" />,
+    icon: <img src="/icons/elephant.png" alt="Waves" className="w-20 h-20" />,
     title: "Waves for all",
     description:
       "Whether you're just starting out your surfing journey or chasing barrels, Arugam Bay has surf spots for all levels.",
   },
   {
-    icon: <LucideSun className="w-20 h-20 text-white" />,
+    icon: <img src="/icons/elephant.png" alt="Sun" className="w-20 h-20" />,
     title: "More Than Just Surf",
     description:
       "With culture-rich villages, stunning view points, parties & music – the vibe will make you want to stay forever.",
   },
   {
-    icon: <LucideMountainSnow className="w-20 h-20 text-white" />,
+    icon: <img src="/icons/elephant.png" alt="Mountain" className="w-20 h-20" />,
     title: "Surrounded by Wildlife",
     description:
-      "From elephants and monkeys to vibrant birdlife and even leopards, the area teams with natural wonders.",
+      "From elephants and monkeys to vibrant birdlife and even leopards, the area teems with natural wonders. Just a short drive away, Kumana National Park offers some of Sri Lanka's best wildlife safaris.",
   },
   {
-    icon: <LucideGlobe className="w-20 h-20 text-white" />,
+    icon: <img src="/icons/elephant.png" alt="Globe" className="w-20 h-20" />,
     title: "Globally Recognized",
     description:
       "One of the top surf destinations in the world, loved by surfers from every corner of the globe.",
   },
 ]
+
 
 // Simplified Testimonial Card with Enhanced Animation
 const TestimonialCard = ({ name, location, rating, text }: {
@@ -950,7 +971,7 @@ export default function HomePage() {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
-        className="relative bg-[#04444C] py-8 sm:py-10 md:py-12 px-4 sm:px-6 md:px-20 text-white overflow-hidden"
+        className="relative bg-[#04444C] py-8 sm:py-8 md:py-8 px-4 sm:px-6 md:px-20 text-white overflow-hidden"
       >
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -981,16 +1002,17 @@ export default function HomePage() {
       </motion.section>
 
       {/* Highlights Section with Floating Surfboard */}
-      <section className="relative bg-[#19818f] py-8 sm:py-12 md:py-16 px-4 sm:px-6 md:px-20 text-white overflow-hidden">
+      <section className="relative bg-transparent py-8 sm:py-12 md:py-16 px-4 sm:px-6 md:px-20 text-white overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
             src="/bg.jpg"
             alt="Background"
             fill
-            className="object-cover opacity-20"
+            className="object-cover"
             priority
           />
         </div>
+        <div className="absolute inset-x-0 top-0 h-[88.89%] bg-[#048697e8] z-[1]" />
 
         <motion.div
           variants={staggerContainer}
@@ -1022,7 +1044,7 @@ export default function HomePage() {
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: index * 0.1, duration: 0.6 }}
-                      className="text-xl sm:text-2xl font-bold mb-1"
+                      className="text-xl sm:text-xl font-bold mb-1 tanHeading"
                     >
                       {item.title}
                     </motion.h3>
@@ -1031,7 +1053,7 @@ export default function HomePage() {
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: index * 0.1 + 0.2, duration: 0.6 }}
-                      className="text-base sm:text-lg text-white/90 leading-relaxed"
+                      className="text-base font-bold sm:text-md text-white/90 leading-relaxed"
                     >
                       {item.description}
                     </motion.p>
@@ -1066,23 +1088,14 @@ export default function HomePage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <motion.h2
+            <motion.p
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="text-2xl md:text-4xl font-bold leading-tight customtext mb-6  z-50"
+              className="text-2xl md:text-4xl text-text font-bold leading-tight customtext mb-6  z-50"
             >
-              Why learn to surf with <span className="text-primary">Rupa's Surf Camp?</span>
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4, duration: 0.6 }}
-              className="text-xl text-gray-600 max-w-3xl mx-auto  z-50"
-            >
-              Experience the best surfing education with our professional instructors and perfect conditions
+              Why learn to surf with <span className="text-primary">Rupa's </span>Surf Camp?
             </motion.p>
           </motion.div>
 
@@ -1104,7 +1117,7 @@ export default function HomePage() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className="text-3xl md:text-4xl font-bold customtext"
+            className="text-3xl md:text-4xl font-bold customtext text-text"
           >
             All the Awesome Stuff at <span className="text-primary">Rupa's</span>
           </motion.h2>
@@ -1113,7 +1126,7 @@ export default function HomePage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.4, duration: 0.6 }}
-            className="text-xl mt-2"
+            className="text-xl mt-2 text-text"
           >
             Whether you're here to ride waves, explore wild nature, or just vibe with the rhythm of the coast — we've got it all waiting for you.
           </motion.p>
