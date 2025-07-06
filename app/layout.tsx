@@ -59,7 +59,7 @@ const tanHeading = localFont({
   display: 'swap',
 })
 export const metadata: Metadata = {
-  title: "Rupa's Serf - Hotel & Resort",
+  title: "Rupa's Surf Camp",
   description: "Experience luxury and comfort at our oceanfront hotel with world-class amenities",
   keywords: "hotel, resort, luxury, oceanfront, vacation, accommodation",
 };
