@@ -522,7 +522,7 @@ const VideoHero = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <div className="relative h-screen w-full overflow-hidden">
+    <div className="relative min-h-screen w-full overflow-hidden">
       <video
         ref={videoRef}
         autoPlay
@@ -535,31 +535,6 @@ const VideoHero = ({ children }: { children: React.ReactNode }) => {
         Your browser does not support the video tag.
       </video>
       <div className="absolute inset-0 bg-black/40" />
-
-      {/* Floating Surfboard - Large and Prominent */}
-      <FloatingScrollImage
-        src="/images/surfboard.png"
-        alt="Surfboard"
-        className="top-10 sm:top-20 right-4 sm:right-10 lg:right-20 w-24 sm:w-32 md:w-48 lg:w-64 xl:w-80 h-24 sm:h-32 md:h-48 lg:h-64 xl:h-80 z-50"
-        scrollRange={[0, 1000]}
-        yRange={[0, -200]}
-        rotateRange={[0, 45]}
-        scaleRange={[1, 1.2]}
-        opacityRange={[0.8, 1]}
-      />
-
-      {/* Floating Leaf 1 - Top Left */}
-      <FloatingScrollImage
-        src="/images/leaf1.png"
-        alt="Leaf 1"
-        className="top-4 sm:top-8 left-4 sm:left-8 lg:left-16 w-16 sm:w-24 md:w-32 lg:w-40 xl:w-48 h-16 sm:h-24 md:h-32 lg:h-40 xl:h-48 z-50"
-        scrollRange={[0, 800]}
-        yRange={[0, -100]}
-        xRange={[0, 50]}
-        rotateRange={[0, -30]}
-        scaleRange={[1, 1.1]}
-        opacityRange={[0.7, 1]}
-      />
 
       {/* Content in front of video */}
       <div className="absolute inset-0 flex items-center justify-center z-40">
@@ -596,7 +571,7 @@ const VideoSection = ({
   };
 
   return (
-    <div className={`relative h-[500px] rounded-3xl overflow-hidden shadow-2xl ${className}`}>
+    <div className={`relative min-h-screen rounded-3xl overflow-hidden shadow-2xl ${className}`}>
       <video
         ref={videoRef}
         autoPlay
@@ -799,21 +774,22 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-screen w-full overflow-x-hidden bg-background relative">
+    <main className=" w-full overflow-x-hidden bg-background relative">
       {/* Hero Section with Full Video and Floating Images */}
-      <section id="home" className="h-screen relative overflow-hidden">
+      <section id="home" className="relative overflow-hidden h-screen">
         <VideoHero>
-          <div className="max-w-4xl mx-auto text-center px-4 relative z-30">
+          <div className="max-w-4xl mx-auto text-center px-4 relative z-30 h-screen flex flex-col items-center">
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, ease: "easeOut" }}
+              className="flex flex-col items-center justify-center flex-grow pt-10"
             >
               <motion.p
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
-                className="text-xl md:text-4xl mb-16 max-w-2xl mx-auto leading-relaxed text-white/90 customtext"
+                className="text-xl md:text-4xl mb-20 mt-10 max-w-2xl mx-auto leading-relaxed text-white/90 customtext "
               >
                 Rupa's Surf Camp
               </motion.p>
@@ -821,7 +797,7 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
-                className="text-4xl md:text-7xl font-extrabold mb-4 md:mb-6 drop-shadow-lg tracking-tight text-white customtext"
+                className="text-4xl md:text-7xl font-extrabold drop-shadow-lg tracking-tight text-white customtext pt-10"
               >
                 Arugam Bay
               </motion.h1>
@@ -829,87 +805,84 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7, duration: 0.8, ease: "easeOut" }}
-                className="text-lg md:text-xl mb-4 md:mb-6 max-w-2xl mx-auto leading-relaxed text-white/90"
+                className="text-md md:text-lg mb-6 max-w-2xl mx-auto leading-relaxed text-white/90"
               >
                 Sri Lanka's surfing paradise - the iconic surf town
               </motion.p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.9, duration: 0.8, type: "spring", stiffness: 200 }}
+              className="mb-16 sm:mb-16"
+            >
               <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.9, duration: 0.8, type: "spring", stiffness: 200 }}
-                className="flex justify-center"
+                whileHover={{ scale: 1.05, y: -5 }}
+                whileTap={{ scale: 0.95 }}
+                className=""
               >
-                <motion.div
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  whileTap={{ scale: 0.95 }}
+                <Button
+                  size="lg"
+                  className="text-lg md:text-xl bg-transparent border-2 border-white text-white px-8 py-4 rounded-full shadow-xl hover:bg-primary hover:border-primary hover:text-white transition-all duration-300 relative overflow-hidden group"
                 >
-                  <Button
-                    size="lg"
-                    className="text-lg md:text-xl bg-transparent border-2 border-white text-white px-8 py-4 rounded-full shadow-xl hover:bg-primary hover:border-primary hover:text-white transition-all duration-300 relative overflow-hidden group"
-                  >
-                    <motion.span
-                      className="absolute inset-0 bg-primary/20"
-                      initial={{ x: "-100%" }}
-                      whileHover={{ x: "100%" }}
-                      transition={{ duration: 0.5 }}
-                    />
-                    <span className="relative z-10">Book Now</span>
-                  </Button>
-                </motion.div>
+                  <motion.span
+                    className="absolute inset-0 bg-primary/20"
+                    initial={{ x: "-100%" }}
+                    whileHover={{ x: "100%" }}
+                    transition={{ duration: 0.5 }}
+                  />
+                  <span className="relative z-10">Book Now</span>
+                </Button>
               </motion.div>
             </motion.div>
           </div>
         </VideoHero>
 
+
+      </section>
+      <section className="relative overflow-hidden h-[150px]">
         {/* Bottom Info Bar */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2, duration: 0.6 }}
-          className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm z-30"
+          className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm z-30 px-5"
         >
           <div className="container mx-auto px-4 py-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-7 gap-4 items-center">
               <motion.div
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 1.4, duration: 0.5 }}
-                className="flex items-center gap-4 text-center md:text-left md:col-span-1.6"
+                className="flex items-center gap-8 text-center md:text-left md:col-span-3"
               >
                 <div className="hidden md:block">
-                  <h3 className="text-xl font-bold text-primary customtext">Arugam Bay</h3>
+                  <h3 className="text-xl font-bold text-primary text-center tanHeading">Arugam Bay</h3>
                 </div>
-                <p className="text-sm md:text-base text-black/90">Rich wildlife, deep-rooted Sri Lankan culture and breath-taking scenery, it's more than a surfing description - it's a once-in-a-lifetime experience.</p>
+                <p className="text-xs md:text-base text-text text-justify">Rich wildlife, deep-rooted Sri Lankan culture and breath-taking scenery, it's more than a surfing description - it's a once-in-a-lifetime experience.</p>
               </motion.div>
 
-              <div className="hidden md:flex items-center justify-center md:col-span-0.1">
-                <motion.button
-                  whileHover={{ scale: 1.1, rotate: 180 }}
-                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                >
-                  <X className="w-6 h-6 text-black hover:text-primary transition-colors cursor-pointer" />
-                </motion.button>
+              <div className="hidden md:flex justify-center items-center md:col-span-1">
+                <span className="text-2xl text-primary font-bold w-4">×</span>
               </div>
 
               <motion.div
                 initial={{ opacity: 0, x: 30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 1.6, duration: 0.5 }}
-                className="flex items-center gap-4 text-center md:text-right md:col-span-1.6"
+                className="flex items-center gap-8 text-center md:text-right md:col-span-3"
               >
-                <p className="text-sm md:text-base text-black/90">Join Sri Lanka's best Surf Camp - from beginners to advanced surfers, we've got you covered!</p>
+                <p className="text-xs md:text-base text-text text-justify text-text">Join the <b>best Surf Camp in Sri Lanka</b> whether you dream of learning to surf or just love chasing advanced breaks, we  will  take you there!</p>
                 <div className="hidden md:block">
-                  <h3 className="text-xl font-bold text-primary customtext">Rupa's Surf</h3>
+                  <h3 className="text-xl font-bold text-primary text-center tanHeading">Rupa's Surf</h3>
                 </div>
               </motion.div>
             </div>
           </div>
         </motion.div>
       </section>
-
       {/* About Us Section with Video and Floating Leaf */}
-      <section className="py-16 md:px-5 bg-white relative overflow-hidden">
-
+      <section className="py-16 mb-10 md:px-20 bg-white relative overflow-hidden">
         <div className="container mx-auto px-4 relative z-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div
@@ -919,33 +892,33 @@ export default function HomePage() {
               transition={{ duration: 0.8 }}
               className="order-2 lg:order-1"
             >
-              <motion.h2
+              <motion.p
                 initial={{ opacity: 0, x: -30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.2, duration: 0.6 }}
-                className="text-3xl md:text-4xl font-bold mb-8 leading-tight customtext"
+                className="text-3xl md:text-4xl text-text font-bold mb-8 leading-tight customtext"
               >
-                Welcome to <span className="text-primary">Rupa&apos;s Surf Camp</span>
-              </motion.h2>
-              <div className="space-y-6 text-justify">
+                Welcome to <span className="text-primary">Rupa's Surf Camp</span>
+              </motion.p>
+              <div className="space-y-6">
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.4, duration: 0.6 }}
-                  className="text-xl leading-relaxed"
+                  className="text-lg leading-relaxed text-text text-justify"
                 >
-                  Rupa&apos;s Surf Camp, part of the legendary Rupa&apos;s Hotel, has been a trusted home for surfers since 1978 — making it one of the very first surf stays in Arugam Bay. we&apos;re proud to continue offering a laid-back, welcoming space for everyone chasing waves and good vibes.
+                  Rupa's Surf Camp, part of the legendary Rupa's Hotel, has been a trusted home for surfers since 1978 — making it one of the very first surf stays in Arugam Bay. we're proud to continue offering a laid-back, welcoming space for everyone chasing waves and good vibes.
                 </motion.p>
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.6, duration: 0.6 }}
-                  className="text-xl leading-relaxed"
+                  className="text-lg leading-relaxed text-text text-justify"
                 >
-                  We&apos;re located right in front of Arugam Bay&apos;s Baby Point — one of the best spots for beginners to catch their first waves. Whether you&apos;re just learning or ready to explore more challenging reef breaks, our local certified pro surf instructors are friendly, experienced, and stoked to show you the best waves along Sri Lanka&apos;s beautiful east coast.
+                  We're located right in front of Arugam Bay's Baby Point — one of the best spots for beginners to catch their first waves. Whether you're just learning or ready to explore more challenging reef breaks, our local certified pro surf instructors are friendly, experienced, and stoked to show you the best waves along Sri Lanka's beautiful east coast.
                 </motion.p>
               </div>
             </motion.div>
@@ -954,21 +927,17 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="order-1 lg:order-2 relative"
+              className="order-1 lg:order-2 flex justify-center items-center"
             >
-              <div className="relative w-full h-[500px]">
-
-                <VideoSection videoSrc="/heronew.mp4">
-                  <div>
-                  </div>
-                </VideoSection>
-                <div className="absolute top-1 -left-20 w-1/2 h-1/2">
-                  <FloatingScrollImage
-                    src="/images/flower1.png"
-                    alt="Leaf 2"
-                    className="w-full h-full"
-                  />
-                </div>
+              <div className="relative w-full max-w-[500px] aspect-square">
+                <video
+                  src="/heronew.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover rounded-3xl"
+                />
               </div>
             </motion.div>
           </div>
@@ -990,7 +959,7 @@ export default function HomePage() {
           transition={{ duration: 0.6 }}
           className="text-center max-w-4xl mx-auto relative z-20"
         >
-          <motion.h2
+          <motion.p
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -998,8 +967,8 @@ export default function HomePage() {
             className="text-3xl sm:text-4xl md:text-4xl font-semibold leading-tight customtext"
           >
             What&apos;s so special about
-          </motion.h2>
-          <motion.h2
+          </motion.p>
+          <motion.p
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -1007,7 +976,7 @@ export default function HomePage() {
             className="text-3xl sm:text-4xl md:text-4xl font-bold text-cyan-300 mt-2 customtext"
           >
             Arugambay?
-          </motion.h2>
+          </motion.p>
         </motion.div>
       </motion.section>
 
@@ -1077,17 +1046,17 @@ export default function HomePage() {
       {/* Why Learn to Surf Section with Image Slider and Floating Leaf */}
       <section className="py-16 mt-10 bg-background overflow-hidden relative">
         {/* Floating Leaf 1 - Different Position */}
-        <FloatingScrollImage
+        {/*<FloatingScrollImage
           src="/images/leaf1.png"
           alt="Leaf 1"
-          className="top-60 left-4 sm:left-10 lg:left-20 w-24 sm:w-40 md:w-56 lg:w-72 xl:w-96 h-24 sm:h-40 md:h-56 lg:h-72 xl:h-96 z-30"
+          className="hidden md:block top-60 left-4 sm:left-10 lg:left-20 w-24 sm:w-40 md:w-56 lg:w-72 xl:w-96 h-24 sm:h-40 md:h-56 lg:h-72 xl:h-96 z-30"
           scrollRange={[1200, 2200]}
           yRange={[0, -200]}
           xRange={[0, 100]}
           rotateRange={[0, -90]}
           scaleRange={[1, 1.4]}
           opacityRange={[0.5, 1]}
-        />
+        />*/}
 
         <div className="container mx-auto px-4 relative z-20">
           <motion.div
@@ -1193,7 +1162,7 @@ export default function HomePage() {
       {/* Most Popular Package Section with Floating Elements */}
       <section className="py-16 md:px-5 bg-white relative overflow-hidden">
         {/* Floating Leaf 2 - Different Position */}
-        <FloatingScrollImage
+        {/*<FloatingScrollImage
           src="/images/flower1.png"
           alt="Leaf 2"
           className="top-24 w-16 sm:w-24 md:w-32 lg:w-48 xl:w-64 h-16 sm:h-24 md:h-32 lg:h-48 xl:h-64 z-10"
@@ -1203,7 +1172,7 @@ export default function HomePage() {
           rotateRange={[0, 45]}
           scaleRange={[1, 1.2]}
           opacityRange={[0.7, 1]}
-        />
+        />*/}
 
         <motion.div
           initial={{ opacity: 0, y: 40 }}

@@ -508,7 +508,7 @@ const Footer = () => {
                 className="text-primary hover:text-primary/80 font-bold text-sm sm:text-base transition-all duration-300 relative"
               >
                 <Image 
-                  src="/icons/logo.jpg"
+                  src="/trimids.png"
                   alt="TRIMIDS Logo"
                   width={100}
                   height={30}

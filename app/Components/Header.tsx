@@ -63,15 +63,15 @@ export const Header = () => {
           </Link>
           
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
+          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2 uppercase absolute left-1/2 transform -translate-x-1/2">
             {navLinks.map((link) => (
               <Link 
                 key={link.href} 
                 href={link.href}
                 className={cn(
-                  "px-3 py-2 rounded-md text-xl font-medium transition-colors duration-200",
+                  "px-3 py-2 rounded-md text-white  text-md font-normal transition-colors duration-200",
                   scrolled 
-                    ? "hover:bg-primary hover:text-white hover:rounded-full" 
+                    ? "hover:bg-primary hover:text-white hover:rounded-full text-black" 
                     : ""
                 )}
               >
@@ -81,11 +81,11 @@ export const Header = () => {
           </nav>
           
           {/* Call to Action Button and Theme Switch */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Link href="/contact" className="text-xl font-medium">
+          <div className="hidden md:flex items-center space-x-4 ">
+            <Link href="/contact" className="text-md font-medium">
               <Button 
                 className={cn(
-                  "rounded-full transition-all duration-300 text-xl",
+                  "rounded-full transition-all duration-300 text-md uppercase",
                   scrolled 
                     ? "bg-primary hover:bg-blue-600" 
                     : "bg-white/20 backdrop-blur-md hover:bg-white/30 border border-white/20"
@@ -120,7 +120,7 @@ export const Header = () => {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden bg-background border-t border-gray-200 shadow-lg"
+            className="md:hidden bg-white border-t border-gray-200 shadow-lg"
           >
             <div className="container mx-auto px-4 py-4">
               <nav className="flex flex-col space-y-3">
