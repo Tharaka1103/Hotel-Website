@@ -13,7 +13,9 @@ html, body {
 h1, h2 {
   text-transform: uppercase;
 }
-
+.bebasfont{
+    font-family: 'Bebas Neue', sans-serif;
+}
 .customtext{
     font-family: 'tanMeringue', sans-serif;
     font-weight: 1000;

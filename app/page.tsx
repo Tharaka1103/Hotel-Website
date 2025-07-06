@@ -491,8 +491,8 @@ const ImageSlider = () => {
             onClick={() => goToSlide(index)}
             disabled={isTransitioning}
             className={`transition-all duration-500 rounded-full ${index === currentIndex
-                ? 'w-10 h-4 bg-primary shadow-lg transform scale-110'
-                : 'w-4 h-4 bg-gray-300 hover:bg-gray-400 hover:scale-105'
+              ? 'w-10 h-4 bg-primary shadow-lg transform scale-110'
+              : 'w-4 h-4 bg-gray-300 hover:bg-gray-400 hover:scale-105'
               }`}
             style={{
               transform: index === currentIndex && isTransitioning ? 'scale(1.2)' : undefined,
@@ -712,6 +712,227 @@ const TestimonialCard = ({ name, location, rating, text }: {
     </Card>
   </motion.div>
 );
+{/* Magical Arugambay Image Slider Component */ }
+const MagicalArugambaySlider = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Image data - Replace these paths with your actual images
+  const images = [
+    {
+      src: "/images/lepord.jpg", // Replace with actual elephant image
+      title: "Wild Elephants",
+      description: "Majestic elephants roaming freely in their natural habitat"
+    },
+    {
+      src: "/images/lepord.jpg", // Replace with actual lagoon image
+      title: "Glowing Lagoons",
+      description: "Spectacular lagoons that shimmer golden during sunset"
+    },
+    {
+      src: "/images/lepord.jpg", // Replace with actual jungle image
+      title: "Dense Jungles",
+      description: "Thick tropical jungles teeming with diverse wildlife"
+    },
+    {
+      src: "/images/lepord.jpg", // Replace with actual safari image
+      title: "Safari Adventures",
+      description: "Thrilling safari rides through untamed wilderness"
+    },
+    {
+      src: "/images/lepord.jpg", // Replace with actual sunset image
+      title: "Breathtaking Sunsets",
+      description: "Spectacular sunset views that paint the sky in vivid colors"
+    },
+    {
+      src: "/images/lepord.jpg", // Replace with actual wildlife image
+      title: "Rich Wildlife",
+      description: "Home to leopards, peacocks, and countless exotic species"
+    }
+  ];
+
+  // Auto-play functionality with 2-second intervals
+  useEffect(() => {
+    if (isAutoPlaying && !isTransitioning) {
+      const interval = setInterval(() => {
+        handleSlideChange((prev) => (prev + 1) % images.length);
+      }, 2000); // 2 seconds
+      return () => clearInterval(interval);
+    }
+  }, [isAutoPlaying, isTransitioning, images.length]);
+
+  const handleSlideChange = (newIndex: number | ((prev: number) => number)) => {
+    if (isTransitioning) return;
+
+    setIsTransitioning(true);
+    setCurrentIndex(newIndex);
+
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 600);
+  };
+
+  const goToSlide = (index: number) => {
+    if (index !== currentIndex && !isTransitioning) {
+      handleSlideChange(index);
+      setIsAutoPlaying(false);
+      setTimeout(() => setIsAutoPlaying(true), 4000);
+    }
+  };
+
+  // Touch handlers for mobile swipe
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    if (isTransitioning) return;
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+    setIsAutoPlaying(false);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (!touchStart || isTransitioning) return;
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd || isTransitioning) {
+      setTimeout(() => setIsAutoPlaying(true), 2000);
+      return;
+    }
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      handleSlideChange((prev) => (prev + 1) % images.length);
+    } else if (isRightSwipe) {
+      handleSlideChange((prev) => (prev - 1 + images.length) % images.length);
+    }
+
+    setTimeout(() => setIsAutoPlaying(true), 2000);
+  };
+
+  return (
+    <div className="relative w-full max-w-3xl mx-auto flex items-center justify-center">
+      {/* Main Slider Container */}
+      <div
+        className="relative overflow-hidden rounded-3xl w-full"
+      >
+        {/* Black Background to prevent white flash */}
+        <div className="absolute inset-0 bg-black z-0" />
+
+        {/* Image Container */}
+        <div className="relative w-full aspect-[16/9] max-w-3xl mx-auto flex items-center justify-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentIndex}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{
+                duration: 0.4,
+                ease: "easeInOut"
+              }}
+              className="absolute inset-0"
+            >
+              <Image
+                src={images[currentIndex].src}
+                alt={images[currentIndex].title}
+                fill
+                className="object-cover rounded-3xl"
+                priority
+                sizes="(max-width: 480px) 95vw, (max-width: 768px) 85vw, (max-width: 1024px) 75vw, 60vw"
+                quality={85}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30" />
+              {/* Content Overlay */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.4 }}
+                className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 md:p-6 flex flex-col items-center text-center"
+              >
+                <motion.h3
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3, duration: 0.4 }}
+                  className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold mb-1 sm:mb-2 customtext text-white"
+                >
+                  {images[currentIndex].title}
+                </motion.h3>
+                <motion.p
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4, duration: 0.4 }}
+                  className="text-xs sm:text-sm md:text-base lg:text-lg text-white/90 max-w-xl px-2"
+                >
+                  {images[currentIndex].description}
+                </motion.p>
+              </motion.div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Navigation Arrows */}
+      <div className="absolute inset-0 flex items-center justify-between px-2 sm:px-4 md:px-6 lg:px-8"
+        onMouseEnter={() => setIsAutoPlaying(false)}
+        onMouseLeave={() => setIsAutoPlaying(true)}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}>
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => {
+            handleSlideChange((prev) => (prev - 1 + images.length) % images.length);
+            setIsAutoPlaying(false);
+            setTimeout(() => setIsAutoPlaying(true), 4000);
+          }}
+          className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 bg-white/20 backdrop-blur-md border border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 z-10 focus:outline-none focus:ring-2 focus:ring-white/50"
+          disabled={isTransitioning}
+          aria-label="Previous slide"
+        >
+          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => {
+            handleSlideChange((prev) => (prev + 1) % images.length);
+            setIsAutoPlaying(false);
+            setTimeout(() => setIsAutoPlaying(true), 4000);
+          }}
+          className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 bg-white/20 backdrop-blur-md border border-white/30 rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 z-10 focus:outline-none focus:ring-2 focus:ring-white/50"
+          disabled={isTransitioning}
+          aria-label="Next slide"
+        >
+          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
+        </motion.button>
+      </div>
+      {/* Auto-play Status Indicator */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2, duration: 0.4 }}
+        className="hidden sm:flex absolute top-3 right-3 items-center gap-1.5 bg-black/20 backdrop-blur-md rounded-full px-2 py-0.5 text-white text-xs"
+      >
+        <div className={`w-1.5 h-1.5 rounded-full ${isAutoPlaying ? 'bg-green-400 animate-pulse' : 'bg-gray-400'}`} />
+        <span className="text-xs font-medium">
+          {isAutoPlaying ? 'Auto-playing' : 'Paused'}
+        </span>
+      </motion.div>
+    </div>
+  );
+};
+
+
 
 // Feature icon helper function
 const getFeatureIcon = (feature: string) => {
@@ -787,6 +1008,17 @@ export default function HomePage() {
   const getPackageImage = (index: number) => {
     return "/surfer-blue-wave.jpg";
   };
+
+  {/* Food experience section */ }
+  const images = ['/images/image1.jpg', '/images/image2.jpg', '/images/image3.jpg', '/images/image4.jpg']
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length)
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <main className=" w-full overflow-x-hidden bg-background relative">
@@ -1006,7 +1238,7 @@ export default function HomePage() {
             priority
           />
         </div>
-        <div className="absolute inset-x-0 top-0 h-[98%] mdh-[88.89] bg-[#048697e8] z-[1]" />
+        <div className="absolute inset-x-0 top-0 h-[98%] md:h-[88.89%] bg-[#048697e8] z-[1]" />
 
         <motion.div
           variants={staggerContainer}
@@ -1212,7 +1444,7 @@ export default function HomePage() {
           >
             <motion.div
               whileHover={{ scale: 1.05 }}
-              className="text-3xl font-bold text-primary mb-6 md:mb-0 tanHeading"
+              className="text-3xl font-bold text-primary px-4 mb-6 md:mb-0 tanHeading"
             >
               Surf & Safari Retreat
             </motion.div>
@@ -1221,13 +1453,6 @@ export default function HomePage() {
                 <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white rounded-full transition-all duration-300">
                   Starting from $599
                 </Button>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.05 }}>
-                <Link href="/surf">
-                  <Button className="border-primary text-primary hover:bg-primary bg-primary text-white hover:text-white rounded-full transition-all duration-300">
-                    Explore packages
-                  </Button>
-                </Link>
               </motion.div>
             </div>
           </motion.div>
@@ -1269,7 +1494,7 @@ export default function HomePage() {
                   },
                   {
                     number: "",
-                    icon: "/icons/jeep.png",
+                    icon: "/icons/safari.png",
                     title: "Safari & Tours",
                     description: "Go wild with a real Sri Lankan safari — think elephants, leopards, and jungle vibes — then wind down with local sights, bonfire & live music."
                   }
@@ -1331,7 +1556,7 @@ export default function HomePage() {
             >
               <div className="space-y-8 bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl">
                 <div className="">
-                  <div className="flex flex-col md:flex-row items-center gap-6 overflow-x-auto pb-4">
+                  <div className="flex flex-col md:flex-row items-center gap-6 overflow-x-auto">
                     <div className="gap-6 flex flex-col w-full md:w-auto px-2 md:pl-5 mt-4 md:mt-0">
                       <motion.p
                         initial={{ opacity: 0, x: -20 }}
@@ -1350,13 +1575,13 @@ export default function HomePage() {
                         className="flex flex-row gap-4 md:gap-6 flex-wrap justify-center"
                       >
                         {[
-                          { icon: "/icons/wifi.png", text: "HIGH SPEED Wi-Fi", description: "Stay connected with our high-speed internet access throughout your stay", type: "Free Services" },
-                          { icon: "/icons/surf.png", text: "SURF EQUIPMENT", description: "Complete set of quality surfing gear including boards and wetsuits", type: "Free Services" },
-                          { icon: "/icons/media.png", text: "SURF VIDEOS & PHOTOS", description: "Professional photography and video coverage of your surfing sessions", type: "Free Services" },
-                          { icon: "/icons/tuktuk.png", text: "TRANSPORT TO ACTIVITIES", description: "Convenient transportation to all surfing spots and activities", type: "Free Services" },
-                          { icon: "/icons/towel.png", text: "LINEN & TOWEL SERVICE", description: "Fresh linens and towels provided daily for your comfort", type: "Free Services" },
-                          { icon: "/icons/cool.png", text: "ICE BATH RECOVERY", description: "Rejuvenate with our ice bath facilities after surfing sessions", type: "Free Services" },
-                          { icon: "/icons/sunset.png", text: "BEACHFRONT LOUNGE", description: "Exclusive access to our comfortable beachfront lounge area", type: "Free Services" },
+                          { icon: "/icons/wifiicon.png", text: "HIGH SPEED Wi-Fi", description: "Stay connected with our high-speed internet access throughout your stay", type: "Free Services" },
+                          { icon: "/icons/surfeq.png", text: "SURF EQUIPMENT", description: "Complete set of quality surfing gear including boards and wetsuits", type: "Free Services" },
+                          { icon: "/icons/videoi.png", text: "SURF VIDEOS & PHOTOS", description: "Professional photography and video coverage of your surfing sessions", type: "Free Services" },
+                          { icon: "/icons/tukicon.png", text: "TRANSPORT TO ACTIVITIES", description: "Convenient transportation to all surfing spots and activities", type: "Free Services" },
+                          { icon: "/icons/towelicon.png", text: "LINEN & TOWEL SERVICE", description: "Fresh linens and towels provided daily for your comfort", type: "Free Services" },
+                          { icon: "/icons/iceicon.png", text: "ICE BATH RECOVERY", description: "Rejuvenate with our ice bath facilities after surfing sessions", type: "Free Services" },
+                          { icon: "/icons/beachfront.png", text: "BEACHFRONT LOUNGE", description: "Exclusive access to our comfortable beachfront lounge area", type: "Free Services" },
                         ].map((service, index) => (
                           <motion.div
                             key={index}
@@ -1374,7 +1599,7 @@ export default function HomePage() {
                               <div className="absolute w-full h-full flex flex-col items-center backface-hidden">
                                 <motion.div
                                   whileHover={{ scale: 1.1 }}
-                                  className="relative w-10 md:w-14 h-10 md:h-14 mb-2"
+                                  className="relative w-12 md:w-12 h-10 md:h-10 mb-2"
                                 >
                                   <Image
                                     src={service.icon}
@@ -1416,8 +1641,8 @@ export default function HomePage() {
                         className="flex flex-row gap-4 md:gap-6 md:border-l-2 border-t-2 md:border-t-0 border-primary pt-6 md:pt-0 md:pl-10 flex-wrap justify-center"
                       >
                         {[
-                          { icon: "/icons/car.png", text: "AIRPORT PICKUP & DROPOFF", description: "Convenient door-to-door transfer service from and to the airport", type: "Extra Services" },
-                          { icon: "/icons/bbq.png", text: "SUNSET BARBEQUE", description: "Enjoy delicious BBQ meals while watching beautiful sunsets", type: "Extra Services" }
+                          { icon: "/icons/caricon.png", text: "AIRPORT PICKUP & DROPOFF", description: "Convenient door-to-door transfer service from and to the airport", type: "Extra Services" },
+                          { icon: "/icons/sunsetbbq.png", text: "SUNSET BARBEQUE", description: "Enjoy delicious BBQ meals while watching beautiful sunsets", type: "Extra Services" }
                         ].map((service, index) => (
                           <motion.div
                             key={index}
@@ -1435,7 +1660,7 @@ export default function HomePage() {
                               <div className="absolute w-full h-full flex flex-col items-center backface-hidden">
                                 <motion.div
                                   whileHover={{ scale: 1.1 }}
-                                  className="relative w-12 md:w-16 h-12 md:h-16 mb-2"
+                                  className="relative w-10 md:w-10 h-8 md:h-8 mb-2"
                                 >
                                   <Image
                                     src={service.icon}
@@ -1444,7 +1669,7 @@ export default function HomePage() {
                                     className="object-contain"
                                   />
                                 </motion.div>
-                                <span className="text-xs md:text-sm font-semibold text-text text-center">{service.text}</span>
+                                <span className="text-[10px] md:text-xs font-semibold text-text text-center">{service.text}</span>
                               </div>
 
                               {/* Back of card */}
@@ -1463,7 +1688,6 @@ export default function HomePage() {
                 </div>
               </div>
             </motion.div>
-
             <style jsx global>{`
               .perspective-1000 {
                 perspective: 1000px
@@ -1472,6 +1696,18 @@ export default function HomePage() {
                 backface-visibility: hidden
               }
             `}</style>
+          </motion.div>
+
+
+          <motion.div
+            className="flex justify-center pt-5"
+            whileHover={{ scale: 1.05 }}
+          >
+            <Link href="/surf">
+              <Button className="border-primary text-primary hover:bg-primary bg-primary text-white hover:text-white rounded-full transition-all duration-300  cursor-pointer">
+                Explore packages
+              </Button>
+            </Link>
           </motion.div>
         </motion.div>
       </section>
@@ -1514,41 +1750,41 @@ export default function HomePage() {
               initial={{ x: -100 }}
               animate={{ x: 0 }}
             >
-              <div className="relative h-64">
+              <div className="relative h-64 bg-black rounded-3xl">
                 <motion.div
                   animate={{ opacity: [1, 0, 0, 0, 1] }}
-                  transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
                   className="absolute inset-0"
                 >
                   <Image
                     src="/images/proom1.jpg"
                     alt="Luxury Suite View 1"
                     fill
-                    className="object-cover transition-opacity duration-500  rounded-3xl"
+                    className="object-cover transition-opacity duration-1000 rounded-3xl"
                   />
                 </motion.div>
                 <motion.div
                   animate={{ opacity: [0, 1, 0, 0, 0] }}
-                  transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
                   className="absolute inset-0"
                 >
                   <Image
                     src="/images/proom2.jpg"
                     alt="Luxury Suite View 2"
                     fill
-                    className="object-cover transition-opacity duration-500  rounded-3xl"
+                    className="object-cover transition-opacity duration-1000 rounded-3xl"
                   />
                 </motion.div>
                 <motion.div
                   animate={{ opacity: [0, 0, 1, 0, 0] }}
-                  transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
                   className="absolute inset-0"
                 >
                   <Image
                     src="/images/proom3.jpg"
                     alt="Luxury Suite View 3"
                     fill
-                    className="object-cover transition-opacity duration-500  rounded-3xl"
+                    className="object-cover transition-opacity duration-1000 rounded-3xl"
                   />
                 </motion.div>
               </div>
@@ -1597,41 +1833,41 @@ export default function HomePage() {
               initial={{ x: -100 }}
               animate={{ x: 0 }}
             >
-              <div className="relative h-64">
+              <div className="relative h-64 bg-black  rounded-3xl">
                 <motion.div
                   animate={{ opacity: [1, 0, 0, 0, 1] }}
-                  transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
                   className="absolute inset-0"
                 >
                   <Image
                     src="/images/image1.jpg"
                     alt="Luxury Suite View 1"
                     fill
-                    className="object-cover transition-opacity duration-500  rounded-3xl"
+                    className="object-cover transition-opacity duration-1000 rounded-3xl"
                   />
                 </motion.div>
                 <motion.div
                   animate={{ opacity: [0, 1, 0, 0, 0] }}
-                  transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
                   className="absolute inset-0"
                 >
                   <Image
                     src="/images/image3.jpg"
                     alt="Luxury Suite View 2"
                     fill
-                    className="object-cover transition-opacity duration-500  rounded-3xl"
+                    className="object-cover transition-opacity duration-1000 rounded-3xl"
                   />
                 </motion.div>
                 <motion.div
                   animate={{ opacity: [0, 0, 1, 0, 0] }}
-                  transition={{ duration: 9, repeat: Infinity, ease: "linear" }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
                   className="absolute inset-0"
                 >
                   <Image
                     src="/images/image4.jpg"
                     alt="Luxury Suite View 3"
                     fill
-                    className="object-cover transition-opacity duration-500  rounded-3xl"
+                    className="object-cover transition-opacity duration-1000 rounded-3xl"
                   />
                 </motion.div>
               </div>
@@ -1702,14 +1938,25 @@ export default function HomePage() {
               whileInView={{ x: 0, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="w-full lg:w-1/2 relative h-[250px] sm:h-[300px] md:h-[350px]"
+              className="w-full lg:w-1/2 relative h-[250px] sm:h-[300px] md:h-[350px] bg-black rounded-3xl"
             >
-              <Image
-                src="/images/image1.jpg"
-                alt="Culinary Experience"
-                fill
-                className="object-cover"
-              />
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentImageIndex}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src={`/images/image${currentImageIndex + 1}.jpg`}
+                    alt={`Culinary Experience ${currentImageIndex + 1}`}
+                    fill
+                    className="object-cover rounded-3xl"
+                  />
+                </motion.div>
+              </AnimatePresence>
             </motion.div>
           </div>
 
@@ -1725,7 +1972,7 @@ export default function HomePage() {
                 src="/images/image2.jpg"
                 alt="Local Cuisine"
                 fill
-                className="object-cover"
+                className="object-cover rounded-3xl"
               />
             </motion.div>
             <motion.div
@@ -1743,6 +1990,52 @@ export default function HomePage() {
           </div>
         </motion.div>
       </section>
+
+      {/* Arugambay - Truly Magical Section */}
+      <section className="py-16 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
+        <div className="container mx-auto px-4">
+          {/* Section Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-12"
+          >
+            <motion.p
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="text-3xl md:text-4xl lg:text-4xl font-bold text-text customtext mb-6"
+            >
+              Arugambay - <span className="text-primary">Truly Magical</span>
+            </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="text-lg md:text-xl text-text max-w-4xl mx-auto leading-relaxed"
+            >
+              Arugambay isn't just about the waves - it's a place where wild elephants roam, lagoons glow at sunset, and wildlife thrives in thick jungles. Experience adventurous safari rides, breathtaking views and more at this unique paradise.
+            </motion.p>
+          </motion.div>
+
+          {/* Image Slider */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className="relative max-w-6xl mx-auto"
+          >
+            <MagicalArugambaySlider />
+          </motion.div>
+        </div>
+      </section>
+
+
       <section className="relative py-16" style={{
         backgroundImage: "url('/images/review.jpg')",
         backgroundSize: 'cover',
@@ -1979,8 +2272,8 @@ export default function HomePage() {
                       <div className="hidden sm:flex items-center space-x-2">
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                           <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
                         </div>
                       </div>
                     </div>

@@ -3,10 +3,17 @@ import "./globals.css";
 import { ThemeProvider } from './Components/ThemeProvider'
 import Header from "./Components/Header";
 import Footer from './Components/Footer'
-import { Poiret_One, Berkshire_Swash, Montserrat } from 'next/font/google'
+import { Poiret_One, Berkshire_Swash, Montserrat, Bebas_Neue } from 'next/font/google'
 import localFont from 'next/font/local'
 import ConditionalLayout from './Components/ConditionalLayout'
 import {ToastProvider} from '@/contexts/toast-context'
+
+const bebasNeue = Bebas_Neue({
+  subsets: ['latin'],
+  weight: ['400'],
+  variable: '--font-bebas-neue',
+})
+
 const poiret0ne = Poiret_One({
   subsets: ['latin'],
   weight: ['400'],
@@ -63,7 +70,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${poiret0ne.variable} ${montserrat.variable} ${tanMeringue.variable} ${tanHeading.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${poiret0ne.variable} ${montserrat.variable} ${tanMeringue.variable} ${tanHeading.variable} ${bebasNeue.variable}`}>
       <body className="min-h-screen">
         <ThemeProvider>
           <ConditionalLayout>
