@@ -225,10 +225,10 @@ const ImageSlider = () => {
 
   const handleSlideChange = (newIndex: number | ((prev: number) => number)) => {
     if (isTransitioning) return;
-    
+
     setIsTransitioning(true);
     setCurrentIndex(newIndex);
-    
+
     setTimeout(() => {
       setIsTransitioning(false);
     }, 800);
@@ -379,14 +379,14 @@ const ImageSlider = () => {
             <div
               className="relative w-full h-[350px] sm:w-[240px] sm:h-[180px] md:w-[400px] md:h-[300px] lg:w-[500px] lg:h-[375px] xl:w-[600px] xl:h-[450px] rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl"
               style={{
-                transform: isDragging 
+                transform: isDragging
                   ? `translateX(${-dragOffset * 0.3}px) scale(0.98) rotateY(${dragOffset * 0.02}deg)`
-                  : isTransitioning 
+                  : isTransitioning
                     ? 'translateX(0px) scale(1.02) rotateY(0deg)'
                     : 'translateX(0px) scale(1) rotateY(0deg)',
-                transition: isDragging 
-                  ? 'transform 0.1s ease-out' 
-                  : isTransitioning 
+                transition: isDragging
+                  ? 'transform 0.1s ease-out'
+                  : isTransitioning
                     ? 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease-out'
                     : 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
                 opacity: isDragging ? 0.9 : isTransitioning ? 0.95 : 1,
@@ -428,7 +428,7 @@ const ImageSlider = () => {
               <div
                 className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 md:p-6 lg:p-8 text-white"
               >
-                <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-200 drop-shadow leading-relaxed text-center ">
+                <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white drop-shadow leading-relaxed text-center ">
                   {images[currentIndex].description}
                 </p>
               </div>
@@ -490,11 +490,10 @@ const ImageSlider = () => {
             key={index}
             onClick={() => goToSlide(index)}
             disabled={isTransitioning}
-            className={`transition-all duration-500 rounded-full ${
-              index === currentIndex
+            className={`transition-all duration-500 rounded-full ${index === currentIndex
                 ? 'w-10 h-4 bg-primary shadow-lg transform scale-110'
                 : 'w-4 h-4 bg-gray-300 hover:bg-gray-400 hover:scale-105'
-            }`}
+              }`}
             style={{
               transform: index === currentIndex && isTransitioning ? 'scale(1.2)' : undefined,
             }}
@@ -505,13 +504,13 @@ const ImageSlider = () => {
       {/* Mobile Swipe Indicator - Enhanced */}
       <div className="md:hidden text-center mt-4">
         <div className="flex items-center justify-center gap-3 bg-gray-50/80 backdrop-blur-sm rounded-full px-4 py-2 mx-auto w-fit">
-          <div className="flex items-center gap-1 text-gray-600">
+          <div className="flex items-center gap-1 text-text">
             <ChevronLeft className="w-4 h-4" />
             <span className="text-sm font-medium">Swipe</span>
             <ChevronRight className="w-4 h-4" />
           </div>
           <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-          <span className="text-xs text-gray-500">Tap sides to navigate</span>
+          <span className="text-xs text-text">Tap sides to navigate</span>
         </div>
       </div>
     </div>
@@ -1159,7 +1158,7 @@ export default function HomePage() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
                 <div className="absolute bottom-0 left-0 right-0 p-4 text-white text-center">
                   <h3 className="text-xl font-bold mb-2">{video.title}</h3>
-                  <p className="text-sm text-gray-200 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">{video.description}</p>
+                  <p className="text-sm text-white opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">{video.description}</p>
                 </div>
               </div>
             </motion.div>
@@ -1392,7 +1391,7 @@ export default function HomePage() {
                                 className="absolute w-full h-full p-2 bg-primary/10 rounded-lg flex items-center justify-center backface-hidden"
                                 style={{ transform: "rotateY(180deg)" }}
                               >
-                                <p className="text-[8px] md:text-[10px] text-gray-700 text-center">{service.description}</p>
+                                <p className="text-[8px] md:text-[10px] text-text text-center">{service.description}</p>
                               </div>
                             </motion.div>
                           </motion.div>
@@ -1445,7 +1444,7 @@ export default function HomePage() {
                                     className="object-contain"
                                   />
                                 </motion.div>
-                                <span className="text-xs md:text-sm font-semibold text-gray-700 text-center">{service.text}</span>
+                                <span className="text-xs md:text-sm font-semibold text-text text-center">{service.text}</span>
                               </div>
 
                               {/* Back of card */}
@@ -1453,7 +1452,7 @@ export default function HomePage() {
                                 className="absolute w-full h-full p-2 bg-primary/10 rounded-lg flex items-center justify-center backface-hidden"
                                 style={{ transform: "rotateY(180deg)" }}
                               >
-                                <p className="text-[10px] md:text-xs text-gray-700 text-center">{service.description}</p>
+                                <p className="text-[10px] md:text-xs text-text text-center">{service.description}</p>
                               </div>
                             </motion.div>
                           </motion.div>
@@ -1485,19 +1484,19 @@ export default function HomePage() {
           className="container mx-auto px-4"
         >
           <div className="text-center mb-12">
-            <motion.h2
+            <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
               className="text-3xl md:text-4xl font-bold text-primary customtext mb-4"
             >
               Accommodation Options
-            </motion.h2>
+            </motion.p>
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="text-lg text-gray-600 max-w-2xl mx-auto"
+              className="text-lg text-text max-w-2xl mx-auto"
             >
               Choose between our shared dorms for a social vibe or private rooms for added comfort and privacy. All options are just steps from the waves and designed for relaxation after a day in the surf.
             </motion.p>
@@ -1554,37 +1553,37 @@ export default function HomePage() {
                 </motion.div>
               </div>
               <div className="p-6">
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">Private Double</h3>
+                <h3 className="text-2xl font-semibold text-text mb-4">Private Double</h3>
                 <ul className="space-y-2">
-                  <li className="flex items-center text-gray-700">
+                  <li className="flex items-center text-text">
                     <CheckCircle className="h-5 w-5 text-primary mr-2" />
                     <span>Air Conditioning</span>
                   </li>
-                  <li className="flex items-center text-gray-700">
+                  <li className="flex items-center text-text">
                     <CheckCircle className="h-5 w-5 text-primary mr-2" />
                     <span>Spacious Bathroom with Hot Water</span>
                   </li>
-                  <li className="flex items-center text-gray-700">
+                  <li className="flex items-center text-text">
                     <CheckCircle className="h-5 w-5 text-primary mr-2" />
                     <span>Handcrafted Furniture</span>
                   </li>
-                  <li className="flex items-center text-gray-700">
+                  <li className="flex items-center text-text">
                     <CheckCircle className="h-5 w-5 text-primary mr-2" />
                     <span>Garden View Sitting Area</span>
                   </li>
-                  <li className="flex items-center text-gray-700">
+                  <li className="flex items-center text-text">
                     <CheckCircle className="h-5 w-5 text-primary mr-2" />
                     <span>Wi-Fi</span>
                   </li>
-                  <li className="flex items-center text-gray-700">
+                  <li className="flex items-center text-text">
                     <CheckCircle className="h-5 w-5 text-primary mr-2" />
                     <span>Towels & Toiletries</span>
                   </li>
-                  <li className="flex items-center text-gray-700">
+                  <li className="flex items-center text-text">
                     <CheckCircle className="h-5 w-5 text-primary mr-2" />
                     <span>Daily Room Cleaning</span>
                   </li>
-                  <li className="flex items-center text-gray-700">
+                  <li className="flex items-center text-text">
                     <CheckCircle className="h-5 w-5 text-primary mr-2" />
                     <span>Surfboard Storage</span>
                   </li>
@@ -1637,37 +1636,37 @@ export default function HomePage() {
                 </motion.div>
               </div>
               <div className="p-6">
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">Shared Dorm Beds</h3>
+                <h3 className="text-2xl font-semibold text-text mb-4">Shared Dorm Beds</h3>
                 <ul className="space-y-2">
-                  <li className="flex items-center text-gray-700">
+                  <li className="flex items-center text-text">
                     <CheckCircle className="h-5 w-5 text-primary mr-2" />
                     <span>Comfy bunk bed with clean linens and towel</span>
                   </li>
-                  <li className="flex items-center text-gray-700">
+                  <li className="flex items-center text-text">
                     <CheckCircle className="h-5 w-5 text-primary mr-2" />
                     <span>Air Conditioning Spacious Bathroom with Hot Water</span>
                   </li>
-                  <li className="flex items-center text-gray-700">
+                  <li className="flex items-center text-text">
                     <CheckCircle className="h-5 w-5 text-primary mr-2" />
                     <span>Hot water showers</span>
                   </li>
-                  <li className="flex items-center text-gray-700">
+                  <li className="flex items-center text-text">
                     <CheckCircle className="h-5 w-5 text-primary mr-2" />
                     <span>Shared bathroom (cleaned daily)</span>
                   </li>
-                  <li className="flex items-center text-gray-700">
+                  <li className="flex items-center text-text">
                     <CheckCircle className="h-5 w-5 text-primary mr-2" />
                     <span>Wi-Fi</span>
                   </li>
-                  <li className="flex items-center text-gray-700">
+                  <li className="flex items-center text-text">
                     <CheckCircle className="h-5 w-5 text-primary mr-2" />
                     <span>Private Locker</span>
                   </li>
-                  <li className="flex items-center text-gray-700">
+                  <li className="flex items-center text-text">
                     <CheckCircle className="h-5 w-5 text-primary mr-2" />
                     <span>Surfboard Storage</span>
                   </li>
-                  <li className="flex items-center text-gray-700">
+                  <li className="flex items-center text-text">
                     <CheckCircle className="h-5 w-5 text-primary mr-2" />
                     <span>Daily room cleaning</span>
                   </li>
@@ -1677,7 +1676,7 @@ export default function HomePage() {
           </motion.div>
         </motion.div>
       </section>
-      <section className="py-8 sm:py-12 md:py-16 bg-white">
+      <section className="py-8 sm:py-12 md:py-16 md:px-20 bg-white">
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -1693,8 +1692,8 @@ export default function HomePage() {
               transition={{ duration: 0.6 }}
               className="w-full lg:w-1/2"
             >
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold customtext text-primary mb-4 sm:mb-6">The Food Experience at the Camp</h2>
-              <p className="text-base sm:text-lg text-gray-700 leading-relaxed text-justify">
+              <p className="text-2xl sm:text-3xl md:text-4xl font-bold customtext text-primary mb-4 sm:mb-6">The Food Experience at the Camp</p>
+              <p className="text-base sm:text-lg text-text leading-relaxed text-justify">
                 Get ready to eat like a local! Our daily unlimited buffets are packed with authentic Sri Lankan flavors and change every day, so there's always something new to try. From creamy curries and spicy sambols to fresh tropical fruits, it's a tasty adventure at every meal. Whether you're fueling up after a surf session or just here for the food, you're in for a delicious ride.
               </p>
             </motion.div>
@@ -1703,7 +1702,7 @@ export default function HomePage() {
               whileInView={{ x: 0, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="w-full lg:w-1/2 relative h-[250px] sm:h-[300px] md:h-[400px]"
+              className="w-full lg:w-1/2 relative h-[250px] sm:h-[300px] md:h-[350px]"
             >
               <Image
                 src="/images/image1.jpg"
@@ -1720,7 +1719,7 @@ export default function HomePage() {
               whileInView={{ x: 0, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="w-full lg:w-1/2 relative h-[250px] sm:h-[300px] md:h-[400px]"
+              className="w-full lg:w-1/2 relative h-[250px] sm:h-[300px] md:h-[350px]"
             >
               <Image
                 src="/images/image2.jpg"
@@ -1736,7 +1735,7 @@ export default function HomePage() {
               transition={{ duration: 0.6 }}
               className="w-full lg:w-1/2"
             >
-              <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-4 sm:mb-6 text-justify">
+              <p className="text-base sm:text-lg text-text leading-relaxed mb-4 sm:mb-6 text-justify">
                 When you're craving something beyond rice and curry, we've got you covered. Head over to Rupa's, our laid-back international restaurant, serving up everything from juicy burgers to fresh seafood and comfort food from around the world. And for your daily dose of beachside bliss, our cozy café is the go-to spot for smoothie bowls, proper coffee, and tropical drinks that taste like vacation in a cup. Whether you're refueling after a surf or just chilling out, there's always something tasty waiting.
               </p>
 
@@ -1792,8 +1791,8 @@ export default function HomePage() {
                     </svg>
                   ))}
                 </div>
-                <p className="text-gray-600 mt-2">"I came for the waves but found so much more — amazing energy, soulful sunsets, and the kindest crew. The surf theory sessions really helped, and I’ll never forget the bonfire nights."</p>
-                <p className="font-bold text-gray-800">— Anika Stein, 31, yoga teacher from Berlin</p>
+                <p className="text-text mt-2">"I came for the waves but found so much more — amazing energy, soulful sunsets, and the kindest crew. The surf theory sessions really helped, and I’ll never forget the bonfire nights."</p>
+                <p className="font-bold text-text">— Anika Stein, 31, yoga teacher from Berlin</p>
               </div>
             </motion.div>
 
@@ -1824,8 +1823,8 @@ export default function HomePage() {
                     </svg>
                   ))}
                 </div>
-                <p className="text-gray-600 mt-2">“I came for the waves, stayed for the chaos — and left with better balance (on the board and in life). The instructors were total legends, the food slapped, and the sunsets? Unreal. I didn’t know I needed a wildlife safari between surf sessions, but now I want leopards with my vacation. Rupa’s knows how to mix chill vibes with real adventure. 11/10 — would paddle out (and party) again.”</p>
-                <p className=" font-bold text-gray-800">— Lola D., global thrill-seeker & sun-chaser</p>
+                <p className="text-text mt-2">“I came for the waves, stayed for the chaos — and left with better balance (on the board and in life). The instructors were total legends, the food slapped, and the sunsets? Unreal. I didn’t know I needed a wildlife safari between surf sessions, but now I want leopards with my vacation. Rupa’s knows how to mix chill vibes with real adventure. 11/10 — would paddle out (and party) again.”</p>
+                <p className=" font-bold text-text">— Lola D., global thrill-seeker & sun-chaser</p>
               </div>
             </motion.div>
 
@@ -1856,8 +1855,8 @@ export default function HomePage() {
                     </svg>
                   ))}
                 </div>
-                <p className="text-gray-600 mt-2">"First time surfing and I actually stood up on day one — the instructors were chill but knew their stuff. The food was unreal, and the lagoon tour was the perfect midweek reset. This place hits different."</p>
-                <p className="font-bold text-gray-800">— Jake Rivers, 26, freelance designer from Melbourne</p>
+                <p className="text-text mt-2">"First time surfing and I actually stood up on day one — the instructors were chill but knew their stuff. The food was unreal, and the lagoon tour was the perfect midweek reset. This place hits different."</p>
+                <p className="font-bold text-text">— Jake Rivers, 26, freelance designer from Melbourne</p>
               </div>
             </motion.div>
           </div>
@@ -1895,16 +1894,16 @@ export default function HomePage() {
                   >
                     <div className="flex items-center space-x-4">
                       <div className="relative">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
-                          <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 p-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 48 48">
+                            <path fill="#4caf50" d="M45,16.2l-5,2.75l-5,4.75L35,40h7c1.657,0,3-1.343,3-3V16.2z"></path><path fill="#1e88e5" d="M3,16.2l3.614,1.71L13,23.7V40H6c-1.657,0-3-1.343-3-3V16.2z"></path><polygon fill="#e53935" points="35,11.2 24,19.45 13,11.2 12,17 13,23.7 24,31.95 35,23.7 36,17"></polygon><path fill="#c62828" d="M3,12.298V16.2l10,7.5V11.2L9.876,8.859C9.132,8.301,8.228,8,7.298,8h0C4.924,8,3,9.924,3,12.298z"></path><path fill="#fbc02d" d="M45,12.298V16.2l-10,7.5V11.2l3.124-2.341C38.868,8.301,39.772,8,40.702,8h0 C43.076,8,45,9.924,45,12.298z"></path>
                           </svg>
                         </div>
                         <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-600 group-hover:text-gray-800 transition-colors duration-300">Email Us</p>
-                        <p className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-300 truncate">
+                        <p className="text-sm font-medium text-text group-hover:text-text transition-colors duration-300">Email Us</p>
+                        <p className="text-sm font-semibold text-text group-hover:text-blue-600 transition-colors duration-300 truncate">
                           rupassurfcamp.gmail.com
                         </p>
                       </div>
@@ -1930,16 +1929,16 @@ export default function HomePage() {
                   >
                     <div className="flex items-center space-x-4">
                       <div className="relative">
-                        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
-                          <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 p-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 48 48">
+                            <path fill="#4caf50" d="M44,24c0,11.044-8.956,20-20,20S4,35.044,4,24S12.956,4,24,4S44,12.956,44,24z"></path><path fill="#ffc107" d="M24,4v20l8,4l-8.843,16c0.317,0,0.526,0,0.843,0c11.053,0,20-8.947,20-20S35.053,4,24,4z"></path><path fill="#4caf50" d="M44,24c0,11.044-8.956,20-20,20S4,35.044,4,24S12.956,4,24,4S44,12.956,44,24z"></path><path fill="#ffc107" d="M24,4v20l8,4l-8.843,16c0.317,0,0.526,0,0.843,0c11.053,0,20-8.947,20-20S35.053,4,24,4z"></path><path fill="#f44336" d="M41.84,15H24v13l-3-1L7.16,13.26H7.14C10.68,7.69,16.91,4,24,4C31.8,4,38.55,8.48,41.84,15z"></path><path fill="#dd2c00" d="M7.158,13.264l8.843,14.862L21,27L7.158,13.264z"></path><path fill="#558b2f" d="M23.157,44l8.934-16.059L28,25L23.157,44z"></path><path fill="#f9a825" d="M41.865,15H24l-1.579,4.58L41.865,15z"></path><path fill="#fff" d="M33,24c0,4.969-4.031,9-9,9s-9-4.031-9-9s4.031-9,9-9S33,19.031,33,24z"></path><path fill="#2196f3" d="M31,24c0,3.867-3.133,7-7,7s-7-3.133-7-7s3.133-7,7-7S31,20.133,31,24z"></path>
                           </svg>
                         </div>
                         <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange-400 rounded-full border-2 border-white animate-bounce"></div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-600 group-hover:text-gray-800 transition-colors duration-300">Visit Us</p>
-                        <p className="text-sm font-semibold text-gray-900 group-hover:text-purple-600 transition-colors duration-300 truncate">
+                        <p className="text-sm font-medium text-text group-hover:text-text transition-colors duration-300">Visit Us</p>
+                        <p className="text-sm font-semibold text-text group-hover:text-purple-600 transition-colors duration-300 truncate">
                           www.rupassurf.com
                         </p>
                       </div>
@@ -1954,7 +1953,7 @@ export default function HomePage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Phone Card - Full Width */}
                   <motion.a
-                    href="tel:+94771234567"
+                    href="https://wa.link/iz5wh6"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -1964,24 +1963,24 @@ export default function HomePage() {
                   >
                     <div className="flex items-center space-x-4">
                       <div className="relative">
-                        <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
-                          <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 p-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 48 48">
+                            <path fill="#fff" d="M4.868,43.303l2.694-9.835C5.9,30.59,5.026,27.324,5.027,23.979C5.032,13.514,13.548,5,24.014,5c5.079,0.002,9.845,1.979,13.43,5.566c3.584,3.588,5.558,8.356,5.556,13.428c-0.004,10.465-8.522,18.98-18.986,18.98c-0.001,0,0,0,0,0h-0.008c-3.177-0.001-6.3-0.798-9.073-2.311L4.868,43.303z"></path><path fill="#fff" d="M4.868,43.803c-0.132,0-0.26-0.052-0.355-0.148c-0.125-0.127-0.174-0.312-0.127-0.483l2.639-9.636c-1.636-2.906-2.499-6.206-2.497-9.556C4.532,13.238,13.273,4.5,24.014,4.5c5.21,0.002,10.105,2.031,13.784,5.713c3.679,3.683,5.704,8.577,5.702,13.781c-0.004,10.741-8.746,19.48-19.486,19.48c-3.189-0.001-6.344-0.788-9.144-2.277l-9.875,2.589C4.953,43.798,4.911,43.803,4.868,43.803z"></path><path fill="#cfd8dc" d="M24.014,5c5.079,0.002,9.845,1.979,13.43,5.566c3.584,3.588,5.558,8.356,5.556,13.428c-0.004,10.465-8.522,18.98-18.986,18.98h-0.008c-3.177-0.001-6.3-0.798-9.073-2.311L4.868,43.303l2.694-9.835C5.9,30.59,5.026,27.324,5.027,23.979C5.032,13.514,13.548,5,24.014,5 M24.014,42.974C24.014,42.974,24.014,42.974,24.014,42.974C24.014,42.974,24.014,42.974,24.014,42.974 M24.014,42.974C24.014,42.974,24.014,42.974,24.014,42.974C24.014,42.974,24.014,42.974,24.014,42.974 M24.014,4C24.014,4,24.014,4,24.014,4C12.998,4,4.032,12.962,4.027,23.979c-0.001,3.367,0.849,6.685,2.461,9.622l-2.585,9.439c-0.094,0.345,0.002,0.713,0.254,0.967c0.19,0.192,0.447,0.297,0.711,0.297c0.085,0,0.17-0.011,0.254-0.033l9.687-2.54c2.828,1.468,5.998,2.243,9.197,2.244c11.024,0,19.99-8.963,19.995-19.98c0.002-5.339-2.075-10.359-5.848-14.135C34.378,6.083,29.357,4.002,24.014,4L24.014,4z"></path><path fill="#40c351" d="M35.176,12.832c-2.98-2.982-6.941-4.625-11.157-4.626c-8.704,0-15.783,7.076-15.787,15.774c-0.001,2.981,0.833,5.883,2.413,8.396l0.376,0.597l-1.595,5.821l5.973-1.566l0.577,0.342c2.422,1.438,5.2,2.198,8.032,2.199h0.006c8.698,0,15.777-7.077,15.78-15.776C39.795,19.778,38.156,15.814,35.176,12.832z"></path><path fill="#fff" fillRule="evenodd" d="M19.268,16.045c-0.355-0.79-0.729-0.806-1.068-0.82c-0.277-0.012-0.593-0.011-0.909-0.011c-0.316,0-0.83,0.119-1.265,0.594c-0.435,0.475-1.661,1.622-1.661,3.956c0,2.334,1.7,4.59,1.937,4.906c0.237,0.316,3.282,5.259,8.104,7.161c4.007,1.58,4.823,1.266,5.693,1.187c0.87-0.079,2.807-1.147,3.202-2.255c0.395-1.108,0.395-2.057,0.277-2.255c-0.119-0.198-0.435-0.316-0.909-0.554s-2.807-1.385-3.242-1.543c-0.435-0.158-0.751-0.237-1.068,0.238c-0.316,0.474-1.225,1.543-1.502,1.859c-0.277,0.317-0.554,0.357-1.028,0.119c-0.474-0.238-2.002-0.738-3.815-2.354c-1.41-1.257-2.362-2.81-2.639-3.285c-0.277-0.474-0.03-0.731,0.208-0.968c0.213-0.213,0.474-0.554,0.712-0.831c0.237-0.277,0.316-0.475,0.474-0.791c0.158-0.317,0.079-0.594-0.04-0.831C20.612,19.329,19.69,16.983,19.268,16.045z" clipRule="evenodd"></path>
                           </svg>
                         </div>
                         <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full border-2 border-white animate-pulse"></div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-600 group-hover:text-gray-800 transition-colors duration-300">Call Us</p>
-                        <p className="text-lg font-semibold text-gray-900 group-hover:text-green-600 transition-colors duration-300">
+                        <p className="text-sm font-medium text-text group-hover:text-text transition-colors duration-300">Chat with Us</p>
+                        <p className="text-lg font-semibold text-text group-hover:text-green-600 transition-colors duration-300">
                           +94 762332355
                         </p>
                       </div>
                       <div className="hidden sm:flex items-center space-x-2">
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                          </svg>
+                          <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
                         </div>
                       </div>
                     </div>
@@ -1989,7 +1988,7 @@ export default function HomePage() {
 
                   {/* Location Card - Full Width */}
                   <motion.a
-                    href="https://maps.google.com/?q=123+Beach+Road,+Arugam+Bay,+Sri+Lanka"
+                    href="https://maps.app.goo.gl/NNi4kDjn1nyrwEPB6"
                     target="_blank"
                     rel="noopener noreferrer"
                     initial={{ opacity: 0, y: 20 }}
@@ -2001,17 +2000,16 @@ export default function HomePage() {
                   >
                     <div className="flex items-center space-x-4">
                       <div className="relative">
-                        <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
-                          <svg className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 p-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 48 48">
+                            <path fill="#48b564" d="M35.76,26.36h0.01c0,0-3.77,5.53-6.94,9.64c-2.74,3.55-3.54,6.59-3.77,8.06	C24.97,44.6,24.53,45,24,45s-0.97-0.4-1.06-0.94c-0.23-1.47-1.03-4.51-3.77-8.06c-0.42-0.55-0.85-1.12-1.28-1.7L28.24,22l8.33-9.88	C37.49,14.05,38,16.21,38,18.5C38,21.4,37.17,24.09,35.76,26.36z"></path><path fill="#fcc60e" d="M28.24,22L17.89,34.3c-2.82-3.78-5.66-7.94-5.66-7.94h0.01c-0.3-0.48-0.57-0.97-0.8-1.48L19.76,15	c-0.79,0.95-1.26,2.17-1.26,3.5c0,3.04,2.46,5.5,5.5,5.5C25.71,24,27.24,23.22,28.24,22z"></path><path fill="#2c85eb" d="M28.4,4.74l-8.57,10.18L13.27,9.2C15.83,6.02,19.69,4,24,4C25.54,4,27.02,4.26,28.4,4.74z"></path><path fill="#ed5748" d="M19.83,14.92L19.76,15l-8.32,9.88C10.52,22.95,10,20.79,10,18.5c0-3.54,1.23-6.79,3.27-9.3	L19.83,14.92z"></path><path fill="#5695f6" d="M28.24,22c0.79-0.95,1.26-2.17,1.26-3.5c0-3.04-2.46-5.5-5.5-5.5c-1.71,0-3.24,0.78-4.24,2L28.4,4.74	c3.59,1.22,6.53,3.91,8.17,7.38L28.24,22z"></path>
                           </svg>
                         </div>
                         <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-400 rounded-full border-2 border-white animate-bounce"></div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-600 group-hover:text-gray-800 transition-colors duration-300">Find Us</p>
-                        <p className="text-base font-semibold text-gray-900 group-hover:text-orange-600 transition-colors duration-300">
+                        <p className="text-sm font-medium text-text group-hover:text-text transition-colors duration-300">Find Us</p>
+                        <p className="text-base font-semibold text-text group-hover:text-orange-600 transition-colors duration-300">
                           Beach road, Arugam Bay 32500
                         </p>
                       </div>
