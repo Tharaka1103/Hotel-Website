@@ -71,7 +71,7 @@ export const Header = () => {
                 className={cn(
                   "px-3 py-2 rounded-md text-white  text-md font-normal transition-colors duration-200",
                   scrolled 
-                    ? "hover:bg-primary hover:text-white hover:rounded-full text-black" 
+                    ? "hover:bg-primary hover:text-white hover:rounded-full text-text" 
                     : ""
                 )}
               >
@@ -103,9 +103,9 @@ export const Header = () => {
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? (
-                <X className={cn("h-6 w-6", scrolled ? "text-gray-800" : "text-white")} />
+                <X className={cn("h-6 w-6", scrolled ? "text-text" : "text-white")} />
               ) : (
-                <Menu className={cn("h-6 w-6", scrolled ? "text-gray-800" : "text-white")} />
+                <Menu className={cn("h-6 w-6", scrolled ? "text-text" : "text-white")} />
               )}
             </button>
           </div>
@@ -128,14 +128,14 @@ export const Header = () => {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="hover:text-primary px-3 py-2 rounded-md text-base font-medium hover:bg-blue-50"
+                    className="hover:text-primary px-3 py-2 rounded-md text-base text-text font-medium hover:bg-blue-50"
                     onClick={handleNavLinkClick}
                   >
                     {link.label}
                   </Link>
                 ))}
                 <Link href="/contact" className="text-xl font-medium">
-                  <Button className="bg-blue-500 hover:bg-blue-600 rounded-full mt-4">
+                  <Button className="bg-primary hover:bg-blue-600 rounded-full mt-4">
                     Contact Us
                   </Button>
                 </Link>

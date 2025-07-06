@@ -64,6 +64,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
+import InteractiveMap from './Components/InteractiveMap';
 
 // Animation variants
 const fadeInUp = {
@@ -1087,41 +1088,41 @@ export default function HomePage() {
 
 
       </section>
-      <section className="relative overflow-hidden h-[150px]">
+      <section className="relative overflow-hidden h-[150px] sm:h-[180px] md:h-[150px]">
         {/* Bottom Info Bar */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2, duration: 0.6 }}
-          className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm z-30 px-5"
+          className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm z-30 px-2 sm:px-5"
         >
-          <div className="container mx-auto px-4 py-4">
-            <div className="grid grid-cols-1 md:grid-cols-7 gap-4 items-center">
+          <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4">
+            <div className="grid grid-cols-1 md:grid-cols-7 gap-2 sm:gap-4 items-center">
               <motion.div
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 1.4, duration: 0.5 }}
-                className="flex items-center gap-8 text-center md:text-left md:col-span-3"
+                className="flex items-center gap-3 sm:gap-8 text-center md:text-left md:col-span-3"
               >
                 <div className="hidden md:block">
-                  <h3 className="text-xl font-bold text-primary text-center tanHeading">Arugam Bay</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-primary text-center tanHeading">Arugam Bay</h3>
                 </div>
-                <p className="text-xs md:text-base text-text text-justify">Rich wildlife, deep-rooted Sri Lankan culture and breath-taking scenery, it's more than a surfing description - it's a once-in-a-lifetime experience.</p>
+                <p className="text-xs sm:text-sm md:text-base text-text text-justify">Rich wildlife, deep-rooted Sri Lankan culture and breath-taking scenery, it's more than a surfing description - it's a once-in-a-lifetime experience.</p>
               </motion.div>
 
               <div className="hidden md:flex justify-center items-center md:col-span-1">
-                <span className="text-2xl text-primary font-bold w-4">×</span>
+                <span className="text-xl sm:text-2xl text-primary font-bold w-4">×</span>
               </div>
 
               <motion.div
                 initial={{ opacity: 0, x: 30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 1.6, duration: 0.5 }}
-                className="flex items-center gap-8 text-center md:text-right md:col-span-3"
+                className="flex items-center gap-3 sm:gap-8 text-center md:text-right md:col-span-3"
               >
-                <p className="text-xs md:text-base text-text text-justify text-text">Join the <b>best Surf Camp in Sri Lanka</b> whether you dream of learning to surf or just love chasing advanced breaks, we  will  take you there!</p>
+                <p className="text-xs sm:text-sm md:text-base text-text text-justify">Join the <b>best Surf Camp in Sri Lanka</b> whether you dream of learning to surf or just love chasing advanced breaks, we  will  take you there!</p>
                 <div className="hidden md:block">
-                  <h3 className="text-xl font-bold text-primary text-center tanHeading">Rupa's Surf</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-primary text-center tanHeading">Rupa's Surf</h3>
                 </div>
               </motion.div>
             </div>
@@ -1292,7 +1293,7 @@ export default function HomePage() {
       </section>
 
       {/* Why Learn to Surf Section with Image Slider and Floating Leaf */}
-      <section className="py-8 bg-background overflow-hidden relative">
+      <section className="py-16 bg-background overflow-hidden relative mt-10">
         {/* Floating Leaf 1 - Different Position */}
         {/*<FloatingScrollImage
           src="/images/leaf1.png"
@@ -1552,12 +1553,12 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.8, duration: 0.6 }}
-              className="mt-10"
+              className="mt-10 flex justify-center items-center"
             >
               <div className="space-y-8 bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl">
-                <div className="">
-                  <div className="flex flex-col md:flex-row items-center gap-6 overflow-x-auto">
-                    <div className="gap-6 flex flex-col w-full md:w-auto px-2 md:pl-5 mt-4 md:mt-0">
+                <div className="flex justify-center">
+                  <div className="flex flex-col md:flex-row items-center justify-center gap-6 overflow-x-auto">
+                    <div className="gap-6 flex flex-col w-full md:w-auto px-2 md:pl-5 mt-4 md:mt-0 items-center">
                       <motion.p
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
@@ -1623,7 +1624,7 @@ export default function HomePage() {
                         ))}
                       </motion.div>
                     </div>
-                    <div className="gap-6 flex flex-col w-full md:w-auto px-2 md:pl-5 pt-4">
+                    <div className="gap-6 flex flex-col w-full md:w-auto px-2 md:pl-5 pt-4 items-center">
                       <motion.p
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
@@ -2056,7 +2057,7 @@ export default function HomePage() {
             Hear from surfers, travelers, and new friends who’ve lived the Rupa’s experience.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-8 items-center justify-center mt-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-24 md:gap-8 items-center justify-center mt-20 md:mx-10">
             {/* First Review Card */}
             <motion.div
               initial={{ y: 50, opacity: 0 }}
@@ -2155,6 +2156,8 @@ export default function HomePage() {
           </div>
         </motion.div>
       </section>
+      
+
       <section className="relative py-16 bg-gray-50">
         <motion.div
           initial={{ opacity: 0 }}
@@ -2165,13 +2168,22 @@ export default function HomePage() {
         >
           <div className="flex flex-col lg:flex-row gap-8">
             <div className="lg:w-3/4 relative">
-              <Image
-                src="/images/map.png"
-                alt="Location Map"
-                width={1200}
-                height={675}
-                className="rounded-3xl object-cover w-full aspect-auto"
-              />
+              {/* Mobile Map - Draggable */}
+              <div className="block lg:hidden">
+                <InteractiveMap />
+              </div>
+              
+              {/* Desktop Map - Static */}
+              <div className="hidden lg:block">
+                <Image
+                  src="/images/map.png"
+                  alt="Location Map"
+                  width={1200}
+                  height={675}
+                  className="rounded-3xl object-cover w-full aspect-auto"
+                />
+              </div>
+              
               <div className="mt-8 space-y-4 max-w-[700px]">
                 {/* Contact Cards Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -2376,7 +2388,7 @@ export default function HomePage() {
 
                   <button
                     type="submit"
-                    className="w-ful text-white font-bold py-3 px-6 rounded-full hover:bg-blue-600 border-2 border-white transition duration-300"
+                    className="w-full text-white font-bold py-3 px-6 rounded-full hover:bg-white hover:text-primary border-2 border-white transition duration-300"
                   >
                     Send Message
                   </button>

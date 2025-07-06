@@ -41,7 +41,8 @@ import {
   Plus,
   Link,
   MessageCircle,
-  X
+  X,
+  CheckCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
@@ -87,6 +88,58 @@ interface AvailabilityData {
   bookedBeds?: number[];
   roomType: string;
 }
+// Add this component before the main SurfPage component
+const FAQItem = ({ question, answer, index }: { question: string; answer: string; index: number }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="border-b border-gray-200 last:border-b-0">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-100/50 transition-colors duration-200 focus:outline-none focus:bg-gray-100/50"
+      >
+        <span className={`text-lg font-semibold ${isOpen ? 'text-primary' : 'text-text'} pr-4`}>
+          {question}
+        </span>
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          className="flex-shrink-0 bg-primary rounded-full"
+        >
+          <svg
+            className="w-5 h-5 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </motion.div>
+      </button>
+
+      <motion.div
+        initial={{ height: 0, opacity: 0 }}
+        animate={{
+          height: isOpen ? "auto" : 0,
+          opacity: isOpen ? 1 : 0
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="overflow-hidden"
+      >
+        <div className="px-6 pb-5">
+          <p className="text-gray-600 leading-relaxed">
+            {answer}
+          </p>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
 
 export default function SurfPage() {
   const router = useRouter();
@@ -411,65 +464,118 @@ export default function SurfPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <div className="relative h-screen md:h-screen">
+      <div className="relative h-screen md:h-[85vh] lg:h-screen">
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
-            src="/surfbg.jpg"
+            src="/images/bg2.jpg"
             alt="Surf Paradise Hero"
             fill
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-cyan-800/70 to-blue-900/80" />
+          {/* Overlay for better text readability */}
+          <div className="absolute inset-0 bg-black/20 md:bg-black/10"></div>
         </div>
 
         {/* Mobile Layout */}
         <div className="relative md:hidden h-full flex flex-col">
-          {/* Mobile Text Content */}
+          {/* Mobile Text Content - Full Screen */}
           <div className="flex-1 flex flex-col justify-center items-center px-4 text-center">
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4 leading-tight">
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-4xl customtext sm:text-5xl font-bold text-text mb-6 leading-tight drop-shadow-lg"
+            >
               Surf camp
-              <span className="customtext text-primary"> Packs</span>
-            </h1>
-            <p className="text-sm sm:text-base text-blue-100 max-w-sm mx-auto leading-relaxed">
+              <span className="customtext text-primary drop-shadow-lg"> Packs</span>
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="text-base sm:text-lg text-white max-w-sm mx-auto leading-relaxed drop-shadow-md"
+            >
               Book your ideal beach escape — 7-night surf stays from Sunday to Sunday in premium comfort.
-            </p>
+            </motion.p>
+
+            {/* Scroll Indicator */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              className="mt-8 flex flex-col items-center text-white/80"
+            >
+              <span className="text-sm font-medium mb-2">Scroll to explore</span>
+              <motion.div
+                animate={{ y: [0, 10, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className="w-6 h-10 border-2 border-white/60 rounded-full flex justify-center"
+              >
+                <div className="w-1 h-3 bg-white/60 rounded-full mt-2"></div>
+              </motion.div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Desktop Layout */}
+        <div className="hidden md:block">
+          <div className="relative container mx-auto px-4 sm:px-6 h-[60vh] lg:h-[70vh] flex flex-col justify-center items-center">
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-3xl customtext md:text-5xl font-bold text-text mb-8 leading-tight drop-shadow-lg text-center"
+            >
+              Surf camp
+              <span className="customtext text-primary drop-shadow-lg"> Packs</span>
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="text-lg sm:text-xl md:text-2xl text-text max-w-4xl mx-auto leading-relaxed drop-shadow-md text-center"
+            >
+              Book your ideal beach escape — 7-night surf stays from Sunday to Sunday in premium comfort.
+            </motion.p>
           </div>
 
-          {/* Mobile Icon Section */}
-          <div className="bg-white/95 backdrop-blur-sm p-3 shadow-xl">
-            <div className="max-w-full mx-auto">
+          {/* Desktop Bottom Icons Section - Reduced Height */}
+          <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm py-2 shadow-xl">
+            <div className="max-w-7xl mx-auto px-4">
               <motion.div
                 variants={staggerContainer}
                 initial="initial"
                 whileInView="animate"
                 viewport={{ once: true }}
-                className="grid grid-cols-2 gap-2"
+                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2 md:gap-3"
               >
                 {[
-                  { icon: "/icons/mappin.png", text: "BEST LOCATION" },
-                  { icon: "/icons/verify.png", text: "ISA CERTIFIED" },
-                  { icon: "/icons/double.png", text: "MODERN ROOMS" },
-                  { icon: "/icons/cutlery.png", text: "RESTAURANT" },
-                  { icon: "/icons/sunbed.png", text: "BEACHFRONT" },
-                  { icon: "/icons/userlevel.png", text: "ALL LEVELS" },
-                  { icon: "/icons/sunrise.png", text: "FUN ACTIVITIES" },
-                  { icon: "/icons/tuktukc.png", text: "TRANSPORT" },
+                  { icon: "/icons/mappin.png", text: "BEST LOCATION TO SURF", description: "Prime surfing location with consistent waves year-round" },
+                  { icon: "/icons/verify.png", text: "ISA CERTIFIED INSTRUCTORS", description: "Professional certified instructors for all skill levels" },
+                  { icon: "/icons/double.png", text: "MODERN, AFFORDABLE ROOMS", description: "Comfortable accommodation with modern amenities" },
+                  { icon: "/icons/cutlery.png", text: "RESTAURANT & CAFE", description: "Delicious local and international cuisine on-site" },
+                  { icon: "/icons/sunbed.png", text: "BEACHFRONT LOUNGE", description: "Exclusive beachfront relaxation area" },
+                  { icon: "/icons/userlevel.png", text: "ALL SKILL LEVELS", description: "Programs designed for beginners to advanced surfers" },
+                  { icon: "/icons/sunrise.png", text: "FUN ACTIVITIES", description: "Diverse activities beyond surfing" },
+                  { icon: "/icons/tuktukc.png", text: "TRANSPORT SERVICE", description: "Convenient transportation to surf spots" },
                 ].map((service, index) => (
                   <motion.div
                     key={index}
                     variants={staggerItem}
-                    className="perspective-1000"
+                    className="group perspective-1000"
                   >
                     <motion.div
-                      className="relative w-full cursor-pointer group"
+                      className="relative w-full aspect-[4/3] cursor-pointer"
                       initial={false}
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.3 }}
                     >
-                      <div className="w-full flex flex-col items-center justify-center bg-white rounded-lg p-2 transition-all duration-300 group-hover:shadow-lg border border-gray-100">
+                      <div className="absolute w-full h-full flex flex-col items-center justify-center backface-hidden bg-white rounded-lg p-1 transition-all duration-300 group-hover:shadow-lg border border-gray-100">
                         <motion.div
                           whileHover={{ scale: 1.1 }}
-                          className="relative w-6 h-6 mb-1"
+                          className="relative w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 mb-1"
                         >
                           <Image
                             src={service.icon}
@@ -478,7 +584,7 @@ export default function SurfPage() {
                             className="object-contain"
                           />
                         </motion.div>
-                        <span className="text-[10px] font-semibold text-gray-700 text-center uppercase leading-tight">
+                        <span className="text-[9px] sm:text-[10px] font-semibold text-gray-700 text-center uppercase leading-tight">
                           {service.text}
                         </span>
                       </div>
@@ -489,75 +595,86 @@ export default function SurfPage() {
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Desktop Layout */}
-        <div className="hidden md:block">
-          <div className="relative container mx-auto px-4 sm:px-6 h-[70vh] flex flex-col justify-center items-center">
-            <h1 className="text-4xl customtext sm:text-5xl md:text-6xl font-bold text-white mb-8 leading-tight">
-              Surf camp
-              <span className="customtext text-primary"> Packs</span>
-            </h1>
-            <p className="text-lg sm:text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              Book your ideal beach escape — 7-night surf stays from Sunday to Sunday in premium comfort.
-            </p>
-          </div>
-
-          <div className="absolute bottom-0 left-0 right-0 bg-white p-2 md:p-2 shadow-xl">
-            <div className="max-w-7xl mx-auto">
-              <motion.div
-                variants={staggerContainer}
-                initial="initial"
-                whileInView="animate"
-                viewport={{ once: true }}
-                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4 md:gap-6"
-              >
-                {[
-                  { icon: "/icons/mappin.png", text: "BEST LOCATION TO SURF", description: "Stay connected with our high-speed internet access throughout your stay", type: "Free Services" },
-                  { icon: "/icons/verify.png", text: "ISA Certified instructors", description: "Complete set of quality surfing gear including boards and wetsuits", type: "Free Services" },
-                  { icon: "/icons/double.png", text: "MODERN, AFFORDABLE ROOMS", description: "Professional photography and video coverage of your surfing sessions", type: "Free Services" },
-                  { icon: "/icons/cutlery.png", text: "RESTAURANT & CAFE", description: "Convenient transportation to all surfing spots and activities", type: "Free Services" },
-                  { icon: "/icons/sunbed.png", text: "BEACHFRONT LOUNGE", description: "Fresh linens and towels provided daily for your comfort", type: "Free Services" },
-                  { icon: "/icons/userlevel.png", text: "ALL SKILL LEVELS", description: "Rejuvenate with our ice bath facilities after surfing sessions", type: "Free Services" },
-                  { icon: "/icons/sunrise.png", text: "FUN ACTIVITIES", description: "Exclusive access to our comfortable beachfront lounge area", type: "Free Services" },
-                  { icon: "/icons/tuktukc.png", text: "TRANSPORT SERVICE", description: "Convenient door-to-door transfer service from and to the airport", type: "Extra Services" },
-                ].map((service, index) => (
+      {/* Mobile Bottom Icons Section - Scroll Triggered */}
+      <div className="md:hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+          className="bg-white py-6 shadow-lg"
+        >
+          <div className="max-w-full mx-auto px-4">
+            <motion.div
+              variants={staggerContainer}
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true }}
+              className="grid grid-cols-2 gap-4"
+            >
+              {[
+                { icon: "/icons/mappin.png", text: "BEST LOCATION", description: "Prime surfing location with consistent waves" },
+                { icon: "/icons/verify.png", text: "ISA CERTIFIED", description: "Professional certified instructors" },
+                { icon: "/icons/double.png", text: "MODERN ROOMS", description: "Comfortable modern accommodation" },
+                { icon: "/icons/cutlery.png", text: "RESTAURANT", description: "Delicious on-site dining" },
+                { icon: "/icons/sunbed.png", text: "BEACHFRONT", description: "Exclusive beachfront access" },
+                { icon: "/icons/userlevel.png", text: "ALL LEVELS", description: "Programs for all skill levels" },
+                { icon: "/icons/sunrise.png", text: "FUN ACTIVITIES", description: "Diverse activity programs" },
+                { icon: "/icons/tuktukc.png", text: "TRANSPORT", description: "Convenient transport service" },
+              ].map((service, index) => (
+                <motion.div
+                  key={index}
+                  variants={staggerItem}
+                  className="group"
+                >
                   <motion.div
-                    key={index}
-                    variants={staggerItem}
-                    className="perspective-1000"
+                    className="relative w-full cursor-pointer"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <motion.div
-                      className="relative w-full aspect-[3/4] cursor-pointer group"
-                      initial={false}
-                    >
-                      {/* Front of card */}
-                      <div className="absolute w-full flex flex-col items-center justify-center backface-hidden bg-white rounded-lg p-3 transition-all duration-300 group-hover:shadow-lg">
-                        <motion.div
-                          whileHover={{ scale: 1.1 }}
-                          className="relative w-12 h-12 sm:w-16 sm:h-16 mb-2 sm:mb-3"
-                        >
-                          <Image
-                            src={service.icon}
-                            alt={service.text}
-                            fill
-                            className="object-contain"
-                          />
-                        </motion.div>
-                        <span className="text-xs sm:text-sm font-semibold text-gray-700 text-center uppercase leading-tight">{service.text}</span>
-                      </div>
-                    </motion.div>
+                    <div className="w-full flex flex-col items-center justify-center bg-white rounded-xl p-4 transition-all duration-300 group-hover:shadow-lg border border-gray-100 group-hover:border-primary/20">
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        className="relative w-8 h-8 sm:w-10 sm:h-10 mb-2"
+                      >
+                        <Image
+                          src={service.icon}
+                          alt={service.text}
+                          fill
+                          className="object-contain"
+                        />
+                      </motion.div>
+                      <span className="text-xs font-semibold text-gray-700 text-center uppercase leading-tight mb-1">
+                        {service.text}
+                      </span>
+                      <span className="text-[10px] text-gray-500 text-center leading-tight">
+                        {service.description}
+                      </span>
+                    </div>
                   </motion.div>
-                ))}
-              </motion.div>
-            </div>
+                </motion.div>
+              ))}
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </div>
 
 
-      {/* Most Popular Package Section with Floating Elements */}
-      <section className="py-16 md:px-5 bg-white relative overflow-hidden">
+      <section className="py-16 md:px-20 bg-white relative overflow-hidden">
         {/* Floating Leaf 2 - Different Position */}
+        {/*<FloatingScrollImage
+                src="/images/flower1.png"
+                alt="Leaf 2"
+                className="top-24 w-16 sm:w-24 md:w-32 lg:w-48 xl:w-64 h-16 sm:h-24 md:h-32 lg:h-48 xl:h-64 z-10"
+                scrollRange={[2200, 3200]}
+                yRange={[0, -120]}
+                xRange={[0, 80]}
+                rotateRange={[0, 45]}
+                scaleRange={[1, 1.2]}
+                opacityRange={[0.7, 1]}
+              />*/}
 
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -573,10 +690,10 @@ export default function SurfPage() {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl md:text-4xl font-bold customtext">
+            <p className="text-3xl md:text-4xl font-bold customtext text-text">
               Most Popular <span className="text-primary">Surf Camp </span> Package
-            </h2>
-            <p className="text-xl mt-4 text-gray-600">
+            </p>
+            <p className="text-xl mt-4 text-text">
               The package our guests love the most — surf every day, eat well, explore wildlife and soak up the Arugam Bay vibe.
             </p>
           </motion.div>
@@ -590,10 +707,17 @@ export default function SurfPage() {
           >
             <motion.div
               whileHover={{ scale: 1.05 }}
-              className="text-3xl font-bold text-primary mb-6 md:mb-0 tanHeading"
+              className="text-3xl font-bold text-primary px-4 mb-6 md:mb-0 tanHeading"
             >
               Surf & Safari Retreat
             </motion.div>
+            <div className="flex gap-4">
+              <motion.div whileHover={{ scale: 1.05 }}>
+                <Button variant="outline" className="border-primary text-primary rounded-full transition-all duration-300">
+                  Starting from $599
+                </Button>
+              </motion.div>
+            </div>
           </motion.div>
 
           <motion.div
@@ -633,7 +757,7 @@ export default function SurfPage() {
                   },
                   {
                     number: "",
-                    icon: "/icons/jeep.png",
+                    icon: "/icons/safari.png",
                     title: "Safari & Tours",
                     description: "Go wild with a real Sri Lankan safari — think elephants, leopards, and jungle vibes — then wind down with local sights, bonfire & live music."
                   }
@@ -667,7 +791,7 @@ export default function SurfPage() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1 + 0.2, duration: 0.5 }}
-                        className="text-xl font-bold text-gray-800 mb-2 flex flex-row items-center justify-center"
+                        className="text-xl font-bold text-text mb-2 flex flex-row items-center justify-center"
                       >
                         {item.title}
                       </motion.p>
@@ -676,7 +800,7 @@ export default function SurfPage() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1 + 0.4, duration: 0.5 }}
-                        className="text-gray-600 text-sm text-justify"
+                        className="text-text text-sm text-justify"
                       >
                         {item.description}
                       </motion.p>
@@ -691,12 +815,12 @@ export default function SurfPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.8, duration: 0.6 }}
-              className="mt-10"
+              className="mt-10 flex justify-center items-center"
             >
-              <div className="space-y-8 bg-white/95 backdrop-blur-sm rounded-3xl p-4 shadow-xl">
-                <div className="">
-                  <div className="flex flex-col md:flex-row items-center gap-6 overflow-x-auto pb-4">
-                    <div className="gap-6 flex flex-col w-full md:w-auto px-2 md:pl-5">
+              <div className="space-y-8 bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl">
+                <div className="flex justify-center">
+                  <div className="flex flex-col md:flex-row items-center justify-center gap-6 overflow-x-auto">
+                    <div className="gap-6 flex flex-col w-full md:w-auto px-2 md:pl-5 mt-4 md:mt-0 items-center">
                       <motion.p
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
@@ -714,13 +838,13 @@ export default function SurfPage() {
                         className="flex flex-row gap-4 md:gap-6 flex-wrap justify-center"
                       >
                         {[
-                          { icon: "/icons/wifi.png", text: "HIGH SPEED Wi-Fi", description: "Stay connected with our high-speed internet access throughout your stay", type: "Free Services" },
-                          { icon: "/icons/surf.png", text: "SURF EQUIPMENT", description: "Complete set of quality surfing gear including boards and wetsuits", type: "Free Services" },
-                          { icon: "/icons/media.png", text: "SURF VIDEOS & PHOTOS", description: "Professional photography and video coverage of your surfing sessions", type: "Free Services" },
-                          { icon: "/icons/tuktuk.png", text: "TRANSPORT TO ACTIVITIES", description: "Convenient transportation to all surfing spots and activities", type: "Free Services" },
-                          { icon: "/icons/towel.png", text: "LINEN & TOWEL SERVICE", description: "Fresh linens and towels provided daily for your comfort", type: "Free Services" },
-                          { icon: "/icons/cool.png", text: "ICE BATH RECOVERY", description: "Rejuvenate with our ice bath facilities after surfing sessions", type: "Free Services" },
-                          { icon: "/icons/sunset.png", text: "BEACHFRONT LOUNGE", description: "Exclusive access to our comfortable beachfront lounge area", type: "Free Services" },
+                          { icon: "/icons/wifiicon.png", text: "HIGH SPEED Wi-Fi", description: "Stay connected with our high-speed internet access throughout your stay", type: "Free Services" },
+                          { icon: "/icons/surfeq.png", text: "SURF EQUIPMENT", description: "Complete set of quality surfing gear including boards and wetsuits", type: "Free Services" },
+                          { icon: "/icons/videoi.png", text: "SURF VIDEOS & PHOTOS", description: "Professional photography and video coverage of your surfing sessions", type: "Free Services" },
+                          { icon: "/icons/tukicon.png", text: "TRANSPORT TO ACTIVITIES", description: "Convenient transportation to all surfing spots and activities", type: "Free Services" },
+                          { icon: "/icons/towelicon.png", text: "LINEN & TOWEL SERVICE", description: "Fresh linens and towels provided daily for your comfort", type: "Free Services" },
+                          { icon: "/icons/iceicon.png", text: "ICE BATH RECOVERY", description: "Rejuvenate with our ice bath facilities after surfing sessions", type: "Free Services" },
+                          { icon: "/icons/beachfront.png", text: "BEACHFRONT LOUNGE", description: "Exclusive access to our comfortable beachfront lounge area", type: "Free Services" },
                         ].map((service, index) => (
                           <motion.div
                             key={index}
@@ -728,7 +852,7 @@ export default function SurfPage() {
                             className="perspective-1000"
                           >
                             <motion.div
-                              className="relative w-20 md:w-24 h-28 md:h-32 cursor-pointer"
+                              className="relative w-16 md:w-20 h-24 md:h-28 cursor-pointer"
                               initial={false}
                               whileHover={{ rotateY: 180, scale: 1.05 }}
                               style={{ transformStyle: "preserve-3d" }}
@@ -738,7 +862,7 @@ export default function SurfPage() {
                               <div className="absolute w-full h-full flex flex-col items-center backface-hidden">
                                 <motion.div
                                   whileHover={{ scale: 1.1 }}
-                                  className="relative w-12 md:w-16 h-12 md:h-16 mb-2"
+                                  className="relative w-12 md:w-12 h-10 md:h-10 mb-2"
                                 >
                                   <Image
                                     src={service.icon}
@@ -747,7 +871,7 @@ export default function SurfPage() {
                                     className="object-contain"
                                   />
                                 </motion.div>
-                                <span className="text-xs md:text-sm font-semibold text-gray-700 text-center">{service.text}</span>
+                                <span className="text-[10px] md:text-xs font-semibold text-text text-center">{service.text}</span>
                               </div>
 
                               {/* Back of card */}
@@ -755,19 +879,19 @@ export default function SurfPage() {
                                 className="absolute w-full h-full p-2 bg-primary/10 rounded-lg flex items-center justify-center backface-hidden"
                                 style={{ transform: "rotateY(180deg)" }}
                               >
-                                <p className="text-[10px] md:text-xs text-gray-700 text-center">{service.description}</p>
+                                <p className="text-[8px] md:text-[10px] text-text text-center">{service.description}</p>
                               </div>
                             </motion.div>
                           </motion.div>
                         ))}
                       </motion.div>
                     </div>
-                    <div className="gap-6 flex flex-col w-full md:w-auto px-2 md:pl-5 mt-8 md:mt-0">
+                    <div className="gap-6 flex flex-col w-full md:w-auto px-2 md:pl-5 pt-4 items-center">
                       <motion.p
-                        initial={{ opacity: 0, x: 20 }}
+                        initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 0.2, duration: 0.6 }}
+                        transition={{ duration: 0.6 }}
                         className="text-lg text-primary text-center"
                       >
                         Extra services
@@ -780,8 +904,8 @@ export default function SurfPage() {
                         className="flex flex-row gap-4 md:gap-6 md:border-l-2 border-t-2 md:border-t-0 border-primary pt-6 md:pt-0 md:pl-10 flex-wrap justify-center"
                       >
                         {[
-                          { icon: "/icons/car.png", text: "AIRPORT PICKUP & DROPOFF", description: "Convenient door-to-door transfer service from and to the airport", type: "Extra Services" },
-                          { icon: "/icons/bbq.png", text: "SUNSET BARBEQUE", description: "Enjoy delicious BBQ meals while watching beautiful sunsets", type: "Extra Services" }
+                          { icon: "/icons/caricon.png", text: "AIRPORT PICKUP & DROPOFF", description: "Convenient door-to-door transfer service from and to the airport", type: "Extra Services" },
+                          { icon: "/icons/sunsetbbq.png", text: "SUNSET BARBEQUE", description: "Enjoy delicious BBQ meals while watching beautiful sunsets", type: "Extra Services" }
                         ].map((service, index) => (
                           <motion.div
                             key={index}
@@ -799,7 +923,7 @@ export default function SurfPage() {
                               <div className="absolute w-full h-full flex flex-col items-center backface-hidden">
                                 <motion.div
                                   whileHover={{ scale: 1.1 }}
-                                  className="relative w-12 md:w-16 h-12 md:h-16 mb-2"
+                                  className="relative w-10 md:w-10 h-8 md:h-8 mb-2"
                                 >
                                   <Image
                                     src={service.icon}
@@ -808,7 +932,7 @@ export default function SurfPage() {
                                     className="object-contain"
                                   />
                                 </motion.div>
-                                <span className="text-xs md:text-sm font-semibold text-gray-700 text-center">{service.text}</span>
+                                <span className="text-[10px] md:text-xs font-semibold text-text text-center">{service.text}</span>
                               </div>
 
                               {/* Back of card */}
@@ -816,7 +940,7 @@ export default function SurfPage() {
                                 className="absolute w-full h-full p-2 bg-primary/10 rounded-lg flex items-center justify-center backface-hidden"
                                 style={{ transform: "rotateY(180deg)" }}
                               >
-                                <p className="text-[10px] md:text-xs text-gray-700 text-center">{service.description}</p>
+                                <p className="text-[10px] md:text-xs text-text text-center">{service.description}</p>
                               </div>
                             </motion.div>
                           </motion.div>
@@ -827,7 +951,6 @@ export default function SurfPage() {
                 </div>
               </div>
             </motion.div>
-
             <style jsx global>{`
                     .perspective-1000 {
                       perspective: 1000px
@@ -836,6 +959,16 @@ export default function SurfPage() {
                       backface-visibility: hidden
                     }
                   `}</style>
+          </motion.div>
+
+
+          <motion.div
+            className="flex justify-center pt-5"
+            whileHover={{ scale: 1.05 }}
+          >
+            <Button className="border-primary text-primary hover:bg-primary bg-primary text-white hover:text-white rounded-full transition-all duration-300  cursor-pointer">
+              Scroll down for packages
+            </Button>
           </motion.div>
         </motion.div>
       </section>
@@ -858,8 +991,8 @@ export default function SurfPage() {
                   <div className="bg-card p-6 text-white">
                     <div className="flex justify-center items-start">
                       <div className="text-center">
-                        <h3 className="text-2xl font-bold text-black mb-2">Basic Surf Pack</h3>
-                        <p className="text-black text-sm">Perfect for beginners or casual surfers, this package includes everything you need to get started.</p>
+                        <h3 className="text-2xl font-bold text-text mb-2 tanHeading">Basic Surf Pack</h3>
+                        <p className="text-text text-sm">Perfect for beginners or casual surfers, this package includes everything you need to get started.</p>
                       </div>
                     </div>
                   </div>
@@ -893,7 +1026,7 @@ export default function SurfPage() {
 
                     <div className="bg-white w-3/4 p-2 rounded-full border-2 border-primary space-y-2 mx-auto">
                       <div className="flex items-center text-l justify-center text-primary font-bold">
-                        Starting from $699
+                        Starting from $499
                       </div>
                     </div>
 
@@ -903,7 +1036,7 @@ export default function SurfPage() {
                     }}>
                       <DialogTrigger asChild>
                         <Button
-                          className="w-full bg-black text-white font-bold py-4 rounded-full group-hover:shadow-lg transition-all"
+                          className="w-full bg-text text-white font-bold py-4 rounded-full group-hover:shadow-lg transition-all"
                           onClick={() => {
                             setSelectedPackage({
                               _id: "basic-surf-pack",
@@ -949,7 +1082,7 @@ export default function SurfPage() {
                   <div className="p-6 text-white flex items-center justify-center">
                     <div className="flex justify-center items-center">
                       <div className="text-center">
-                        <h3 className="text-2xl text-white font-bold mb-2">Surf & Safari Retreat</h3>
+                        <h3 className="text-2xl text-white font-bold mb-2 tanHeading">Surf & Safari Retreat</h3>
                         <p className="text-white text-sm">A balanced mix of surf, nature and relaxation, this retreat is for those wanting more than just waves.</p>
                       </div>
                     </div>
@@ -983,6 +1116,12 @@ export default function SurfPage() {
                             <span>{feature}</span>
                           </div>
                         ))}
+                      </div>
+                    </div>
+
+                    <div className="bg-white w-3/4 p-2 rounded-full border-2 border-primary space-y-2 mx-auto">
+                      <div className="flex items-center text-l justify-center text-primary font-bold">
+                        Starting from $750
                       </div>
                     </div>
 
@@ -1035,8 +1174,8 @@ export default function SurfPage() {
                   <div className="p-6 flex items-center justify-center">
                     <div className="flex justify-center items-center">
                       <div className="text-center">
-                        <h3 className="text-2xl text-black font-bold mb-2">Surf Guiding Pack</h3>
-                        <p className="text-black text-sm">Tailored for seasoned surfers, this premium option offers expert-guided surf trips, in-depth analysis, and daily briefings.</p>
+                        <h3 className="text-2xl text-text font-bold mb-2 tanHeading">Surf Guiding Pack</h3>
+                        <p className="text-text text-sm">Tailored for seasoned surfers, this premium option offers expert-guided surf trips, in-depth analysis, and daily briefings.</p>
                       </div>
                     </div>
                   </div>
@@ -1068,13 +1207,19 @@ export default function SurfPage() {
                       </div>
                     </div>
 
+                    <div className="bg-white w-3/4 p-2 rounded-full border-2 border-primary space-y-2 mx-auto">
+                      <div className="flex items-center text-l justify-center text-primary font-bold">
+                        Starting from $549
+                      </div>
+                    </div>
+
                     <Dialog open={isDialogOpen && selectedPackage?.title === "Luxury Surf Retreat"} onOpenChange={(open) => {
                       if (!open) resetBookingForm();
                       setIsDialogOpen(open);
                     }}>
                       <DialogTrigger asChild>
                         <Button
-                          className="w-full bg-black text-white font-bold py-4 rounded-full group-hover:shadow-lg transition-all"
+                          className="w-full bg-text text-white font-bold py-4 rounded-full group-hover:shadow-lg transition-all"
                           onClick={() => {
                             setSelectedPackage({
                               _id: "surf-guiding-pack",
@@ -1108,6 +1253,309 @@ export default function SurfPage() {
         </div>
       </div>
 
+      <section className="w-full py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="container mx-auto px-4"
+        >
+          <div className="text-center mb-12">
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-3xl md:text-4xl font-bold text-primary customtext mb-4"
+            >
+              Accommodation Options
+            </motion.p>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-lg text-text max-w-2xl mx-auto"
+            >
+              Choose between our shared dorms for a social vibe or private rooms for added comfort and privacy. All options are just steps from the waves and designed for relaxation after a day in the surf.
+            </motion.p>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto"
+          >
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              className="card bg-white rounded-3xl shadow-lg border-2 border-primary overflow-hidden p-5"
+              initial={{ x: -100 }}
+              animate={{ x: 0 }}
+            >
+              <div className="relative h-64 bg-black rounded-3xl">
+                <motion.div
+                  animate={{ opacity: [1, 0, 0, 0, 1] }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src="/images/proom1.jpg"
+                    alt="Luxury Suite View 1"
+                    fill
+                    className="object-cover transition-opacity duration-1000 rounded-3xl"
+                  />
+                </motion.div>
+                <motion.div
+                  animate={{ opacity: [0, 1, 0, 0, 0] }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src="/images/proom2.jpg"
+                    alt="Luxury Suite View 2"
+                    fill
+                    className="object-cover transition-opacity duration-1000 rounded-3xl"
+                  />
+                </motion.div>
+                <motion.div
+                  animate={{ opacity: [0, 0, 1, 0, 0] }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src="/images/proom3.jpg"
+                    alt="Luxury Suite View 3"
+                    fill
+                    className="object-cover transition-opacity duration-1000 rounded-3xl"
+                  />
+                </motion.div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-2xl font-semibold text-text mb-4">Private Double</h3>
+                <ul className="space-y-2">
+                  <li className="flex items-center text-text">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Air Conditioning</span>
+                  </li>
+                  <li className="flex items-center text-text">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Spacious Bathroom with Hot Water</span>
+                  </li>
+                  <li className="flex items-center text-text">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Handcrafted Furniture</span>
+                  </li>
+                  <li className="flex items-center text-text">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Garden View Sitting Area</span>
+                  </li>
+                  <li className="flex items-center text-text">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Wi-Fi</span>
+                  </li>
+                  <li className="flex items-center text-text">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Towels & Toiletries</span>
+                  </li>
+                  <li className="flex items-center text-text">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Daily Room Cleaning</span>
+                  </li>
+                  <li className="flex items-center text-text">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Surfboard Storage</span>
+                  </li>
+                </ul>
+              </div>
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              className="card bg-white rounded-3xl shadow-lg border-2 border-primary overflow-hidden p-5"
+              initial={{ x: -100 }}
+              animate={{ x: 0 }}
+            >
+              <div className="relative h-64 bg-black  rounded-3xl">
+                <motion.div
+                  animate={{ opacity: [1, 0, 0, 0, 1] }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src="/images/image1.jpg"
+                    alt="Luxury Suite View 1"
+                    fill
+                    className="object-cover transition-opacity duration-1000 rounded-3xl"
+                  />
+                </motion.div>
+                <motion.div
+                  animate={{ opacity: [0, 1, 0, 0, 0] }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src="/images/image3.jpg"
+                    alt="Luxury Suite View 2"
+                    fill
+                    className="object-cover transition-opacity duration-1000 rounded-3xl"
+                  />
+                </motion.div>
+                <motion.div
+                  animate={{ opacity: [0, 0, 1, 0, 0] }}
+                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src="/images/image4.jpg"
+                    alt="Luxury Suite View 3"
+                    fill
+                    className="object-cover transition-opacity duration-1000 rounded-3xl"
+                  />
+                </motion.div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-2xl font-semibold text-text mb-4">Shared Dorm Beds</h3>
+                <ul className="space-y-2">
+                  <li className="flex items-center text-text">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Comfy bunk bed with clean linens and towel</span>
+                  </li>
+                  <li className="flex items-center text-text">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Air Conditioning Spacious Bathroom with Hot Water</span>
+                  </li>
+                  <li className="flex items-center text-text">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Hot water showers</span>
+                  </li>
+                  <li className="flex items-center text-text">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Shared bathroom (cleaned daily)</span>
+                  </li>
+                  <li className="flex items-center text-text">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Wi-Fi</span>
+                  </li>
+                  <li className="flex items-center text-text">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Private Locker</span>
+                  </li>
+                  <li className="flex items-center text-text">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Surfboard Storage</span>
+                  </li>
+                  <li className="flex items-center text-text">
+                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
+                    <span>Daily room cleaning</span>
+                  </li>
+                </ul>
+              </div>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      </section>
+      {/* FAQ Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <p className="text-3xl sm:text-4xl font-bold text-text mb-4 customtext">
+              Frequently Asked <span className="text-primary">Questions</span>
+            </p>
+            <p className="text-lg text-text max-w-2xl mx-auto">
+              Got questions about our surf camp packages? We've got answers! Check out our most commonly asked questions below.
+            </p>
+          </motion.div>
+
+          <div className="max-w-4xl mx-auto">
+            <div className="space-y-4">
+              {[
+                {
+                  question: "What's included in the surf camp packages?",
+                  answer: "Our surf camp packages include accommodation (dorm or private room), meals, professional surf lessons with ISA-certified instructors, surf equipment rental, transport to surf spots, video analysis sessions, and access to our beachfront facilities. Some packages also include safari tours, sunset BBQ, and additional activities."
+                },
+                {
+                  question: "Do I need to have surfing experience to join?",
+                  answer: "Not at all! Our packages cater to all skill levels from complete beginners to advanced surfers. Our ISA-certified instructors will assess your level and provide personalized coaching. We have different surf spots suitable for various skill levels, so everyone can enjoy the waves safely."
+                },
+                {
+                  question: "What's the difference between room and dome accommodation?",
+                  answer: "Rooms are private double occupancy with 2 beds each, offering more privacy and comfort at $750 per person. Domes are shared accommodation with 6 individual beds at $500 per person, perfect for solo travelers or those looking for a more social experience. Both options include A/C, hot water, and daily housekeeping."
+                },
+                {
+                  question: "When can I check in and what's the minimum stay?",
+                  answer: "Check-in is every Sunday and check-out is the following Sunday, making it a 7-night stay. This schedule allows us to provide the best experience with our weekly program structure. You can arrive anytime on Sunday, and we'll arrange airport pickup if needed."
+                },
+                {
+                  question: "What should I bring and what's provided?",
+                  answer: "We provide all surf equipment (boards, wetsuits, rash guards), towels, bed linens, and professional surf instruction. You should bring casual clothes, swimwear, sunscreen, personal toiletries, and any medications you need. Don't forget your camera to capture those epic surf moments!"
+                }
+              ].map((faq, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                  className="bg-gray-50 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
+                >
+                  <FAQItem
+                    question={faq.question}
+                    answer={faq.answer}
+                    index={index}
+                  />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Contact CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+            className="text-center mt-12"
+          >
+            <div className="bg-primary/5 rounded-2xl p-8 border border-primary/10">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4 tanHeading">
+                Still have questions?
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Our friendly team is here to help you plan your perfect surf getaway.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <motion.a
+                  href="https://wa.link/iz5wh6"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-full font-medium transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.51 3.688z" />
+                  </svg>
+                  WhatsApp Us
+                </motion.a>
+                <motion.a
+                  href="mailto:rupassurfcamp@gmail.com"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white px-6 py-3 rounded-full font-medium transition-colors"
+                >
+                  <Mail className="w-5 h-5" />
+                  Email Us
+                </motion.a>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
       {/* Booking Dialog */}
       {selectedPackage && (
