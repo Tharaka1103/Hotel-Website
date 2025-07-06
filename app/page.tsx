@@ -192,11 +192,6 @@ const ImageSlider = () => {
       description: "One of the original surf stays in town, with a legacy of happy surfers from around the world."
     },
     {
-      src: "/images/image3.jpg",
-      title: "Quality Room Equipment",
-      description: "Top-grade amenities, furniture, and comfort essentials provided in all rooms"
-    },
-    {
       src: "/images/image4.jpg",
       title: "Modern & Affordable rooms",
       description: "Clean, specious,  rooms with all the creature comforts you need after a surf session."
@@ -364,7 +359,7 @@ const ImageSlider = () => {
         <div className="flex items-center justify-center relative">
           {/* Previous Image - Left Side */}
           <div
-            className="absolute left-0 sm:left-4 md:left-8 lg:left-16 z-10 cursor-pointer select-none"
+            className="hidden sm:block absolute left-0 sm:left-4 md:left-8 lg:left-16 z-10 cursor-pointer select-none"
             onClick={prevSlide}
           >
             <div className="relative w-[80px] h-[120px] sm:w-[100px] sm:h-[150px] md:w-[200px] md:h-[280px] lg:w-[250px] lg:h-[350px] rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden shadow-xl opacity-85 hover:opacity-95 transition-opacity duration-300">
@@ -380,9 +375,9 @@ const ImageSlider = () => {
           </div>
 
           {/* Current Image - Center */}
-          <div className="relative z-20">
+          <div className="relative z-20 w-full sm:w-auto">
             <div
-              className="relative w-[200px] h-[150px] sm:w-[240px] sm:h-[180px] md:w-[400px] md:h-[300px] lg:w-[500px] lg:h-[375px] xl:w-[600px] xl:h-[450px] rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl"
+              className="relative w-full h-[350px] sm:w-[240px] sm:h-[180px] md:w-[400px] md:h-[300px] lg:w-[500px] lg:h-[375px] xl:w-[600px] xl:h-[450px] rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl"
               style={{
                 transform: isDragging 
                   ? `translateX(${-dragOffset * 0.3}px) scale(0.98) rotateY(${dragOffset * 0.02}deg)`
@@ -433,7 +428,7 @@ const ImageSlider = () => {
               <div
                 className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 md:p-6 lg:p-8 text-white"
               >
-                <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-200 drop-shadow leading-relaxed text-center line-clamp-2 sm:line-clamp-none">
+                <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-200 drop-shadow leading-relaxed text-center ">
                   {images[currentIndex].description}
                 </p>
               </div>
@@ -443,7 +438,7 @@ const ImageSlider = () => {
 
           {/* Next Image - Right Side */}
           <div
-            className="absolute right-0 sm:right-4 md:right-8 lg:right-16 z-10 cursor-pointer select-none"
+            className="hidden sm:block absolute right-0 sm:right-4 md:right-8 lg:right-16 z-10 cursor-pointer select-none"
             onClick={nextSlide}
           >
             <div className="relative w-[80px] h-[120px] sm:w-[100px] sm:h-[150px] md:w-[200px] md:h-[280px] lg:w-[250px] lg:h-[350px] rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden shadow-xl opacity-85 hover:opacity-95 transition-opacity duration-300">
@@ -625,7 +620,7 @@ const VideoSection = ({
 
 const highlights = [
   {
-    icon: <img src="/icons/elephant.png" alt="Waves" className="w-20 h-20" />,
+    icon: <img src="/icons/waves.png" alt="Waves" className="w-20 h-20" />,
     title: "Waves for all",
     description:
       "Whether you're just starting out your surfing journey or chasing barrels, Arugam Bay has surf spots for all levels.",
@@ -1012,7 +1007,7 @@ export default function HomePage() {
             priority
           />
         </div>
-        <div className="absolute inset-x-0 top-0 h-[88.89%] bg-[#048697e8] z-[1]" />
+        <div className="absolute inset-x-0 top-0 h-[98%] mdh-[88.89] bg-[#048697e8] z-[1]" />
 
         <motion.div
           variants={staggerContainer}
@@ -1028,17 +1023,17 @@ export default function HomePage() {
               whileHover={{ scale: 1.02, y: -5 }}
               whileTap={{ scale: 0.98 }}
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
-              className="h-full"
+              className="h-full flex justify-center md:justify-start"
             >
-              <Card className="bg-transparent border-none hover:shadow-xl transition-all text-white h-full group">
-                <CardContent className="p-4 sm:p-6 flex flex-col sm:flex-row items-start gap-3 sm:gap-4 h-full">
+              <Card className="bg-transparent border-none hover:shadow-xl transition-all text-white h-full group w-full max-w-[90%] md:max-w-full">
+                <CardContent className="p-4 sm:p-6 flex flex-col items-center md:items-start md:flex-row gap-3 sm:gap-4 h-full">
                   <motion.div
                     whileHover={{ scale: 1.1, rotate: 10 }}
                     className="p-2 sm:p-3 rounded-full shrink-0 group-hover:bg-white/10 transition-all duration-300"
                   >
                     {item.icon}
                   </motion.div>
-                  <div className="flex-1">
+                  <div className="flex-1 text-center md:text-left">
                     <motion.h3
                       initial={{ opacity: 0, x: -20 }}
                       whileInView={{ opacity: 1, x: 0 }}
@@ -1066,7 +1061,7 @@ export default function HomePage() {
       </section>
 
       {/* Why Learn to Surf Section with Image Slider and Floating Leaf */}
-      <section className="py-16 mt-10 bg-background overflow-hidden relative">
+      <section className="py-8 bg-background overflow-hidden relative">
         {/* Floating Leaf 1 - Different Position */}
         {/*<FloatingScrollImage
           src="/images/leaf1.png"
@@ -1086,14 +1081,14 @@ export default function HomePage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-16"
+            className="text-center mb-4"
           >
             <motion.p
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="text-2xl md:text-4xl text-text font-bold leading-tight customtext mb-6  z-50"
+              className="text-3xl md:text-4xl text-text font-bold leading-tight customtext mb-6 z-50"
             >
               Why learn to surf with <span className="text-primary">Rupa's </span>Surf Camp?
             </motion.p>
@@ -1104,7 +1099,7 @@ export default function HomePage() {
       </section>
 
       {/* All Awesome Stuff Section with Enhanced Videos */}
-      <section className="py-16 px-6 md:px-20 bg-background relative overflow-hidden">
+      <section className="py-8 px-6 md:px-10 bg-background relative overflow-hidden">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1112,7 +1107,7 @@ export default function HomePage() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12 relative z-20"
         >
-          <motion.h2
+          <motion.p
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -1120,13 +1115,13 @@ export default function HomePage() {
             className="text-3xl md:text-4xl font-bold customtext text-text"
           >
             All the Awesome Stuff at <span className="text-primary">Rupa's</span>
-          </motion.h2>
+          </motion.p>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.4, duration: 0.6 }}
-            className="text-xl mt-2 text-text"
+            className="text-lg mt-2 text-text"
           >
             Whether you're here to ride waves, explore wild nature, or just vibe with the rhythm of the coast — we've got it all waiting for you.
           </motion.p>
@@ -1137,13 +1132,13 @@ export default function HomePage() {
           initial="initial"
           whileInView="animate"
           viewport={{ once: true }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 mx-auto max-w-7xl relative z-20"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mx-auto max-w-7xl relative z-20"
         >
           {[
-            { src: "/heronew.mp4", title: "Perfect Waves", description: "Experience world-class waves perfect for both beginners and pros" },
-            { src: "/video1.mp4", title: "Sunset Surfing", description: "Catch the perfect wave while the sun sets in paradise" },
-            { src: "/video2.mp4", title: "Pro Techniques", description: "Learn from the best surfers in Arugambay" },
-            { src: "/video3.mp4", title: "Beach Vibes", description: "Immerse yourself in the laid-back surfing culture" }
+            { src: "/heronew.mp4", title: "Perfect Waves", description: "Surf coaching for all levels, led by local certified pros — right at the break." },
+            { src: "/video1.mp4", title: "Sunset Surfing", description: "Comfy, modern rooms just steps from the surf and perfect for winding down" },
+            { src: "/video2.mp4", title: "Pro Techniques", description: "Explore national parks, scenic lagoons - the wild and unique beauty of Arugambay" },
+            { src: "/video3.mp4", title: "Beach Vibes", description: "Sri Lankan buffet, cozy café, and a full à la carte menu with global flavors." }
           ].map((video, index) => (
             <motion.div
               key={index}
@@ -1161,10 +1156,10 @@ export default function HomePage() {
               >
                 <source src={video.src} type="video/mp4" />
               </video>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="absolute bottom-0 left-0 right-0 p-4 text-white opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+                <div className="absolute bottom-0 left-0 right-0 p-4 text-white text-center">
                   <h3 className="text-xl font-bold mb-2">{video.title}</h3>
-                  <p className="text-sm text-gray-200">{video.description}</p>
+                  <p className="text-sm text-gray-200 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">{video.description}</p>
                 </div>
               </div>
             </motion.div>
@@ -1173,7 +1168,7 @@ export default function HomePage() {
       </section>
 
       {/* Most Popular Package Section with Floating Elements */}
-      <section className="py-16 md:px-5 bg-white relative overflow-hidden">
+      <section className="py-16 md:px-20 bg-white relative overflow-hidden">
         {/* Floating Leaf 2 - Different Position */}
         {/*<FloatingScrollImage
           src="/images/flower1.png"
@@ -1201,10 +1196,10 @@ export default function HomePage() {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl md:text-4xl font-bold customtext">
+            <p className="text-3xl md:text-4xl font-bold customtext text-text">
               Most Popular <span className="text-primary">Surf Camp </span> Package
-            </h2>
-            <p className="text-xl mt-4 text-gray-600">
+            </p>
+            <p className="text-xl mt-4 text-text">
               The package our guests love the most — surf every day, eat well, explore wildlife and soak up the Arugam Bay vibe.
             </p>
           </motion.div>
@@ -1230,7 +1225,7 @@ export default function HomePage() {
               </motion.div>
               <motion.div whileHover={{ scale: 1.05 }}>
                 <Link href="/surf">
-                  <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white rounded-full transition-all duration-300">
+                  <Button className="border-primary text-primary hover:bg-primary bg-primary text-white hover:text-white rounded-full transition-all duration-300">
                     Explore packages
                   </Button>
                 </Link>
@@ -1309,7 +1304,7 @@ export default function HomePage() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1 + 0.2, duration: 0.5 }}
-                        className="text-xl font-bold text-gray-800 mb-2 flex flex-row items-center justify-center"
+                        className="text-xl font-bold text-text mb-2 flex flex-row items-center justify-center"
                       >
                         {item.title}
                       </motion.p>
@@ -1318,7 +1313,7 @@ export default function HomePage() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1 + 0.4, duration: 0.5 }}
-                        className="text-gray-600 text-sm text-justify"
+                        className="text-text text-sm text-justify"
                       >
                         {item.description}
                       </motion.p>
@@ -1335,10 +1330,10 @@ export default function HomePage() {
               transition={{ delay: 0.8, duration: 0.6 }}
               className="mt-10"
             >
-              <div className="space-y-8 bg-white/95 backdrop-blur-sm rounded-3xl p-4 shadow-xl">
+              <div className="space-y-8 bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl">
                 <div className="">
                   <div className="flex flex-col md:flex-row items-center gap-6 overflow-x-auto pb-4">
-                    <div className="gap-6 flex flex-col w-full md:w-auto px-2 md:pl-5">
+                    <div className="gap-6 flex flex-col w-full md:w-auto px-2 md:pl-5 mt-4 md:mt-0">
                       <motion.p
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
@@ -1370,7 +1365,7 @@ export default function HomePage() {
                             className="perspective-1000"
                           >
                             <motion.div
-                              className="relative w-20 md:w-24 h-28 md:h-32 cursor-pointer"
+                              className="relative w-16 md:w-20 h-24 md:h-28 cursor-pointer"
                               initial={false}
                               whileHover={{ rotateY: 180, scale: 1.05 }}
                               style={{ transformStyle: "preserve-3d" }}
@@ -1380,7 +1375,7 @@ export default function HomePage() {
                               <div className="absolute w-full h-full flex flex-col items-center backface-hidden">
                                 <motion.div
                                   whileHover={{ scale: 1.1 }}
-                                  className="relative w-12 md:w-16 h-12 md:h-16 mb-2"
+                                  className="relative w-10 md:w-14 h-10 md:h-14 mb-2"
                                 >
                                   <Image
                                     src={service.icon}
@@ -1389,7 +1384,7 @@ export default function HomePage() {
                                     className="object-contain"
                                   />
                                 </motion.div>
-                                <span className="text-xs md:text-sm font-semibold text-gray-700 text-center">{service.text}</span>
+                                <span className="text-[10px] md:text-xs font-semibold text-text text-center">{service.text}</span>
                               </div>
 
                               {/* Back of card */}
@@ -1397,19 +1392,19 @@ export default function HomePage() {
                                 className="absolute w-full h-full p-2 bg-primary/10 rounded-lg flex items-center justify-center backface-hidden"
                                 style={{ transform: "rotateY(180deg)" }}
                               >
-                                <p className="text-[10px] md:text-xs text-gray-700 text-center">{service.description}</p>
+                                <p className="text-[8px] md:text-[10px] text-gray-700 text-center">{service.description}</p>
                               </div>
                             </motion.div>
                           </motion.div>
                         ))}
                       </motion.div>
                     </div>
-                    <div className="gap-6 flex flex-col w-full md:w-auto px-2 md:pl-5 mt-8 md:mt-0">
+                    <div className="gap-6 flex flex-col w-full md:w-auto px-2 md:pl-5 pt-4">
                       <motion.p
-                        initial={{ opacity: 0, x: 20 }}
+                        initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 0.2, duration: 0.6 }}
+                        transition={{ duration: 0.6 }}
                         className="text-lg text-primary text-center"
                       >
                         Extra services
