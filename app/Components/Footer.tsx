@@ -245,19 +245,6 @@ const Footer = () => {
         </div>
       </div>
       
-      {/* Mobile Scroll to Top */}
-      <motion.button
-        onClick={scrollToTop}
-        className="fixed bottom-6 right-6 z-50 bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg transition-all duration-200 md:hidden"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        aria-label="Scroll to top"
-      >
-        <ChevronUp className="h-5 w-5" />
-      </motion.button>
     </footer>
   );
 };
