@@ -12,6 +12,7 @@ const navLinks = [
   { href: "/", label: "Home" },
   { href: "/surf", label: "Packages" },
   { href: "/gallery", label: "Gallery" },
+  { href: "/about-us", label: "About Us" },
 ];
 
 export const Header = () => {
