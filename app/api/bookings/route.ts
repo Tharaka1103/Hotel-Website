@@ -21,7 +21,8 @@ const HARDCODED_PACKAGES = {
       "2 video analysis sessions",
       "2 ice bath recovery sessions"
     ],
-    price: 699
+    doubleRoomPrice: 750,
+    domeRoomPrice: 550
   },
   "surf-and-safari-retreat": {
     _id: "surf-and-safari-retreat",
@@ -42,7 +43,8 @@ const HARDCODED_PACKAGES = {
       "Sunset Lagoon Tour",
       "Sunset BBQ"
     ],
-    price: 750
+    doubleRoomPrice: 850,
+    domeRoomPrice: 650
   },
   "surf-guiding-pack": {
     _id: "surf-guiding-pack",
@@ -59,7 +61,8 @@ const HARDCODED_PACKAGES = {
       "Daily updates on surf spots and conditions",
       "3 video analysis sessions"
     ],
-    price: 1200
+    doubleRoomPrice: 1350,
+    domeRoomPrice: 1150
   }
 };
 
@@ -85,7 +88,7 @@ export async function GET(request: NextRequest) {
       const packageData = HARDCODED_PACKAGES[booking.packageId as keyof typeof HARDCODED_PACKAGES];
       return {
         ...booking.toObject(),
-        packageId: packageData || { title: 'Unknown Package', price: 0 }
+        packageId: packageData || { title: 'Unknown Package', doubleRoomPrice: 0, domeRoomPrice: 0 }
       };
     });
 
@@ -298,11 +301,11 @@ export async function POST(request: NextRequest) {
     // Calculate total price based on room type
     let pricePerPerson;
     if (roomType === 'room') {
-      pricePerPerson = 750; // Room price per person
+      pricePerPerson = packageDetails.doubleRoomPrice; // Room price per person
     } else if (roomType === 'dome') {
-      pricePerPerson = 500; // Dome price per person
+      pricePerPerson = packageDetails.domeRoomPrice; // Dome price per person
     } else {
-      pricePerPerson = packageDetails.price; // Default package price
+      pricePerPerson = packageDetails.doubleRoomPrice; // Default to double room price
     }
 
     const totalPrice = pricePerPerson * persons;
@@ -436,7 +439,7 @@ export async function PUT(request: NextRequest) {
     const packageData = HARDCODED_PACKAGES[booking.packageId as keyof typeof HARDCODED_PACKAGES];
     const populatedBooking = {
       ...booking.toObject(),
-      packageId: packageData || { title: 'Unknown Package', price: 0 }
+      packageId: packageData || { title: 'Unknown Package', doubleRoomPrice: 0, domeRoomPrice: 0 }
     };
 
     // Create notification for booking update (with error handling)
@@ -501,7 +504,7 @@ export async function DELETE(request: NextRequest) {
     const packageData = HARDCODED_PACKAGES[booking.packageId as keyof typeof HARDCODED_PACKAGES];
     const populatedBooking = {
       ...booking.toObject(),
-      packageId: packageData || { title: 'Unknown Package', price: 0 }
+      packageId: packageData || { title: 'Unknown Package', doubleRoomPrice: 0, domeRoomPrice: 0 }
     };
 
     // Create notification for booking deletion (with error handling)

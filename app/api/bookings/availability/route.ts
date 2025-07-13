@@ -2,6 +2,28 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 
+// Hardcoded packages for pricing context
+const HARDCODED_PACKAGES = {
+  "basic-surf-pack": {
+    _id: "basic-surf-pack",
+    title: "Basic Surf Pack",
+    doubleRoomPrice: 750,
+    domeRoomPrice: 550
+  },
+  "surf-and-safari-retreat": {
+    _id: "surf-and-safari-retreat",
+    title: "Surf & Safari Retreat",
+    doubleRoomPrice: 850,
+    domeRoomPrice: 650
+  },
+  "surf-guiding-pack": {
+    _id: "surf-guiding-pack",
+    title: "Surf Guiding Pack",
+    doubleRoomPrice: 1350,
+    domeRoomPrice: 1150
+  }
+};
+
 export async function GET(request: NextRequest) {
   try {
     await dbConnect();
@@ -11,35 +33,80 @@ export async function GET(request: NextRequest) {
     const checkInDate = url.searchParams.get('checkInDate');
     const roomType = url.searchParams.get('roomType');
 
+    // Validate required parameters
     if (!packageId || !checkInDate || !roomType) {
       return NextResponse.json({ 
         error: 'Package ID, check-in date, and room type are required' 
       }, { status: 400 });
     }
 
+    // Validate package exists
+    const packageDetails = HARDCODED_PACKAGES[packageId as keyof typeof HARDCODED_PACKAGES];
+    if (!packageDetails) {
+      return NextResponse.json({ 
+        error: 'Invalid package ID' 
+      }, { status: 400 });
+    }
+
+    // Validate room type
+    if (!['room', 'dome'].includes(roomType)) {
+      return NextResponse.json({ 
+        error: 'Room type must be either "room" or "dome"' 
+      }, { status: 400 });
+    }
+
+    // Validate and parse check-in date
     const checkIn = new Date(checkInDate);
+    if (isNaN(checkIn.getTime())) {
+      return NextResponse.json({ 
+        error: 'Invalid check-in date format' 
+      }, { status: 400 });
+    }
+
+    // Validate check-in date is a Sunday
+    if (checkIn.getDay() !== 0) {
+      return NextResponse.json({ 
+        error: 'Check-in must be on a Sunday' 
+      }, { status: 400 });
+    }
+
+    // Validate check-in date is not in the past
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    checkIn.setHours(0, 0, 0, 0);
+    if (checkIn < today) {
+      return NextResponse.json({ 
+        error: 'Check-in date cannot be in the past' 
+      }, { status: 400 });
+    }
+
+    // Calculate checkout date (7 days later)
     const checkOut = new Date(checkIn);
     checkOut.setDate(checkOut.getDate() + 7);
 
     if (roomType === 'room') {
-      // Check room availability (rooms 1-5, each with 2 beds)
+      // Check double room availability (rooms 1-5, each with 2 beds)
       const bookedRooms = await Booking.find({
         roomType: 'room',
         status: { $in: ['confirmed', 'pending'] },
         $or: [
           {
+            // Existing booking starts before or on check-in and ends after check-in
             checkInDate: { $lte: checkIn },
             checkOutDate: { $gt: checkIn }
           },
           {
+            // Existing booking starts before check-out and ends on or after check-out
             checkInDate: { $lt: checkOut },
             checkOutDate: { $gte: checkOut }
           },
           {
+            // Existing booking is completely within the requested period
             checkInDate: { $gte: checkIn },
             checkOutDate: { $lte: checkOut }
           },
           {
+            // Existing booking completely encompasses the requested period
             checkInDate: { $lte: checkIn },
             checkOutDate: { $gte: checkOut }
           }
@@ -47,34 +114,47 @@ export async function GET(request: NextRequest) {
       }).select('roomNumbers');
 
       const bookedRoomNumbers = bookedRooms.flatMap(booking => booking.roomNumbers || []);
-      const allRooms = [1, 2, 3, 4, 5];
+      const allRooms = [1, 2, 3, 4, 5]; // 5 double rooms available
       const availableRooms = allRooms.filter(room => !bookedRoomNumbers.includes(room));
+
+      // Get pricing information for the room type
+      const roomPrice = packageDetails.doubleRoomPrice;
 
       return NextResponse.json({
         availableRooms,
         bookedRooms: bookedRoomNumbers,
-        roomType: 'room'
+        roomType: 'room',
+        totalRooms: allRooms.length,
+        availableCount: availableRooms.length,
+        pricePerPerson: roomPrice,
+        checkInDate: checkIn.toISOString().split('T')[0],
+        checkOutDate: checkOut.toISOString().split('T')[0],
+        packageTitle: packageDetails.title
       });
 
     } else if (roomType === 'dome') {
-      // Check dome bed availability (beds 1-6)
+      // Check dome bed availability (beds 1-6 in shared dome)
       const bookedBeds = await Booking.find({
         roomType: 'dome',
         status: { $in: ['confirmed', 'pending'] },
         $or: [
           {
+            // Existing booking starts before or on check-in and ends after check-in
             checkInDate: { $lte: checkIn },
             checkOutDate: { $gt: checkIn }
           },
           {
+            // Existing booking starts before check-out and ends on or after check-out
             checkInDate: { $lt: checkOut },
             checkOutDate: { $gte: checkOut }
           },
           {
+            // Existing booking is completely within the requested period
             checkInDate: { $gte: checkIn },
             checkOutDate: { $lte: checkOut }
           },
           {
+            // Existing booking completely encompasses the requested period
             checkInDate: { $lte: checkIn },
             checkOutDate: { $gte: checkOut }
           }
@@ -82,22 +162,33 @@ export async function GET(request: NextRequest) {
       }).select('bedNumbers');
 
       const bookedBedNumbers = bookedBeds.flatMap(booking => booking.bedNumbers || []);
-      const allBeds = [1, 2, 3, 4, 5, 6];
+      const allBeds = [1, 2, 3, 4, 5, 6]; // 6 beds in dome accommodation
       const availableBeds = allBeds.filter(bed => !bookedBedNumbers.includes(bed));
+
+      // Get pricing information for the dome type
+      const domePrice = packageDetails.domeRoomPrice;
 
       return NextResponse.json({
         availableBeds,
         bookedBeds: bookedBedNumbers,
-        roomType: 'dome'
+        roomType: 'dome',
+        totalBeds: allBeds.length,
+        availableCount: availableBeds.length,
+        pricePerPerson: domePrice,
+        checkInDate: checkIn.toISOString().split('T')[0],
+        checkOutDate: checkOut.toISOString().split('T')[0],
+        packageTitle: packageDetails.title
       });
     }
 
-    return NextResponse.json({ error: 'Invalid room type' }, { status: 400 });
+    return NextResponse.json({ 
+      error: 'Invalid room type specified' 
+    }, { status: 400 });
 
   } catch (error) {
     console.error('Error checking availability:', error);
     return NextResponse.json({ 
-      error: 'Failed to check availability' 
+      error: 'Failed to check availability. Please try again.' 
     }, { status: 500 });
   }
 }

@@ -19,7 +19,8 @@ const HARDCODED_PACKAGES = {
       '2 video analysis sessions',
       '2 ice bath recovery sessions'
     ],
-    price: 699
+    doubleRoomPrice: 750,
+    domeRoomPrice: 550
   },
   'surf-and-safari-retreat': {
     _id: 'surf-and-safari-retreat',
@@ -40,7 +41,8 @@ const HARDCODED_PACKAGES = {
       'Sunset Lagoon Tour',
       'Sunset BBQ'
     ],
-    price: 750
+    doubleRoomPrice: 850,
+    domeRoomPrice: 650
   },
   'surf-guiding-pack': {
     _id: 'surf-guiding-pack',
@@ -57,7 +59,8 @@ const HARDCODED_PACKAGES = {
       'Daily updates on surf spots and conditions',
       '3 video analysis sessions'
     ],
-    price: 1200
+    doubleRoomPrice: 1350,
+    domeRoomPrice: 1150
   }
 };
 
@@ -99,12 +102,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Calculate pricing based on room type
-    let actualPricePerPerson = packageData.price;
+    // Calculate pricing based on room type - use actual booking price
+    let actualPricePerPerson = booking.pricePerPerson || packageData.doubleRoomPrice;
+    let basePackagePrice = packageData.doubleRoomPrice; // Show double room as base price
+
+    // If room type exists in booking, use the correct price from package
     if (booking.roomType === 'room') {
-      actualPricePerPerson = 750; // Room pricing
+      basePackagePrice = packageData.doubleRoomPrice;
     } else if (booking.roomType === 'dome') {
-      actualPricePerPerson = 500; // Dome pricing
+      basePackagePrice = packageData.domeRoomPrice;
     }
 
     // Format the response for customer view
@@ -114,7 +120,7 @@ export async function GET(request: NextRequest) {
       packageId: booking.packageId,
       packageTitle: packageData.title,
       packageDescription: packageData.description,
-      packagePrice: packageData.price,
+      packagePrice: basePackagePrice, // Price for the selected room type
       packageFeatures: packageData.features,
       personCount: booking.personCount,
       roomType: booking.roomType,
@@ -128,7 +134,9 @@ export async function GET(request: NextRequest) {
       bookingDate: booking.bookingDate ? booking.bookingDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
       totalPrice: booking.totalPrice,
       pricePerPerson: actualPricePerPerson,
-      basePackagePrice: packageData.price,
+      basePackagePrice: basePackagePrice, // Price for the selected room type
+      doubleRoomPrice: packageData.doubleRoomPrice, // For display purposes
+      domeRoomPrice: packageData.domeRoomPrice, // For display purposes
       status: booking.status,
       adminNotes: booking.adminNotes || '',
       createdAt: booking.createdAt || booking.bookingDate,
@@ -202,7 +210,9 @@ export async function PUT(request: NextRequest) {
       packageTitle: packageData?.title || 'Unknown Package',
       packageDescription: packageData?.description || '',
       packageFeatures: packageData?.features || [],
-      packagePrice: packageData?.price || 0
+      packagePrice: packageData?.doubleRoomPrice || 0, // Default to double room price
+      doubleRoomPrice: packageData?.doubleRoomPrice || 0,
+      domeRoomPrice: packageData?.domeRoomPrice || 0
     };
 
     return NextResponse.json({ 

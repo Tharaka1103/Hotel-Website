@@ -77,6 +77,8 @@ interface BookingDetails {
   totalPrice: number;
   pricePerPerson: number;
   basePackagePrice: number;
+  doubleRoomPrice?: number;
+  domeRoomPrice?: number;
   status: string;
   adminNotes?: string;
   createdAt: string;
@@ -369,11 +371,11 @@ export default function BookingDetailsPage() {
       yPosition += 20;
       
       // Pricing Table
+      const roomTypeText = booking.roomType === 'room' ? 'Double Room' : 'Dome Room';
       const pricingData = [
         ['Package', booking.packageTitle],
-        ['Base Price per Person', `$${booking.basePackagePrice}`],
-        ['Accommodation Type', booking.roomType === 'room' ? 'Private Room' : 'Dome Bed'],
-        ['Final Price per Person', `$${booking.pricePerPerson}`],
+        ['Accommodation Type', roomTypeText],
+        ['Price per Person', `$${booking.pricePerPerson}`],
         ['Number of Persons', booking.personCount.toString()],
         ['Subtotal', `$${booking.pricePerPerson * booking.personCount}`],
         ['Total Amount', `$${booking.totalPrice}`]
@@ -680,7 +682,7 @@ export default function BookingDetailsPage() {
   const daysUntilCheckIn = getDaysUntilCheckIn();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-white p-4 sm:p-6 lg:p-8 mt-20">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8">
@@ -791,16 +793,39 @@ export default function BookingDetailsPage() {
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                     <div className="bg-blue-50 p-3 rounded-lg">
-                      <p className="text-sm font-medium text-blue-800">Base Package Price</p>
-                      <p className="text-xl font-bold text-blue-900">${booking.basePackagePrice}</p>
-                      <p className="text-xs text-blue-600">per person</p>
+                      <p className="text-sm font-medium text-blue-800">Selected Room Type</p>
+                      <p className="text-xl font-bold text-blue-900">
+                        {booking.roomType === 'room' ? 'Double Room' : 'Dome Room'}
+                      </p>
+                      <p className="text-xs text-blue-600">
+                        ${booking.pricePerPerson} per person
+                      </p>
                     </div>
                     <div className="bg-green-50 p-3 rounded-lg">
-                      <p className="text-sm font-medium text-green-800">Your Final Price</p>
-                      <p className="text-xl font-bold text-green-900">${booking.pricePerPerson}</p>
-                      <p className="text-xs text-green-600">per person (incl. accommodation)</p>
+                      <p className="text-sm font-medium text-green-800">Total Price</p>
+                      <p className="text-xl font-bold text-green-900">${booking.totalPrice}</p>
+                      <p className="text-xs text-green-600">
+                        for {booking.personCount} person{booking.personCount > 1 ? 's' : ''}
+                      </p>
                     </div>
                   </div>
+
+                  {/* Room Type Pricing Info */}
+                  {booking.doubleRoomPrice && booking.domeRoomPrice && (
+                    <div className="bg-gray-50 p-3 rounded-lg">
+                      <p className="text-sm font-medium text-gray-700 mb-2">Available Pricing Options:</p>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div className={`p-2 rounded ${booking.roomType === 'room' ? 'bg-blue-100 border border-blue-300' : 'bg-white'}`}>
+                          <span className="font-medium">Double Room:</span> ${booking.doubleRoomPrice}/person
+                          {booking.roomType === 'room' && <span className="text-blue-600 ml-1">(Selected)</span>}
+                        </div>
+                        <div className={`p-2 rounded ${booking.roomType === 'dome' ? 'bg-blue-100 border border-blue-300' : 'bg-white'}`}>
+                          <span className="font-medium">Dome Room:</span> ${booking.domeRoomPrice}/person
+                          {booking.roomType === 'dome' && <span className="text-blue-600 ml-1">(Selected)</span>}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -936,11 +961,13 @@ export default function BookingDetailsPage() {
                     <span className="font-semibold">{booking.packageTitle}</span>
                   </div>
                   <div className="flex justify-between items-center border-b border-white/20 pb-2">
-                    <span>Base price per person</span>
-                    <span className="font-semibold">${booking.basePackagePrice}</span>
+                    <span>Room Type</span>
+                    <span className="font-semibold">
+                      {booking.roomType === 'room' ? 'Double Room' : 'Dome Room'}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center border-b border-white/20 pb-2">
-                    <span>Final price per person</span>
+                    <span>Price per person</span>
                     <span className="font-semibold">${booking.pricePerPerson}</span>
                   </div>
                   <div className="flex justify-between items-center border-b border-white/20 pb-2">
@@ -999,210 +1026,68 @@ export default function BookingDetailsPage() {
                   {generatingPDF ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      Generating PDF...
+                      Generating...
                     </>
                   ) : (
                     <>
                       <Download className="w-4 h-4" />
-                      Download Booking PDF
+                      Download PDF
                     </>
                   )}
                 </Button>
-                
                 <Button
                   onClick={copyBookingLink}
-                  className="w-full bg-gradient-to-r from-primary to-cyan-600 hover:from-primary/90 hover:to-cyan-600/90 text-white font-semibold py-3 flex items-center gap-2"
+                  variant="outline"
+                  className="w-full border-primary text-primary hover:bg-primary hover:text-white py-3 flex items-center gap-2"
                 >
                   {copied ? (
                     <>
                       <CheckCircle2 className="w-4 h-4" />
-                      Link Copied!
+                      Copied!
                     </>
                   ) : (
                     <>
                       <Copy className="w-4 h-4" />
-                      Copy Booking Link
+                      Copy Link
                     </>
                   )}
                 </Button>
-                
                 <Button
                   onClick={shareBooking}
                   variant="outline"
-                  className="w-full border-primary text-primary hover:bg-primary hover:text-white font-semibold py-3 flex items-center gap-2"
+                  className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 py-3 flex items-center gap-2"
                 >
                   <Share2 className="w-4 h-4" />
                   Share Booking
                 </Button>
-                
-                <div className="text-xs text-muted-foreground text-center mt-3 p-3 bg-background rounded-lg">
-                  <Info className="w-4 h-4 inline mr-1" />
-                  Keep this booking information safe for your records
-                </div>
               </CardContent>
             </Card>
 
-            {/* Booking Progress */}
-            <Card className="shadow-lg border-0 bg-card">
-              <CardContent className="p-6">
-                <h3 className="font-bold text-purple-800 mb-4 flex items-center gap-2">
-                  <Clock className="w-5 h-5" />
-                  Booking Progress
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <div className="flex-1">
-                      <span className="text-sm font-medium">Booking Created</span>
-                      <p className="text-xs text-muted-foreground">
-                        {formatShortDate(booking.createdAt || booking.bookingDate)}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <div className={`w-3 h-3 rounded-full ${
-                      booking.status === 'confirmed' || booking.status === 'completed' 
-                        ? 'bg-green-500' 
-                        : booking.status === 'cancelled' 
-                          ? 'bg-red-500' 
-                          : 'bg-gray-300'
-                    }`}></div>
-                    <div className="flex-1">
-                      <span className="text-sm font-medium">Booking Status</span>
-                      <p className="text-xs text-muted-foreground">
-                        {booking.status === 'confirmed' ? 'Confirmed' : 
-                         booking.status === 'cancelled' ? 'Cancelled' : 
-                         booking.status === 'completed' ? 'Completed' : 'Pending'}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <div className={`w-3 h-3 rounded-full ${
-                      booking.status === 'completed' ? 'bg-green-500' : 'bg-gray-300'
-                    }`}></div>
-                    <div className="flex-1">
-                      <span className="text-sm font-medium">Experience Completed</span>
-                      <p className="text-xs text-muted-foreground">
-                        {booking.status === 'completed' ? 'Completed' : 'Pending'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="mt-4 p-3 bg-gradient-to-r from-primary/10 to-cyan-600/10 rounded-lg">
-                  <p className="text-sm text-primary text-center font-semibold">
-                    Current Status: {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Contact Support */}
-            <Card className="shadow-lg border-0 bg-gradient-to-br from-gray-100 to-gray-200">
-              <CardContent className="p-6">
-                <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <Phone className="w-5 h-5" />
+            {/* Contact Information */}
+            <Card className="shadow-lg border-0 bg-gradient-to-br from-slate-100 to-gray-200">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg text-gray-800">
+                  <Info className="w-5 h-5 text-primary" />
                   Need Help?
-                </h3>
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-gray-600" />
-                    <span>+94 77 123 4567</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 text-gray-700">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-4 h-4 text-primary" />
+                    <span className="text-sm">+94 (76) 233-2335</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-gray-600" />
-                    <span>info@surfparadise.com</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-gray-600" />
-                    <span>24/7 Customer Support</span>
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-4 h-4 text-primary" />
+                    <span className="text-sm">rupassurfcamp@gmail.com</span>
                   </div>
                 </div>
-                <p className="text-xs text-gray-600 mt-4">
-                  Our team is here to help with any questions about your booking.
+                <p className="text-xs text-gray-600">
+                  Contact us if you have any questions about your booking or need to make changes.
                 </p>
               </CardContent>
             </Card>
           </div>
-        </div>
-
-        {/* Footer Message */}
-        <div className="mt-12 text-center">
-          <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-6 sm:p-8 rounded-2xl shadow-lg">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-4">🏄‍♂️ Get Ready to Surf!</h2>
-            <p className="text-blue-100 text-lg mb-4">
-              Your amazing surf adventure starts on {formatDate(booking.checkInDate)}
-            </p>
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 mb-4">
-              <p className="text-blue-100 text-sm mb-2">
-                <strong>Accommodation Details:</strong>
-              </p>
-              <p className="text-blue-200 text-sm">
-                {booking.roomType === 'room' 
-                  ? `You'll be staying in Room${booking.roomNumbers.length > 1 ? 's' : ''} ${booking.roomNumbers.join(', ')} with ${booking.roomNumbers.length * 2} beds for ${booking.personCount} person${booking.personCount > 1 ? 's' : ''}.`
-                  : `You'll be staying in the Dome with Bed${booking.bedNumbers.length > 1 ? 's' : ''} ${booking.bedNumbers.join(', ')} for ${booking.personCount} person${booking.personCount > 1 ? 's' : ''}.`
-                }
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-              <div className="bg-white/10 rounded-lg p-3">
-                <div className="text-blue-200 text-xs mb-1">Check-in</div>
-                <div className="font-semibold">Sunday 2:00 PM</div>
-              </div>
-              <div className="bg-white/10 rounded-lg p-3">
-                <div className="text-blue-200 text-xs mb-1">Duration</div>
-                <div className="font-semibold">7 Days / 6 Nights</div>
-              </div>
-              <div className="bg-white/10 rounded-lg p-3">
-                <div className="text-blue-200 text-xs mb-1">Check-out</div>
-                <div className="font-semibold">Sunday 11:00 AM</div>
-              </div>
-            </div>
-            <p className="text-blue-200 text-sm mt-4">
-              We'll send you a confirmation email with detailed check-in instructions and packing tips.
-            </p>
-          </div>
-        </div>
-
-        {/* Additional Information */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="shadow-lg border-0 bg-card">
-            <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MapPin className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="font-bold mb-2">Location</h3>
-              <p className="text-sm text-muted-foreground">
-                Arugam Bay, Sri Lanka's premier surf destination
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-lg border-0 bg-card">
-            <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Waves className="w-6 h-6 text-green-600" />
-              </div>
-              <h3 className="font-bold mb-2">Perfect Waves</h3>
-              <p className="text-sm text-muted-foreground">
-                World-class surf breaks suitable for all levels
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-lg border-0 bg-card">
-            <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Heart className="w-6 h-6 text-purple-600" />
-              </div>
-              <h3 className="font-bold mb-2">Unforgettable Experience</h3>
-              <p className="text-sm text-muted-foreground">
-                Create memories that will last a lifetime
-              </p>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

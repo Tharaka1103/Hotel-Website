@@ -46,7 +46,8 @@ interface Booking {
     _id: string;
     title: string;
     description: string;
-    price: number;
+    doubleRoomPrice?: number;
+    domeRoomPrice?: number;
     features: string[];
   };
   personCount: number;
@@ -88,7 +89,9 @@ export default function AdminBookingsPage() {
       const data = await response.json();
       setBookings(data.bookings || []);
     } catch (error) {
-      toast.error('Failed to fetch bookings');
+      toast.error('Failed to fetch bookings', {
+                position: 'bottom-right'
+              });
     } finally {
       setLoading(false);
     }
@@ -202,14 +205,28 @@ export default function AdminBookingsPage() {
       });
 
       if (response.ok) {
-        toast.success('Booking deleted successfully');
-        fetchBookings();
+              toast.success('Booking deleted successfully', {
+                position: 'bottom-right'
+              });
+              fetchBookings();
       } else {
         const errorData = await response.json();
-        toast.error(errorData.error || 'Failed to delete booking');
+        toast.error(errorData.error || 'Failed to delete booking', {
+                position: 'bottom-right'
+              });
       }
     } catch (error) {
-      toast.error('Failed to delete booking');
+      toast.error('Failed to delete booking', {
+                position: 'bottom-right'
+              });
+    }
+  };
+
+  const getRoomTypePrice = (booking: Booking) => {
+    if (booking.roomType === 'room') {
+      return booking.packageId?.doubleRoomPrice || booking.pricePerPerson;
+    } else {
+      return booking.packageId?.domeRoomPrice || booking.pricePerPerson;
     }
   };
 
@@ -506,6 +523,9 @@ export default function AdminBookingsPage() {
                                               `Dome - Bed${booking.bedNumbers.length > 1 ? 's' : ''} ${booking.bedNumbers.join(', ')}`
                                             )}
                                           </p>
+                                          <p className="text-xs text-gray-500">
+                                            ${booking.pricePerPerson}/person ({booking.roomType === 'room' ? 'Double Room' : 'Dome'})
+                                          </p>
                                         </div>
                                       </div>
                                       
@@ -516,6 +536,9 @@ export default function AdminBookingsPage() {
                                         <div>
                                           <p className="text-gray-500 text-xs">Total Amount</p>
                                           <p className="font-bold text-xl text-teal-600">${booking.totalPrice}</p>
+                                          <p className="text-xs text-gray-500">
+                                            ${booking.pricePerPerson} × {booking.personCount} person{booking.personCount > 1 ? 's' : ''}
+                                          </p>
                                         </div>
                                       </div>
                                     </div>

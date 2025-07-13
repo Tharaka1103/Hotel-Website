@@ -44,7 +44,8 @@ import {
   DollarSign,
   CreditCard,
   Building,
-  Info
+  Info,
+  Tag
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -70,6 +71,9 @@ interface BookingDetails {
   bookingDate: string;
   totalPrice: number;
   pricePerPerson: number;
+  basePackagePrice?: number;
+  doubleRoomPrice?: number;
+  domeRoomPrice?: number;
   status: string;
   adminNotes?: string;
 }
@@ -133,13 +137,19 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
       if (response.ok) {
         const data = await response.json();
         setBooking(data.booking);
-        toast.success('Booking updated successfully!');
+        toast.success('Booking updated successfully!', {
+                position: 'bottom-right'
+              });
       } else {
         const errorData = await response.json();
-        toast.error(errorData.error || 'Failed to update booking');
+        toast.error(errorData.error || 'Failed to update booking', {
+                position: 'bottom-right'
+              });
       }
     } catch (error) {
-      toast.error('Failed to update booking');
+      toast.error('Failed to update booking', {
+                position: 'bottom-right'
+              });
     } finally {
       setUpdating(false);
     }
@@ -323,9 +333,43 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
                     <div className="text-center border-b pb-6">
                       <h2 className="text-3xl sm:text-4xl font-bold text-primary mb-3">{booking.packageTitle}</h2>
                       <p className="text-gray-600 text-lg leading-relaxed">{booking.packageDescription}</p>
-                      <div className="mt-4 inline-flex items-center bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-3 rounded-full shadow-lg">
-                        <DollarSign className="w-5 h-5 mr-2" />
-                        <span className="text-xl font-bold">${booking.packagePrice} per person</span>
+                      
+                      {/* Enhanced Pricing Display */}
+                      <div className="mt-6 space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="p-4 bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-xl shadow-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Home className="w-5 h-5" />
+                              <span className="font-semibold">Double Room</span>
+                            </div>
+                            <p className="text-2xl font-bold">
+                              ${booking.doubleRoomPrice || 'N/A'}
+                            </p>
+                            <p className="text-sm opacity-90">per person</p>
+                          </div>
+                          
+                          <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-500 text-white rounded-xl shadow-lg">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Bed className="w-5 h-5" />
+                              <span className="font-semibold">Dome Room</span>
+                            </div>
+                            <p className="text-2xl font-bold">
+                              ${booking.domeRoomPrice || 'N/A'}
+                            </p>
+                            <p className="text-sm opacity-90">per person</p>
+                          </div>
+                        </div>
+                        
+                        {/* Selected Price Highlight */}
+                        <div className="p-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl shadow-lg">
+                          <div className="flex items-center justify-center gap-3">
+                            <Tag className="w-6 h-6" />
+                            <div className="text-center">
+                              <p className="font-semibold">Customer Selected: {booking.roomType === 'room' ? 'Double Room' : 'Dome Room'}</p>
+                              <p className="text-2xl font-bold">${booking.pricePerPerson} per person</p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     
@@ -438,6 +482,9 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
                             </div>
                           )}
                         </div>
+                        <div className="mt-4 p-3 bg-white/20 rounded-lg">
+                          <p className="text-sm font-medium">Rate: ${booking.pricePerPerson}/person</p>
+                        </div>
                       </div>
                     </div>
 
@@ -475,7 +522,7 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
                 </CardContent>
               </Card>
 
-              {/* Pricing Information - Highlighted */}
+              {/* Enhanced Pricing Information */}
               <Card className="shadow-2xl border-0 bg-gradient-to-br from-yellow-50 via-orange-50 to-red-50 overflow-hidden">
                 <CardHeader className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white p-6">
                   <CardTitle className="flex items-center gap-3 text-2xl font-bold">
@@ -487,6 +534,14 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                       <div className="text-center p-6 bg-white rounded-xl shadow-lg border-2 border-gray-100">
+                        <Tag className="w-10 h-10 mx-auto mb-3 text-blue-600" />
+                        <p className="text-sm text-gray-500 font-medium">Room Type Selected</p>
+                        <p className="text-xl font-bold text-gray-800">
+                          {booking.roomType === 'room' ? 'Double Room' : 'Dome Room'}
+                        </p>
+                      </div>
+                      
+                      <div className="text-center p-6 bg-white rounded-xl shadow-lg border-2 border-gray-100">
                         <DollarSign className="w-10 h-10 mx-auto mb-3 text-green-600" />
                         <p className="text-sm text-gray-500 font-medium">Price per Person</p>
                         <p className="text-2xl font-bold text-gray-800">${booking.pricePerPerson}</p>
@@ -497,22 +552,47 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
                         <p className="text-sm text-gray-500 font-medium">Number of Persons</p>
                         <p className="text-2xl font-bold text-gray-800">{booking.personCount}</p>
                       </div>
-                      
-                      <div className="text-center p-6 bg-gradient-to-br from-green-500 to-emerald-500 text-white rounded-xl shadow-xl">
-                        <CreditCard className="w-10 h-10 mx-auto mb-3" />
-                        <p className="text-sm opacity-90 font-medium">Total Amount</p>
-                        <p className="text-3xl font-bold">${booking.totalPrice}</p>
+                    </div>
+                    
+                    {/* Total Section */}
+                    <div className="p-6 bg-gradient-to-br from-green-500 to-emerald-500 text-white rounded-xl shadow-xl">
+                      <div className="text-center">
+                        <CreditCard className="w-12 h-12 mx-auto mb-3" />
+                        <p className="text-lg opacity-90 font-medium">Total Amount</p>
+                        <p className="text-4xl font-bold">${booking.totalPrice}</p>
+                        <p className="text-sm opacity-90 mt-2">
+                          ${booking.pricePerPerson} × {booking.personCount} person{booking.personCount > 1 ? 's' : ''}
+                        </p>
                       </div>
                     </div>
                     
+                    {/* Pricing Comparison */}
                     <div className="p-6 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-2xl border border-indigo-200">
-                      <div className="text-center">
+                      <div className="text-center mb-4">
                         <Info className="w-8 h-8 mx-auto mb-3 text-indigo-600" />
-                        <p className="text-indigo-800 font-semibold text-lg">Payment Details</p>
-                        <p className="text-indigo-700 mt-2">
-                          ${booking.pricePerPerson} × {booking.personCount} person{booking.personCount > 1 ? 's' : ''} = ${booking.totalPrice}
+                        <p className="text-indigo-800 font-semibold text-lg">Pricing Details</p>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="p-3 bg-white rounded-lg">
+                          <p className="text-sm font-medium text-gray-600">Double Room Rate</p>
+                          <p className="text-lg font-bold text-blue-600">
+                            ${booking.doubleRoomPrice || 'N/A'}/person
+                          </p>
+                        </div>
+                        <div className="p-3 bg-white rounded-lg">
+                          <p className="text-sm font-medium text-gray-600">Dome Room Rate</p>
+                          <p className="text-lg font-bold text-green-600">
+                            ${booking.domeRoomPrice || 'N/A'}/person
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-4 p-3 bg-yellow-100 rounded-lg border border-yellow-300">
+                        <p className="text-center text-yellow-800 font-semibold">
+                          Customer paid: <span className="text-lg">${booking.pricePerPerson}/person</span> 
+                          <span className="text-sm"> ({booking.roomType === 'room' ? 'Double Room' : 'Dome Room'} rate)</span>
                         </p>
-                        <p className="text-sm text-indigo-600 mt-1">7-day accommodation included</p>
                       </div>
                     </div>
                   </div>
@@ -600,7 +680,7 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
                 </CardContent>
               </Card>
 
-              {/* Quick Stats */}
+              {/* Enhanced Quick Stats */}
               <Card className="shadow-xl border-0 bg-gradient-to-br from-blue-50 to-indigo-100">
                 <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4">
                   <CardTitle className="text-lg">Quick Stats</CardTitle>
@@ -612,8 +692,14 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
                       <span className="font-bold text-blue-600">7 Days</span>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm">
-                      <span className="text-sm font-medium text-gray-600">Accommodation</span>
+                      <span className="text-sm font-medium text-gray-600">Room Type</span>
                       <span className="font-bold text-purple-600">
+                        {booking.roomType === 'room' ? 'Double Room' : 'Dome'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm">
+                      <span className="text-sm font-medium text-gray-600">Accommodation</span>
+                      <span className="font-bold text-indigo-600">
                         {booking.roomType === 'room' 
                           ? `${booking.roomNumbers.length} Room${booking.roomNumbers.length > 1 ? 's' : ''}`
                           : `${booking.bedNumbers.length} Bed${booking.bedNumbers.length > 1 ? 's' : ''}`
@@ -628,6 +714,10 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
                           : booking.bedNumbers.length
                         }
                       </span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg shadow-sm">
+                      <span className="text-sm font-medium">Revenue</span>
+                      <span className="font-bold text-lg">${booking.totalPrice}</span>
                     </div>
                   </div>
                 </CardContent>

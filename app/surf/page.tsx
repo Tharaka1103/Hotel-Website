@@ -67,7 +67,9 @@ interface Package {
   title: string;
   description: string;
   features: string[];
-  price: number;
+  doubleRoomPrice: number;
+  domeRoomPrice: number;
+  popular: boolean
 }
 
 interface FormErrors {
@@ -87,6 +89,7 @@ interface AvailabilityData {
   bookedBeds?: number[];
   roomType: string;
 }
+
 // Add this component before the main SurfPage component
 const FAQItem = ({ question, answer, index }: { question: string; answer: string; index: number }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -142,7 +145,69 @@ const FAQItem = ({ question, answer, index }: { question: string; answer: string
 
 export default function SurfPage() {
   const router = useRouter();
-  const [packages, setPackages] = useState<Package[]>([]);
+  const [packages] = useState<Package[]>([
+    {
+      _id: 'basic-surf-pack',
+      title: 'Basic Surf Pack',
+      description: 'Perfect for beginners or casual surfers, this package includes everything you need to get started.',
+      features: [
+        '7 nights accommodation (Dorm or Private Room)',
+        'Breakfast x 7',
+        '5 x Unlimited Local Buffet (Lunch or Dinner)',
+        'Surf course 6 x 1.5 hours',
+        'Surf equipment (2 hours x 2 Daily)',
+        'Transport to surf spots',
+        'Surf theory',
+        '2 video analysis sessions',
+        '2 ice bath recovery sessions'
+      ],
+      doubleRoomPrice: 750,
+      domeRoomPrice: 550,
+      popular: false
+    },
+    {
+      _id: 'surf-and-safari-retreat',
+      title: 'Surf & Safari Retreat',
+      description: 'A balanced mix of surf, nature and relaxation, this retreat is for those wanting more than just waves.',
+      features: [
+        '7 nights accommodation (Dorm or Private Room)',
+        'Breakfast x 7',
+        '5 x Unlimited Local Buffet (Lunch or Dinner)',
+        'Surf course 5 x 1.5 hours',
+        'Surf equipment (2 hours x 2 Daily)',
+        'Transport to surf spots',
+        'Surf theory',
+        '2 video analysis sessions',
+        '5 ice bath recovery sessions',
+        '1 x surf skate session',
+        'Kumana Safari (Half Day)',
+        'Sunset Lagoon Tour',
+        'Sunset BBQ'
+      ],
+      doubleRoomPrice: 850,
+      domeRoomPrice: 650,
+      popular: true
+    },
+    {
+      _id: 'surf-guiding-pack',
+      title: 'Surf Guiding Pack',
+      description: 'Tailored for seasoned surfers, this premium option offers expert-guided surf trips, in-depth analysis, and daily briefings.',
+      features: [
+        '7 nights accommodation (Dorm or Private Room)',
+        'Breakfast x 7',
+        '5 x Unlimited Local Buffet (Lunch or Dinner)',
+        'Meet your new surf buddies and feel part of the crew instantly',
+        'Surf the top local spots with a knowledgeable local guide',
+        'Transportation included to all surf spots - no rental car required.',
+        '5 days of surf guiding, with 2 sessions each day',
+        'Daily updates on surf spots and conditions',
+        '3 video analysis sessions'
+      ],
+      doubleRoomPrice: 1350,
+      domeRoomPrice: 1150,
+      popular: false
+    }
+  ]);
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [checkInDate, setCheckInDate] = useState('');
   const [personCount, setPersonCount] = useState(1);
@@ -150,7 +215,7 @@ export default function SurfPage() {
   const [selectedRooms, setSelectedRooms] = useState<number[]>([]);
   const [selectedBeds, setSelectedBeds] = useState<number[]>([]);
   const [availabilityData, setAvailabilityData] = useState<AvailabilityData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -160,22 +225,6 @@ export default function SurfPage() {
     email: '',
     phone: ''
   });
-
-  useEffect(() => {
-    fetchPackages();
-  }, []);
-
-  const fetchPackages = async () => {
-    try {
-      const response = await fetch('/api/packages');
-      const data = await response.json();
-      setPackages(data.packages || []);
-    } catch (error) {
-      toast.error('Failed to fetch packages');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const checkAvailability = async (packageId: string, date: string, roomTypeSelected: string) => {
     setAvailabilityLoading(true);
@@ -407,7 +456,13 @@ export default function SurfPage() {
 
   const calculateTotalPrice = () => {
     if (!selectedPackage) return 0;
-    return selectedPackage.price * personCount;
+    const roomPrice = roomType === 'room' ? selectedPackage.doubleRoomPrice : selectedPackage.domeRoomPrice;
+    return roomPrice * personCount;
+  };
+
+  const getRoomPrice = () => {
+    if (!selectedPackage || !roomType) return 0;
+    return roomType === 'room' ? selectedPackage.doubleRoomPrice : selectedPackage.domeRoomPrice;
   };
 
   const getFeatureIcon = (feature: string) => {
@@ -663,18 +718,6 @@ export default function SurfPage() {
 
       <section className="py-16 md:px-20 bg-white relative overflow-hidden">
         {/* Floating Leaf 2 - Different Position */}
-        {/*<FloatingScrollImage
-                src="/images/flower1.png"
-                alt="Leaf 2"
-                className="top-24 w-16 sm:w-24 md:w-32 lg:w-48 xl:w-64 h-16 sm:h-24 md:h-32 lg:h-48 xl:h-64 z-10"
-                scrollRange={[2200, 3200]}
-                yRange={[0, -120]}
-                xRange={[0, 80]}
-                rotateRange={[0, 45]}
-                scaleRange={[1, 1.2]}
-                opacityRange={[0.7, 1]}
-              />*/}
-
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -713,7 +756,7 @@ export default function SurfPage() {
             <div className="flex gap-4">
               <motion.div whileHover={{ scale: 1.05 }}>
                 <Button variant="outline" className="border-primary text-primary rounded-full transition-all duration-300">
-                  Starting from $599
+                  Starting from $650
                 </Button>
               </motion.div>
             </div>
@@ -982,1033 +1025,488 @@ export default function SurfPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {/* Package 1 - Essential */}
-            <div className="relative">
-              <Card className="group hover:shadow-2xl rounded-3xl transition-all duration-500 border border-gray-200 bg-card overflow-hidden transform hover:-translate-y-2 h-full">
-                <CardContent className="p-0">
-                  {/* Header */}
-                  <div className="bg-card p-6 text-white">
-                    <div className="flex justify-center items-start">
-                      <div className="text-center">
-                        <h3 className="text-2xl font-bold text-text mb-2 tanHeading">Basic Surf Pack</h3>
-                        <p className="text-text text-sm">Perfect for beginners or casual surfers, this package includes everything you need to get started.</p>
+            {packages.map((pkg, index) => (
+              <div key={pkg._id} className="relative">
+                <Card className="group hover:shadow-2xl rounded-3xl transition-all duration-500 border border-gray-200 bg-card overflow-hidden transform hover:-translate-y-2 h-full">
+                  <CardContent className="p-0">
+                    {/* Header */}
+                    <div className="bg-card p-6 text-white">
+                      <div className="flex justify-center items-start">
+                        <div className="text-center">
+                          <h3 className="text-2xl font-bold text-text mb-2 tanHeading">{pkg.title}</h3>
+                          <p className="text-text text-sm">{pkg.description}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Content */}
-                  <div className="p-6 space-y-6">
-                    <div>
-                      <h4 className="font-semibold mb-4 flex items-center justify-center text-black">
-                        <Star className="w-4 h-4 mr-2 text-yellow-500" />
-                        What's Included
-                      </h4>
+                    {/* Content */}
+                    <div className="p-6 space-y-6">
+
+                      {/* Features */}
                       <div className="space-y-3">
-                        {[
-                          "7 nights accommodation (Dorm or Private Room)",
-                          "Breakfast x 7",
-                          "5 x Unlimited Local Buffet (Lunch or Dinner)",
-                          "Surf course 6 x 1.5 hours",
-                          "Surf equipment (2 hours x 2 Daily)",
-                          "Transport to surf spots",
-                          "Surf theory",
-                          "2 video analysis sessions",
-                          "2 ice bath recovery sessions"
-                        ].map((feature, index) => (
-                          <div key={index} className="flex items-center text-sm text-gray-600">
-                            <CheckCircle2 className="w-4 h-4 mr-3 text-green-500 flex-shrink-0" />
-                            <span>{feature}</span>
+                        <h4 className="text-lg font-semibold text-text flex items-center gap-2">
+                          <Star className="w-5 h-5 text-yellow-500" />
+                          What's Included
+                        </h4>
+                        <div className="space-y-2 pr-2">
+                          {pkg.features.map((feature, featureIndex) => (
+                            <div key={featureIndex} className="flex items-center gap-3 text-sm">
+                              {getFeatureIcon(feature)}
+                              <span className="text-gray-700">{feature}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Pricing */}
+                      <div className="space-y-4 pt-4 border-t border-gray-200">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-primary mb-2">
+                            Starting from ${pkg.domeRoomPrice}
                           </div>
-                        ))}
+                          <p className="text-sm text-gray-600">per person (dome room)</p>
+                          <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                            <div className="text-sm text-gray-700 mb-1">Pricing options:</div>
+                            <div className="flex justify-between text-sm">
+                              <span>Dome Room:</span>
+                              <span className="font-semibold text-green-600">${pkg.domeRoomPrice}/person</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span>Double Room:</span>
+                              <span className="font-semibold text-blue-600">${pkg.doubleRoomPrice}/person</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Book Now Button */}
+                        <Dialog open={isDialogOpen && selectedPackage?._id === pkg._id} onOpenChange={setIsDialogOpen}>
+                          <DialogTrigger asChild>
+                            <Button
+                              className="w-full bg-gradient-to-r from-primary to-cyan-600 hover:from-primary/90 hover:to-cyan-600/90 text-white font-semibold py-3 rounded-xl transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                              onClick={() => {
+                                setSelectedPackage(pkg);
+                                setIsDialogOpen(true);
+                              }}
+                            >
+                              <Waves className="w-5 h-5 mr-2" />
+                              Book This Package
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                            <DialogHeader>
+                              <DialogTitle className="text-2xl font-bold text-primary">
+                                Book {selectedPackage?.title}
+                              </DialogTitle>
+                            </DialogHeader>
+
+                            <div className="space-y-6 py-4">
+                              {/* Check-in Date */}
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium">Check-in Date (Sunday only)</label>
+                                <Input
+                                  type="date"
+                                  value={checkInDate}
+                                  onChange={(e) => {
+                                    setCheckInDate(e.target.value);
+                                    setErrors(prev => ({ ...prev, checkInDate: undefined }));
+                                    if (e.target.value && roomType) {
+                                      checkAvailability(selectedPackage?._id || '', e.target.value, roomType);
+                                    }
+                                  }}
+                                  min={getNextSunday()}
+                                  className={errors.checkInDate ? 'border-red-500' : ''}
+                                />
+                                {errors.checkInDate && (
+                                  <p className="text-red-500 text-sm">{errors.checkInDate}</p>
+                                )}
+                                {checkInDate && (
+                                  <p className="text-sm text-gray-600">
+                                    Check-out: {formatDate(getCheckOutDate(checkInDate))}
+                                  </p>
+                                )}
+                              </div>
+
+                              {/* Number of Guests */}
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium">Number of Guests (1-6)</label>
+                                <div className="flex items-center gap-3">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handlePersonCountChange(false)}
+                                    disabled={personCount <= 1}
+                                  >
+                                    <Minus className="w-4 h-4" />
+                                  </Button>
+                                  <span className="w-12 text-center font-semibold">{personCount}</span>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handlePersonCountChange(true)}
+                                    disabled={personCount >= 6}
+                                  >
+                                    <Plus className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                                {errors.personCount && (
+                                  <p className="text-red-500 text-sm">{errors.personCount}</p>
+                                )}
+                              </div>
+
+                              {/* Room Type Selection */}
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium">Accommodation Type</label>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                  <div
+                                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${roomType === 'room'
+                                        ? 'border-blue-400 bg-blue-100'
+                                        : 'border-gray-200 hover:border-gray-300'
+                                      }`}
+                                    onClick={() => {
+                                      setRoomType('room');
+                                      setErrors(prev => ({ ...prev, roomType: undefined }));
+                                      if (checkInDate) {
+                                        checkAvailability(selectedPackage?._id || '', checkInDate, 'room');
+                                      }
+                                    }}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <Home className="w-5 h-5 text-blue-600" />
+                                      <div>
+                                        <h4 className="font-semibold">Double Room</h4>
+                                        <p className="text-sm text-gray-600">Private room with 2 beds</p>
+                                        <p className="text-sm font-semibold text-blue-600">
+                                          ${selectedPackage?.doubleRoomPrice}/person
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${roomType === 'dome'
+                                        ? 'border-green-400 bg-green-100'
+                                        : 'border-gray-200 hover:border-gray-300'
+                                      }`}
+                                    onClick={() => {
+                                      setRoomType('dome');
+                                      setErrors(prev => ({ ...prev, roomType: undefined }));
+                                      if (checkInDate) {
+                                        checkAvailability(selectedPackage?._id || '', checkInDate, 'dome');
+                                      }
+                                    }}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <Bed className="w-5 h-5 text-green-600" />
+                                      <div>
+                                        <h4 className="font-semibold">Dome Room</h4>
+                                        <p className="text-sm text-gray-600">Shared dome accommodation</p>
+                                        <p className="text-sm font-semibold text-green-600">
+                                          ${selectedPackage?.domeRoomPrice}/person
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                {errors.roomType && (
+                                  <p className="text-red-500 text-sm">{errors.roomType}</p>
+                                )}
+                              </div>
+
+                              {/* Room/Bed Selection */}
+                              {availabilityLoading && (
+                                <div className="text-center py-4">
+                                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                                  <p className="text-sm text-gray-600 mt-2">Checking availability...</p>
+                                </div>
+                              )}
+
+                              {availabilityData && !availabilityLoading && (
+                                <div className="space-y-4">
+                                  {roomType === 'room' && (
+                                    <div className="space-y-2">
+                                      <label className="text-sm font-medium">Select Rooms (2 beds per room)</label>
+                                      <div className="grid grid-cols-5 gap-2">
+                                        {[1, 2, 3, 4, 5].map((roomNum) => {
+                                          const isAvailable = availabilityData.availableRooms?.includes(roomNum);
+                                          const isSelected = selectedRooms.includes(roomNum);
+                                          return (
+                                            <button
+                                              key={roomNum}
+                                              type="button"
+                                              disabled={!isAvailable}
+                                              onClick={() => handleRoomSelection(roomNum)}
+                                              className={`p-3 rounded-lg border-2 transition-all duration-200 ${isSelected
+                                                  ? 'border-primary bg-primary text-white'
+                                                  : isAvailable
+                                                    ? 'border-gray-300 hover:border-primary'
+                                                    : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                }`}
+                                            >
+                                              <Home className="w-4 h-4 mx-auto mb-1" />
+                                              <div className="text-xs">Room {roomNum}</div>
+                                            </button>
+                                          );
+                                        })}
+                                      </div>
+                                      <p className="text-xs text-gray-600">
+                                        Selected: {selectedRooms.length} room(s) = {selectedRooms.length * 2} beds
+                                      </p>
+                                    </div>
+                                  )}
+
+                                  {roomType === 'dome' && (
+                                    <div className="space-y-2">
+                                      <label className="text-sm font-medium">Select Beds ({personCount} needed)</label>
+                                      <div className="grid grid-cols-6 gap-2">
+                                        {[1, 2, 3, 4, 5, 6].map((bedNum) => {
+                                          const isAvailable = availabilityData.availableBeds?.includes(bedNum);
+                                          const isSelected = selectedBeds.includes(bedNum);
+                                          return (
+                                            <button
+                                              key={bedNum}
+                                              type="button"
+                                              disabled={!isAvailable || (selectedBeds.length >= personCount && !isSelected)}
+                                              onClick={() => handleBedSelection(bedNum)}
+                                              className={`p-2 rounded-lg border-2 transition-all duration-200 ${isSelected
+                                                  ? 'border-primary bg-primary text-white'
+                                                  : isAvailable && selectedBeds.length < personCount
+                                                    ? 'border-gray-300 hover:border-primary'
+                                                    : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                }`}
+                                            >
+                                              <Bed className="w-3 h-3 mx-auto mb-1" />
+                                              <div className="text-xs">Bed {bedNum}</div>
+                                            </button>
+                                          );
+                                        })}
+                                      </div>
+                                      <p className="text-xs text-gray-600">
+                                        Selected: {selectedBeds.length} of {personCount} beds
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+
+                              {errors.roomSelection && (
+                                <p className="text-red-500 text-sm">{errors.roomSelection}</p>
+                              )}
+
+                              {/* Customer Information */}
+                              <div className="space-y-4">
+                                <h4 className="font-semibold">Customer Information</h4>
+                                <div className="grid grid-cols-1 gap-4">
+                                  <div>
+                                    <label className="text-sm font-medium">Full Name</label>
+                                    <Input
+                                      type="text"
+                                      value={customerInfo.name}
+                                      onChange={(e) => {
+                                        setCustomerInfo(prev => ({ ...prev, name: e.target.value }));
+                                        setErrors(prev => ({ ...prev, name: undefined }));
+                                      }}
+                                      placeholder="Enter your full name"
+                                      className={errors.name ? 'border-red-500' : ''}
+                                    />
+                                    {errors.name && (
+                                      <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                                    )}
+                                  </div>
+                                  <div>
+                                    <label className="text-sm font-medium">Email Address</label>
+                                    <Input
+                                      type="email"
+                                      value={customerInfo.email}
+                                      onChange={(e) => {
+                                        setCustomerInfo(prev => ({ ...prev, email: e.target.value }));
+                                        setErrors(prev => ({ ...prev, email: undefined }));
+                                      }}
+                                      placeholder="Enter your email"
+                                      className={errors.email ? 'border-red-500' : ''}
+                                    />
+                                    {errors.email && (
+                                      <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                                    )}
+                                  </div>
+                                  <div>
+                                    <label className="text-sm font-medium">Phone Number</label>
+                                    <Input
+                                      type="tel"
+                                      value={customerInfo.phone}
+                                      onChange={(e) => {
+                                        setCustomerInfo(prev => ({ ...prev, phone: e.target.value }));
+                                        setErrors(prev => ({ ...prev, phone: undefined }));
+                                      }}
+                                      placeholder="Enter your phone number"
+                                      className={errors.phone ? 'border-red-500' : ''}
+                                    />
+                                    {errors.phone && (
+                                      <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Price Summary */}
+                              {roomType && selectedPackage && (
+                                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                                  <h4 className="font-semibold">Price Summary</h4>
+                                  <div className="space-y-1 text-sm">
+                                    <div className="flex justify-between">
+                                      <span>Package:</span>
+                                      <span>{selectedPackage.title}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Room Type:</span>
+                                      <span>{roomType === 'room' ? 'Double Room' : 'Dome Room'}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Price per person:</span>
+                                      <span>${getRoomPrice()}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span>Number of guests:</span>
+                                      <span>{personCount}</span>
+                                    </div>
+                                    <div className="flex justify-between font-semibold text-base border-t pt-2">
+                                      <span>Total:</span>
+                                      <span>${calculateTotalPrice()}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Action Buttons */}
+                              <div className="flex gap-3 pt-4">
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setIsDialogOpen(false);
+                                    resetBookingForm();
+                                  }}
+                                  className="flex-1"
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  onClick={handleBooking}
+                                  disabled={bookingLoading}
+                                  className="flex-1 bg-primary hover:bg-primary/90"
+                                >
+                                  {bookingLoading ? (
+                                    <>
+                                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                      Booking...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <CheckCircle className="w-4 h-4 mr-2" />
+                                      Confirm Booking
+                                    </>
+                                  )}
+                                </Button>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                       </div>
                     </div>
-
-                    <div className="bg-white w-3/4 p-2 rounded-full border-2 border-primary space-y-2 mx-auto">
-                      <div className="flex items-center text-l justify-center text-primary font-bold">
-                        Starting from $499
-                      </div>
-                    </div>
-
-                    <Dialog open={isDialogOpen && selectedPackage?.title === "Essential Surf"} onOpenChange={(open) => {
-                      if (!open) resetBookingForm();
-                      setIsDialogOpen(open);
-                    }}>
-                      <DialogTrigger asChild>
-                        <Button
-                          className="w-full bg-text text-white font-bold py-4 rounded-full group-hover:shadow-lg transition-all"
-                          onClick={() => {
-                            setSelectedPackage({
-                              _id: "basic-surf-pack",
-                              title: "Basic Surf Pack",
-                              description: "Perfect for beginners or casual surfers, this package includes everything you need to get started.",
-                              features: [
-                                "7 nights accommodation (Dorm or Private Room)",
-                                "Breakfast x 7",
-                                "5 x Unlimited Local Buffet (Lunch or Dinner)",
-                                "Surf course 6 x 1.5 hours",
-                                "Surf equipment (2 hours x 2 Daily)",
-                                "Transport to surf spots",
-                                "Surf theory",
-                                "2 video analysis sessions",
-                                "2 ice bath recovery sessions"
-                              ],
-                              price: 699
-                            });
-                            setIsDialogOpen(true);
-                          }}
-                        >
-                          Book Now
-                        </Button>
-                      </DialogTrigger>
-                    </Dialog>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Package 2 - Most Popular */}
-            <div className="relative lg:scale-105 z-10">
-              {/* Most Popular Badge */}
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20 w-full flex justify-center">
-                <div className="bg-primary text-white px-4 sm:px-6 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-lg whitespace-nowrap">
-                  🔥 MOST POPULAR
-                </div>
+                  </CardContent>
+                </Card>
               </div>
-
-              <Card className="group hover:shadow-2xl transition-all duration-500 border-2 border-cyan-700 rounded-3xl bg-cyan-700 overflow-hidden transform hover:-translate-y-2 h-full shadow-xl">
-                <CardContent className="p-0">
-                  {/* Header */}
-                  <div className="p-6 text-white flex items-center justify-center">
-                    <div className="flex justify-center items-center">
-                      <div className="text-center">
-                        <h3 className="text-2xl text-white font-bold mb-2 tanHeading">Surf & Safari Retreat</h3>
-                        <p className="text-white text-sm">A balanced mix of surf, nature and relaxation, this retreat is for those wanting more than just waves.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-6 space-y-6">
-                    <div>
-                      <h4 className="font-semibold mb-4 flex items-center justify-center text-white">
-                        <Star className="w-4 h-4 mr-2 text-yellow-500" />
-                        What's Included
-                      </h4>
-                      <div className="space-y-3">
-                        {[
-                          "7 nights accommodation (Dorm or Private Room)",
-                          "Breakfast x 7",
-                          "5 x Unlimited Local Buffet (Lunch or Dinner)",
-                          "Surf course 5 x 1.5 hours",
-                          "Surf equipment (2 hours x 2 Daily)",
-                          "Transport to surf spots",
-                          "Surf theory",
-                          "2 video analysis sessions",
-                          "5 ice bath recovery sessions",
-                          "1 x surf skate session",
-                          "Kumana Safari (Half Day)",
-                          "Sunset Lagoon Tour",
-                          "Sunset BBQ"
-                        ].map((feature, index) => (
-                          <div key={index} className="flex items-center text-sm text-white">
-                            <CheckCircle2 className="w-4 h-4 mr-3 text-green-500 flex-shrink-0" />
-                            <span>{feature}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="bg-white w-3/4 p-2 rounded-full border-2 border-primary space-y-2 mx-auto">
-                      <div className="flex items-center text-l justify-center text-primary font-bold">
-                        Starting from $750
-                      </div>
-                    </div>
-
-                    <Dialog open={isDialogOpen && selectedPackage?.title === "Ultimate Surf & Safari"} onOpenChange={(open) => {
-                      if (!open) resetBookingForm();
-                      setIsDialogOpen(open);
-                    }}>
-                      <DialogTrigger asChild>
-                        <Button
-                          className="w-full bg-primary border-2 border-primary hover:bg-black text-white hover:text-white font-bold py-3 rounded-full group-hover:shadow-lg transition-all transform hover:scale-105"
-                          onClick={() => {
-                            setSelectedPackage({
-                              _id: "surf-and-safari-retreat",
-                              title: "Surf & Safari Retreat",
-                              description: "A balanced mix of surf, nature and relaxation, this retreat is for those wanting more than just waves.",
-                              features: [
-                                "7 nights accommodation (Dorm or Private Room)",
-                                "Breakfast x 7",
-                                "5 x Unlimited Local Buffet (Lunch or Dinner)",
-                                "Surf course 5 x 1.5 hours",
-                                "Surf equipment (2 hours x 2 Daily)",
-                                "Transport to surf spots",
-                                "Surf theory",
-                                "2 video analysis sessions",
-                                "5 ice bath recovery sessions",
-                                "1 x surf skate session",
-                                "Kumana Safari (Half Day)",
-                                "Sunset Lagoon Tour",
-                                "Sunset BBQ"
-                              ],
-                              price: 750
-                            });
-                            setIsDialogOpen(true);
-                          }}
-                        >
-                          Book Now
-                        </Button>
-                      </DialogTrigger>
-                    </Dialog>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Package 3 - Luxury */}
-            <div className="relative">
-              <Card className="group hover:shadow-2xl rounded-3xl transition-all duration-500 border border-gray-200 bg-card overflow-hidden transform hover:-translate-y-2 h-full">
-                <CardContent className="p-0">
-                  {/* Header */}
-                  <div className="p-6 flex items-center justify-center">
-                    <div className="flex justify-center items-center">
-                      <div className="text-center">
-                        <h3 className="text-2xl text-text font-bold mb-2 tanHeading">Surf Guiding Pack</h3>
-                        <p className="text-text text-sm">Tailored for seasoned surfers, this premium option offers expert-guided surf trips, in-depth analysis, and daily briefings.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-6 space-y-6">
-                    <div>
-                      <h4 className="font-semibold mb-4 flex items-center text-gray-800">
-                        <Star className="w-4 h-4 mr-2 text-yellow-500" />
-                        Luxury Amenities
-                      </h4>
-                      <div className="space-y-3">
-                        {[
-                          "7 nights accommodation (Dorm or Private Room)",
-                          "Breakfast x 7",
-                          "5 x Unlimited Local Buffet (Lunch or Dinner)",
-                          "Meet your new surf buddies and feel part of the crew instantly",
-                          "Surf the top local spots with a knowledgeable local guide",
-                          "Transportation included to all surf spots - no rental car required.",
-                          "5 days of surf guiding, with 2 sessions each day",
-                          "Daily updates on surf spots and conditions",
-                          "3 video analysis sessions"
-                        ].map((feature, index) => (
-                          <div key={index} className="flex items-center text-sm text-gray-600">
-                            <CheckCircle2 className="w-4 h-4 mr-3 text-green-500 flex-shrink-0" />
-                            <span>{feature}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="bg-white w-3/4 p-2 rounded-full border-2 border-primary space-y-2 mx-auto">
-                      <div className="flex items-center text-l justify-center text-primary font-bold">
-                        Starting from $549
-                      </div>
-                    </div>
-
-                    <Dialog open={isDialogOpen && selectedPackage?.title === "Luxury Surf Retreat"} onOpenChange={(open) => {
-                      if (!open) resetBookingForm();
-                      setIsDialogOpen(open);
-                    }}>
-                      <DialogTrigger asChild>
-                        <Button
-                          className="w-full bg-text text-white font-bold py-4 rounded-full group-hover:shadow-lg transition-all"
-                          onClick={() => {
-                            setSelectedPackage({
-                              _id: "surf-guiding-pack",
-                              title: "Surf Guiding Pack",
-                              description: "Tailored for seasoned surfers, this premium option offers expert-guided surf trips, in-depth analysis, and daily briefings.",
-                              features: [
-                                "7 nights accommodation (Dorm or Private Room)",
-                                "Breakfast x 7",
-                                "5 x Unlimited Local Buffet (Lunch or Dinner)",
-                                "Meet your new surf buddies and feel part of the crew instantly",
-                                "Surf the top local spots with a knowledgeable local guide",
-                                "Transportation included to all surf spots - no rental car required.",
-                                "5 days of surf guiding, with 2 sessions each day",
-                                "Daily updates on surf spots and conditions",
-                                "3 video analysis sessions"
-                              ],
-                              price: 1200
-                            });
-                            setIsDialogOpen(true);
-                          }}
-                        >
-                          Book Now
-                        </Button>
-                      </DialogTrigger>
-                    </Dialog>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            ))}
           </div>
         </div>
       </div>
 
-      <div className="w-full py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-text customtext">
-              Create Your Custom Package
-            </h2>
-            <p className="text-lg text-text mt-4 max-w-2xl mx-auto">
-              Want something unique? Design your perfect surf experience with our customizable packages tailored to your preferences and skill level.
-            </p>
-          </div>
-
-          <div className="flex justify-center">
-            <Link href="/#contact">
-              <Button className="w-full bg-primary text-white font-bold py-4 rounded-full hover:shadow-lg transition-all">
-                Customize Your Package
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      <section className="w-full py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="container mx-auto px-4"
-        >
-          <div className="text-center mb-12">
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="text-3xl md:text-4xl font-bold text-primary customtext mb-4"
-            >
-              Accommodation Options
-            </motion.p>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="text-lg text-text max-w-2xl mx-auto"
-            >
-              Choose between our shared dorms for a social vibe or private rooms for added comfort and privacy. All options are just steps from the waves and designed for relaxation after a day in the surf.
-            </motion.p>
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto"
-          >
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="card bg-white rounded-3xl shadow-lg border-2 border-primary overflow-hidden p-5"
-              initial={{ x: -100 }}
-              animate={{ x: 0 }}
-            >
-              <div className="relative h-64 bg-black rounded-3xl">
-                <motion.div
-                  animate={{ opacity: [1, 0, 0, 0, 1] }}
-                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-0"
-                >
-                  <Image
-                    src="/images/proom1.jpg"
-                    alt="Luxury Suite View 1"
-                    fill
-                    className="object-cover transition-opacity duration-1000 rounded-3xl"
-                  />
-                </motion.div>
-                <motion.div
-                  animate={{ opacity: [0, 1, 0, 0, 0] }}
-                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-0"
-                >
-                  <Image
-                    src="/images/proom2.jpg"
-                    alt="Luxury Suite View 2"
-                    fill
-                    className="object-cover transition-opacity duration-1000 rounded-3xl"
-                  />
-                </motion.div>
-                <motion.div
-                  animate={{ opacity: [0, 0, 1, 0, 0] }}
-                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-0"
-                >
-                  <Image
-                    src="/images/proom3.jpg"
-                    alt="Luxury Suite View 3"
-                    fill
-                    className="object-cover transition-opacity duration-1000 rounded-3xl"
-                  />
-                </motion.div>
-              </div>
-              <div className="p-6">
-                <h3 className="text-2xl font-semibold text-text mb-4">Private Double</h3>
-                <ul className="space-y-2">
-                  <li className="flex items-center text-text">
-                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
-                    <span>Air Conditioning</span>
-                  </li>
-                  <li className="flex items-center text-text">
-                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
-                    <span>Spacious Bathroom with Hot Water</span>
-                  </li>
-                  <li className="flex items-center text-text">
-                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
-                    <span>Handcrafted Furniture</span>
-                  </li>
-                  <li className="flex items-center text-text">
-                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
-                    <span>Garden View Sitting Area</span>
-                  </li>
-                  <li className="flex items-center text-text">
-                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
-                    <span>Wi-Fi</span>
-                  </li>
-                  <li className="flex items-center text-text">
-                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
-                    <span>Towels & Toiletries</span>
-                  </li>
-                  <li className="flex items-center text-text">
-                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
-                    <span>Daily Room Cleaning</span>
-                  </li>
-                  <li className="flex items-center text-text">
-                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
-                    <span>Surfboard Storage</span>
-                  </li>
-                </ul>
-              </div>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="card bg-white rounded-3xl shadow-lg border-2 border-primary overflow-hidden p-5"
-              initial={{ x: -100 }}
-              animate={{ x: 0 }}
-            >
-              <div className="relative h-64 bg-black  rounded-3xl">
-                <motion.div
-                  animate={{ opacity: [1, 0, 0, 0, 1] }}
-                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-0"
-                >
-                  <Image
-                    src="/images/image1.jpg"
-                    alt="Luxury Suite View 1"
-                    fill
-                    className="object-cover transition-opacity duration-1000 rounded-3xl"
-                  />
-                </motion.div>
-                <motion.div
-                  animate={{ opacity: [0, 1, 0, 0, 0] }}
-                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-0"
-                >
-                  <Image
-                    src="/images/image3.jpg"
-                    alt="Luxury Suite View 2"
-                    fill
-                    className="object-cover transition-opacity duration-1000 rounded-3xl"
-                  />
-                </motion.div>
-                <motion.div
-                  animate={{ opacity: [0, 0, 1, 0, 0] }}
-                  transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-0"
-                >
-                  <Image
-                    src="/images/image4.jpg"
-                    alt="Luxury Suite View 3"
-                    fill
-                    className="object-cover transition-opacity duration-1000 rounded-3xl"
-                  />
-                </motion.div>
-              </div>
-              <div className="p-6">
-                <h3 className="text-2xl font-semibold text-text mb-4">Shared Dorm Beds</h3>
-                <ul className="space-y-2">
-                  <li className="flex items-center text-text">
-                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
-                    <span>Comfy bunk bed with clean linens and towel</span>
-                  </li>
-                  <li className="flex items-center text-text">
-                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
-                    <span>Air Conditioning Spacious Bathroom with Hot Water</span>
-                  </li>
-                  <li className="flex items-center text-text">
-                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
-                    <span>Hot water showers</span>
-                  </li>
-                  <li className="flex items-center text-text">
-                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
-                    <span>Shared bathroom (cleaned daily)</span>
-                  </li>
-                  <li className="flex items-center text-text">
-                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
-                    <span>Wi-Fi</span>
-                  </li>
-                  <li className="flex items-center text-text">
-                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
-                    <span>Private Locker</span>
-                  </li>
-                  <li className="flex items-center text-text">
-                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
-                    <span>Surfboard Storage</span>
-                  </li>
-                  <li className="flex items-center text-text">
-                    <CheckCircle className="h-5 w-5 text-primary mr-2" />
-                    <span>Daily room cleaning</span>
-                  </li>
-                </ul>
-              </div>
-            </motion.div>
-          </motion.div>
-        </motion.div>
-      </section>
       {/* FAQ Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
-          >
-            <p className="text-3xl sm:text-4xl font-bold text-text mb-4 customtext">
-              Frequently Asked <span className="text-primary">Questions</span>
+      <div className="py-16 bg-white">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-text mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-lg text-gray-600">
+              Everything you need to know about our surf packages
             </p>
-            <p className="text-lg text-text max-w-2xl mx-auto">
-              Got questions about our surf camp packages? We've got answers! Check out our most commonly asked questions below.
-            </p>
-          </motion.div>
+          </div>
 
           <div className="max-w-4xl mx-auto">
-            <div className="space-y-4">
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
               {[
                 {
-                  question: "What's included in the surf camp packages?",
-                  answer: "Our surf camp packages include accommodation (dorm or private room), meals, professional surf lessons with ISA-certified instructors, surf equipment rental, transport to surf spots, video analysis sessions, and access to our beachfront facilities. Some packages also include safari tours, sunset BBQ, and additional activities."
+                  question: "What's included in the accommodation?",
+                  answer: "All rooms come with air conditioning, hot water, free WiFi, and daily housekeeping. Double rooms are private with 2 beds, while dome rooms are shared accommodation with individual beds."
                 },
                 {
-                  question: "Do I need to have surfing experience to join?",
-                  answer: "Not at all! Our packages cater to all skill levels from complete beginners to advanced surfers. Our ISA-certified instructors will assess your level and provide personalized coaching. We have different surf spots suitable for various skill levels, so everyone can enjoy the waves safely."
+                  question: "Do I need to be an experienced surfer?",
+                  answer: "Not at all! Our packages are designed for all skill levels. We have ISA-certified instructors who will assess your level and provide appropriate guidance, from complete beginners to advanced surfers."
                 },
                 {
-                  question: "What's the difference between room and dome accommodation?",
-                  answer: "Rooms are private double occupancy with 2 beds each, offering more privacy and comfort at $750 per person. Domes are shared accommodation with 6 individual beds at $500 per person, perfect for solo travelers or those looking for a more social experience. Both options include A/C, hot water, and daily housekeeping."
+                  question: "What should I bring?",
+                  answer: "Just bring yourself, swimwear, sunscreen, and personal items. We provide all surfing equipment including boards, wetsuits, and safety gear. We also provide fresh towels and linens daily."
                 },
                 {
-                  question: "When can I check in and what's the minimum stay?",
-                  answer: "Check-in is every Sunday and check-out is the following Sunday, making it a 7-night stay. This schedule allows us to provide the best experience with our weekly program structure. You can arrive anytime on Sunday, and we'll arrange airport pickup if needed."
+                  question: "Can I change my booking dates?",
+                  answer: "Yes, you can modify your booking up to 7 days before your check-in date, subject to availability. Changes within 7 days may incur additional charges."
                 },
                 {
-                  question: "What should I bring and what's provided?",
-                  answer: "We provide all surf equipment (boards, wetsuits, rash guards), towels, bed linens, and professional surf instruction. You should bring casual clothes, swimwear, sunscreen, personal toiletries, and any medications you need. Don't forget your camera to capture those epic surf moments!"
+                  question: "What's the cancellation policy?",
+                  answer: "Free cancellation up to 7 days before check-in. Cancellations within 7 days are subject to a 50% charge. No refunds for no-shows or early departures."
+                },
+                {
+                  question: "Is transportation included?",
+                  answer: "Transportation to surf spots and activities is included in all packages. Airport pickup and drop-off are available as an extra service for an additional fee."
                 }
               ].map((faq, index) => (
-                <motion.div
+                <FAQItem
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1, duration: 0.5 }}
-                  className="bg-gray-50 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
-                >
-                  <FAQItem
-                    question={faq.question}
-                    answer={faq.answer}
-                    index={index}
-                  />
-                </motion.div>
+                  question={faq.question}
+                  answer={faq.answer}
+                  index={index}
+                />
               ))}
             </div>
           </div>
-
-          {/* Contact CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.6, duration: 0.6 }}
-            className="text-center mt-12"
-          >
-            <div className="bg-primary/5 rounded-2xl p-8 border border-primary/10">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4 tanHeading">
-                Still have questions?
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Our friendly team is here to help you plan your perfect surf getaway.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <motion.a
-                  href="https://wa.link/iz5wh6"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-full font-medium transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.51 3.688z" />
-                  </svg>
-                  WhatsApp Us
-                </motion.a>
-                <motion.a
-                  href="mailto:rupassurfcamp@gmail.com"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white px-6 py-3 rounded-full font-medium transition-colors"
-                >
-                  <Mail className="w-5 h-5" />
-                  Email Us
-                </motion.a>
-              </div>
-            </div>
-          </motion.div>
         </div>
-      </section>
+      </div>
 
-      {/* Booking Dialog */}
-      {selectedPackage && (
-        <Dialog open={isDialogOpen} onOpenChange={(open) => {
-          if (!open) resetBookingForm();
-          setIsDialogOpen(open);
-        }}>
-          <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto p-0">
-            <div className="sticky top-0 bg-card z-10 border-b">
-              <DialogHeader className="p-4 sm:p-6">
-                <DialogTitle className="text-xl sm:text-2xl font-bold text-center flex items-center justify-center gap-2">
-                  <Waves className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-                  Book {selectedPackage.title}
-                </DialogTitle>
-              </DialogHeader>
+      {/* Contact Section */}
+      <div className="py-16 bg-gradient-to-br from-primary to-cyan-600 text-white">
+        <div className="container mx-auto px-4 sm:px-6 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+            Ready to Catch Some Waves?
+          </h2>
+          <p className="text-xl mb-8 max-w-2xl mx-auto">
+            Have questions about our packages? Need help with your booking?
+            Our team is here to help you plan the perfect surf adventure.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="flex items-center gap-2">
+              <Phone className="w-5 h-5" />
+              <span className="font-semibold">+94 77 123 4567</span>
             </div>
-
-            <div className="p-4 sm:p-6 space-y-6">
-              {/* Package Summary */}
-              <Card className="bg-gradient-to-r from-primary/5 to-cyan-600/5 border-primary/20">
-                <CardContent className="p-4 sm:p-6">
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                    <div>
-                      <span className="text-lg font-semibold">Price per person (7 days)</span>
-                      <p className="text-sm mt-1 text-muted-foreground">Sunday to Sunday stay</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-2xl sm:text-3xl font-bold text-primary">${selectedPackage.price}</span>
-                      <p className="text-sm text-muted-foreground">per person</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Date Selection */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium">
-                  <Calendar className="w-4 h-4 inline mr-2" />
-                  Select Check-in Date (Sunday)
-                </label>
-                <Input
-                  type="date"
-                  value={checkInDate}
-                  min={getNextSunday()}
-                  onChange={(e) => {
-                    const selectedDate = new Date(e.target.value);
-                    setCheckInDate(e.target.value);
-                    setErrors(prev => ({ ...prev, checkInDate: undefined }));
-                    setRoomType(''); // Reset room type selection
-                    setAvailabilityData(null);
-
-                    if (selectedDate.getDay() !== 0) {
-                      setErrors(prev => ({ ...prev, checkInDate: 'Check-in must be on a Sunday' }));
-                      return;
-                    }
-                  }}
-                  className={`w-full ${errors.checkInDate ? 'border-red-500 focus:ring-red-500' : ''}`}
-                />
-                {errors.checkInDate && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
-                    <span className="w-4 h-4">⚠️</span>
-                    {errors.checkInDate}
-                  </p>
-                )}
-                {checkInDate && !errors.checkInDate && (
-                  <p className="text-sm text-green-600 flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4" />
-                    Check-out: {formatDate(getCheckOutDate(checkInDate))}
-                  </p>
-                )}
-              </div>
-
-              {/* Person Count Selection */}
-              {checkInDate && !errors.checkInDate && (
-                <div className="space-y-3">
-                  <label className="block text-sm font-medium">
-                    <Users className="w-4 h-4 inline mr-2" />
-                    Number of Persons (1-6)
-                  </label>
-                  <div className="flex items-center gap-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePersonCountChange(false)}
-                      disabled={personCount <= 1}
-                    >
-                      <Minus className="w-4 h-4" />
-                    </Button>
-                    <span className="text-lg font-semibold min-w-[2rem] text-center">{personCount}</span>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePersonCountChange(true)}
-                      disabled={personCount >= 6}
-                    >
-                      <Plus className="w-4 h-4" />
-                    </Button>
-                    <span className="text-sm text-muted-foreground ml-2">
-                      Total: ${calculateTotalPrice().toFixed(2)}
-                    </span>
-                  </div>
-                  {errors.personCount && (
-                    <p className="text-sm text-red-600 flex items-center gap-1">
-                      <span className="w-4 h-4">⚠️</span>
-                      {errors.personCount}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* Room Type Selection */}
-              {personCount > 0 && (
-                <div className="space-y-3">
-                  <label className="block text-sm font-medium">
-                    <Home className="w-4 h-4 inline mr-2" />
-                    Select Room Type
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Card className={`cursor-pointer transition-all ${roomType === 'room' ? 'ring-2 ring-primary bg-primary/5' : 'hover:shadow-md'}`}>
-                      <CardContent
-                        className="p-4"
-                        onClick={() => {
-                          setRoomType('room');
-                          setErrors(prev => ({ ...prev, roomType: undefined }));
-                          checkAvailability(selectedPackage._id, checkInDate, 'room');
-                        }}
-                      >
-                        <div className="text-center space-y-2">
-                          <Home className="w-8 h-8 mx-auto text-primary" />
-                          <h3 className="font-semibold">Double Rooms ( $750 / per person )</h3>
-                          <p className="text-sm text-muted-foreground">5 rooms available, 2 beds each</p>
-                          <p className="text-xs text-muted-foreground">Select multiple rooms if needed</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card className={`cursor-pointer transition-all ${roomType === 'dome' ? 'ring-2 ring-primary bg-primary/5' : 'hover:shadow-md'}`}>
-                      <CardContent
-                        className="p-4"
-                        onClick={() => {
-                          setRoomType('dome');
-                          setErrors(prev => ({ ...prev, roomType: undefined }));
-                          checkAvailability(selectedPackage._id, checkInDate, 'dome');
-                        }}
-                      >
-                        <div className="text-center space-y-2">
-                          <Bed className="w-8 h-8 mx-auto text-primary" />
-                          <h3 className="font-semibold">Dome ( $500 / per person )</h3>
-                          <p className="text-sm text-muted-foreground">6 individual beds</p>
-                          <p className="text-xs text-muted-foreground">Select individual beds</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                  {errors.roomType && (
-                    <p className="text-sm text-red-600 flex items-center gap-1">
-                      <span className="w-4 h-4">⚠️</span>
-                      {errors.roomType}
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* Room/Bed Selection */}
-              {roomType && availabilityData && (
-                <div className="space-y-3">
-                  {availabilityLoading ? (
-                    <div className="text-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                      <p className="mt-2 text-sm text-muted-foreground">Checking availability...</p>
-                    </div>
-                  ) : (
-                    <>
-                      {roomType === 'room' && (
-                        <>
-                          <label className="block text-sm font-medium">
-                            <MapPin className="w-4 h-4 inline mr-2" />
-                            Select Rooms (Need {Math.ceil(personCount / 2)} room{Math.ceil(personCount / 2) > 1 ? 's' : ''} minimum)
-                          </label>
-                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                            {[1, 2, 3, 4, 5].map((roomNum) => (
-                              <button
-                                key={roomNum}
-                                onClick={() => handleRoomSelection(roomNum)}
-                                disabled={availabilityData.bookedRooms?.includes(roomNum)}
-                                className={`
-                                  p-3 sm:p-4 rounded-lg border-2 transition-all transform hover:scale-105
-                                  ${availabilityData.bookedRooms?.includes(roomNum)
-                                    ? 'bg-red-50 border-red-300 text-red-600 cursor-not-allowed opacity-60'
-                                    : selectedRooms.includes(roomNum)
-                                      ? 'bg-primary border-primary text-white shadow-lg'
-                                      : 'bg-background border hover:border-primary hover:shadow-md cursor-pointer'
-                                  }
-                                `}
-                              >
-                                <div className="text-center">
-                                  <Home className="w-5 h-5 mx-auto mb-1" />
-                                  <div className="font-bold text-sm">Room {roomNum}</div>
-                                  <div className="text-xs mt-1">
-                                    {availabilityData.bookedRooms?.includes(roomNum) ? 'Booked' : '2 beds'}
-                                  </div>
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                          {selectedRooms.length > 0 && (
-                            <p className="text-sm text-green-600 flex items-center gap-2">
-                              <CheckCircle2 className="w-4 h-4" />
-                              Selected {selectedRooms.length} room{selectedRooms.length > 1 ? 's' : ''}
-                              ({selectedRooms.length * 2} beds total)
-                            </p>
-                          )}
-                        </>
-                      )}
-
-                      {roomType === 'dome' && (
-                        <>
-                          <label className="block text-sm font-medium">
-                            <Bed className="w-4 h-4 inline mr-2" />
-                            Select {personCount} Bed{personCount > 1 ? 's' : ''} in Dome
-                          </label>
-                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-                            {[1, 2, 3, 4, 5, 6].map((bedNum) => (
-                              <button
-                                key={bedNum}
-                                onClick={() => handleBedSelection(bedNum)}
-                                disabled={availabilityData.bookedBeds?.includes(bedNum)}
-                                className={`
-                                  p-3 sm:p-4 rounded-lg border-2 transition-all transform hover:scale-105
-                                  ${availabilityData.bookedBeds?.includes(bedNum)
-                                    ? 'bg-red-50 border-red-300 text-red-600 cursor-not-allowed opacity-60'
-                                    : selectedBeds.includes(bedNum)
-                                      ? 'bg-primary border-primary text-white shadow-lg'
-                                      : 'bg-background border hover:border-primary hover:shadow-md cursor-pointer'
-                                  }
-                                `}
-                              >
-                                <div className="text-center">
-                                  <Bed className="w-5 h-5 mx-auto mb-1" />
-                                  <div className="font-bold text-sm">Bed {bedNum}</div>
-                                  <div className="text-xs mt-1">
-                                    {availabilityData.bookedBeds?.includes(bedNum) ? 'Booked' : 'Available'}
-                                  </div>
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                          {selectedBeds.length > 0 && (
-                            <p className="text-sm text-green-600 flex items-center gap-2">
-                              <CheckCircle2 className="w-4 h-4" />
-                              Selected {selectedBeds.length} of {personCount} bed{personCount > 1 ? 's' : ''}
-                            </p>
-                          )}
-                        </>
-                      )}
-
-                      {errors.roomSelection && (
-                        <p className="text-sm text-red-600 flex items-center gap-1">
-                          <span className="w-4 h-4">⚠️</span>
-                          {errors.roomSelection}
-                        </p>
-                      )}
-                    </>
-                  )}
-                </div>
-              )}
-
-              {/* Customer Information */}
-              {((roomType === 'room' && selectedRooms.length > 0) ||
-                (roomType === 'dome' && selectedBeds.length === personCount)) && (
-                  <div className="space-y-4">
-                    <h3 className="font-semibold text-lg flex items-center gap-2">
-                      <User className="w-5 h-5 text-primary" />
-                      Customer Information
-                    </h3>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="block text-sm font-medium">
-                          <User className="w-4 h-4 inline mr-2" />
-                          Full Name
-                        </label>
-                        <Input
-                          value={customerInfo.name}
-                          onChange={(e) => {
-                            setCustomerInfo(prev => ({ ...prev, name: e.target.value }));
-                            setErrors(prev => ({ ...prev, name: undefined }));
-                          }}
-                          placeholder="Enter your full name"
-                          className={errors.name ? 'border-red-500 focus:ring-red-500' : ''}
-                        />
-                        {errors.name && (
-                          <p className="text-sm text-red-600 flex items-center gap-1">
-                            <span className="w-4 h-4">⚠️</span>
-                            {errors.name}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="block text-sm font-medium">
-                          <Phone className="w-4 h-4 inline mr-2" />
-                          Phone Number
-                        </label>
-                        <Input
-                          type="tel"
-                          value={customerInfo.phone}
-                          onChange={(e) => {
-                            setCustomerInfo(prev => ({ ...prev, phone: e.target.value }));
-                            setErrors(prev => ({ ...prev, phone: undefined }));
-                          }}
-                          placeholder="Enter your phone number"
-                          className={errors.phone ? 'border-red-500 focus:ring-red-500' : ''}
-                        />
-                        {errors.phone && (
-                          <p className="text-sm text-red-600 flex items-center gap-1">
-                            <span className="w-4 h-4">⚠️</span>
-                            {errors.phone}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium">
-                        <Mail className="w-4 h-4 inline mr-2" />
-                        Email Address
-                      </label>
-                      <Input
-                        type="email"
-                        value={customerInfo.email}
-                        onChange={(e) => {
-                          setCustomerInfo(prev => ({ ...prev, email: e.target.value }));
-                          setErrors(prev => ({ ...prev, email: undefined }));
-                        }}
-                        placeholder="Enter your email"
-                        className={errors.email ? 'border-red-500 focus:ring-red-500' : ''}
-                      />
-                      {errors.email && (
-                        <p className="text-sm text-red-600 flex items-center gap-1">
-                          <span className="w-4 h-4">⚠️</span>
-                          {errors.email}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-              {/* Booking Summary */}
-              {customerInfo.name && customerInfo.email && customerInfo.phone &&
-                ((roomType === 'room' && selectedRooms.length > 0) ||
-                  (roomType === 'dome' && selectedBeds.length === personCount)) && (
-                  <Card className="bg-muted/50 border-green-200">
-                    <CardContent className="p-4 sm:p-6">
-                      <h3 className="font-semibold mb-4 flex items-center gap-2 text-green-600">
-                        <CheckCircle2 className="w-5 h-5" />
-                        Booking Summary
-                      </h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                        <div className="space-y-3">
-                          <div className="flex justify-between">
-                            <span>Package:</span>
-                            <span className="font-medium">{selectedPackage.title}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Persons:</span>
-                            <span className="font-medium">{personCount}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Accommodation:</span>
-                            <span className="font-medium">
-                              {roomType === 'room'
-                                ? `Room${selectedRooms.length > 1 ? 's' : ''} ${selectedRooms.join(', ')}`
-                                : `Dome - Bed${selectedBeds.length > 1 ? 's' : ''} ${selectedBeds.join(', ')}`
-                              }
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Check-in:</span>
-                            <span className="font-medium">{formatDate(checkInDate)}</span>
-                          </div>
-                        </div>
-                        <div className="space-y-3">
-                          <div className="flex justify-between">
-                            <span>Check-out:</span>
-                            <span className="font-medium">{formatDate(getCheckOutDate(checkInDate))}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Price per person:</span>
-                            <span className="font-medium">${selectedPackage.price}</span>
-                          </div>
-                          <div className="flex justify-between border-t pt-3 text-base font-bold text-green-800">
-                            <span>Total:</span>
-                            <span>${calculateTotalPrice()}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-4 sticky bottom-0 bg-card border-t -mx-4 sm:-mx-6 px-4 sm:px-6 py-4">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    resetBookingForm();
-                    setIsDialogOpen(false);
-                  }}
-                  className="flex-1 order-2 sm:order-1"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleBooking}
-                  className="flex-1 order-1 sm:order-2"
-                >
-                  {bookingLoading ? (
-                    <div className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      Processing...
-                    </div>
-                  ) : (
-                    'Confirm Booking'
-                  )}
-                </Button>
-              </div>
+            <div className="flex items-center gap-2">
+              <Mail className="w-5 h-5" />
+              <span className="font-semibold">info@surfparadise.com</span>
             </div>
-          </DialogContent>
-        </Dialog>
-      )}
+          </div>
+
+          <div className="mt-8">
+            <Button
+              size="lg"
+              variant="secondary"
+              className="bg-white text-primary hover:bg-gray-100 font-semibold px-8 py-3 rounded-full"
+            >
+              <MessageCircle className="w-5 h-5 mr-2" />
+              Contact Us Now
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
