@@ -83,7 +83,7 @@ export const Header = () => {
           
           {/* Call to Action Button and Theme Switch */}
           <div className="hidden md:flex items-center space-x-4 ">
-            <Link href="/contact" className="text-md font-medium">
+            <Link href="/#contact" className="text-md font-medium">
               <Button 
                 className={cn(
                   "rounded-full transition-all duration-300 text-md uppercase",

@@ -2050,9 +2050,9 @@ export default function HomePage() {
           transition={{ duration: 0.6 }}
           className="relative container mx-auto px-4"
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center text-white customtext mb-4">
+          <p className="text-3xl md:text-4xl lg:text-5xl font-bold text-center text-white customtext mb-4">
             What our guests say!
-          </h2>
+          </p>
           <p className="text-lg md:text-xl text-center text-white/90 max-w-2xl mx-auto mb-12">
             Hear from surfers, travelers, and new friends who’ve lived the Rupa’s experience.
           </p>
@@ -2158,7 +2158,7 @@ export default function HomePage() {
       </section>
       
 
-      <section className="relative py-16 bg-gray-50">
+      <section id='contact' className="relative py-16 bg-gray-50">
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -2335,7 +2335,7 @@ export default function HomePage() {
             <div className="lg:w-4/12 lg:absolute lg:right-20 lg:top-2/4 lg:transform lg:-translate-y-1/2">
               <div className="bg-primary p-8 rounded-3xl shadow-lg backdrop-blur-lg bg-opacity-95">
                 <div className="text-center mb-12">
-                  <h2 className="text-2xl font-bold text-white customtext">Talk to Us</h2>
+                  <p className="text-2xl font-bold text-white customtext">Talk to Us</p>
                 </div>
                 <form className="space-y-6">
                   <div>

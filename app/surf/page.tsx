@@ -39,7 +39,6 @@ import {
   UserPlus,
   Minus,
   Plus,
-  Link,
   MessageCircle,
   X,
   CheckCircle
@@ -48,7 +47,7 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-
+import Link from 'next/link';
 
 const staggerContainer = {
   animate: {
@@ -1249,6 +1248,27 @@ export default function SurfPage() {
                 </CardContent>
               </Card>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold text-text customtext">
+              Create Your Custom Package
+            </h2>
+            <p className="text-lg text-text mt-4 max-w-2xl mx-auto">
+              Want something unique? Design your perfect surf experience with our customizable packages tailored to your preferences and skill level.
+            </p>
+          </div>
+
+          <div className="flex justify-center">
+            <Link href="/#contact">
+              <Button className="w-full bg-primary text-white font-bold py-4 rounded-full hover:shadow-lg transition-all">
+                Customize Your Package
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

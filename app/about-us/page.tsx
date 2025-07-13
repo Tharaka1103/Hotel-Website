@@ -21,45 +21,68 @@ const facilities = [
   {
     title: "Sea-View Rooms",
     icon: Bed,
-    description: "Clean, cozy rooms with stunning ocean views and island charm.",
+    description: "We have the best sea-view rooms right in front of the bay, plus relaxing garden-view rooms.",
     features: [
       "Ocean Views",
       "Comfortable Beds",
-      "Island Charm",
-      "Daily Cleaning",
+      "Air Conditioning (AC)",
+      "15 Meters to the Beach",
     ],
   },
   {
     title: "Beachfront Restaurant",
     icon: UtensilsCrossed,
-    description: "Epic ocean views with laid-back meals and authentic Sri Lankan cuisine.",
+    description: "Beachfront dining with a lively vibe and a menu full of international and local favorites.",
     features: [
-      "Ocean Views",
-      "Fresh Seafood",
-      "Local Cuisine",
+      "International Authentic-Style Menu",
+      "Live Music",
       "Relaxed Atmosphere",
+      "Friendly, Professional Staff",
     ],
   },
   {
-    title: "Cozy Café",
+    title: "Meori Café (Arugam Bay)",
     icon: Coffee,
-    description: "Perfect for pre-surf coffee or a chilled afternoon hangout.",
+    description: "Relaxed café space offering specialty coffee, fresh snacks, and a cozy spot to unwind.",
     features: [
-      "Fresh Coffee",
-      "Chill Vibes",
-      "Light Snacks",
+      "Top-Tier Coffee & Chill Vibe",
+      "Concept Store",
+      "Vegan Friendly Options",
       "Free WiFi",
+      "Fresh & Customizable Bowls & Toasts"
     ],
   },
   {
     title: "Sri Lankan Buffet",
     icon: Salad,
-    description: "All-you-can-eat unlimited buffet with authentic home-cooked flavors.",
+    description: "All-you-can-eat Sri Lankan rice & curry buffet with fresh daily dishes, beachfront views, and a laid-back, social vibe.",
     features: [
-      "Unlimited Food",
-      "Live Music",
-      "Home Cooking",
-      "Traditional Recipes",
+      "Unlimited Sri Lankan Rice & Curry Buffet",
+      "Fresh Seafood",
+      "Hip-Hop Music Nights",
+      "Best Cocktails",
+    ],
+  },
+  {
+    title: "Surf Lessons & Trips",
+    icon: Fish,
+    description: "Learn to ride the waves with experienced local instructors or join guided surf trips to Arugam Bay's best breaks.",
+    features: [
+      "Beginner to Advanced Lessons",
+      "Guided Surf Trips",
+      "Professional Local Instructors",
+      "Surfboard Rentals",
+    ],
+  },
+  {
+    title: "East Coast Safaris & Adventures",
+    icon: Users,
+    description: "Discover Sri Lanka's wild side with guided safaris and nature tours along the untouched east coast.",
+    features: [
+      "Kumana National Park Safaris",
+      "Elephant & Wildlife Spotting",
+      "Lagoon & River Tours",
+      "Sunrise & Sunset Experiences",
     ],
   },
 ];
@@ -100,11 +123,6 @@ export default function AboutPage() {
               className="object-cover w-full h-full"
               style={{ borderRadius: "inherit" }}
             />
-            <div className="absolute left-2 sm:left-4 bottom-2 sm:bottom-3 flex items-center gap-1 sm:gap-2 bg-black/70 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] xs:text-xs sm:text-sm backdrop-blur-sm">
-              <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden xs:inline">Est.</span> 1978 &nbsp;|&nbsp;
-              <span className="font-medium">Rupa's Beach Hotel – The Beginning</span>
-            </div>
           </motion.div>
           {/* Right: Story */}
           <motion.div
@@ -119,10 +137,11 @@ export default function AboutPage() {
                 <span className="text-sm xs:text-base sm:text-lg font-semibold text-text">
                   Our Beginning
                 </span>
-                <span className="text-[10px] xs:text-xs sm:text-sm text-text">• Four decades of hospitality</span>
               </div>
               <p className="text-xs xs:text-sm sm:text-base text-text mb-4 sm:mb-6">
-                Rupas Surf Camp is part of Rupas Hotel, one of the oldest and most trusted places to stay in Arugam Bay, Sri Lanka. Started by our grandfather in 1978, our family has been welcoming guests for generations. Today, Rupas Surf Camp carries forward this warm hospitality, blending a professional surf experience with the relaxed charm of coastal living.
+                Rupa’s Surf Camp is built on a true Arugam Bay legacy. Back in 1978, our grandfather Rupa started one of the very first stays for surfers visiting the bay. Since then, our family has proudly carried on the tradition.
+
+Today, we’ve grown that spirit into a full surf camp experience. At Rupa’s, you’ll find surf lessons, guided safaris, east coast adventures, accommodation, and tasty local food — all in one welcoming place. Our goal is simple: to help you enjoy the best of surfing and Sri Lanka, just like family.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-2 sm:gap-4">
@@ -179,7 +198,7 @@ export default function AboutPage() {
                     <span className="font-bold text-base sm:text-lg text-text">{facility.title}</span>
                   </div>
                   <p className="text-text text-xs sm:text-sm mb-3 sm:mb-4">{facility.description}</p>
-                  <ul className="grid grid-cols-2 gap-x-2 sm:gap-x-3 gap-y-1.5 sm:gap-y-2 text-gray-600 text-[10px] xs:text-xs">
+                  <ul className="grid grid-cols-2 gap-x-2 sm:gap-x-3 gap-y-1.5 sm:gap-y-2 text-gray-600 text-xs xs:text-xs">
                     {facility.features.map((feature) => (
                       <li key={feature} className="flex items-center gap-1.5 sm:gap-2">
                         <span className="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#60d6cb]" />
