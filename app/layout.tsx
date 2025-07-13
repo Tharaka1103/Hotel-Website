@@ -6,7 +6,7 @@ import Footer from './Components/Footer'
 import { Poiret_One, Berkshire_Swash, Montserrat, Bebas_Neue } from 'next/font/google'
 import localFont from 'next/font/local'
 import ConditionalLayout from './Components/ConditionalLayout'
-import {ToastProvider} from '@/contexts/toast-context'
+import { ToastProvider } from '@/contexts/toast-context'
 import { TranslationProvider } from "@/contexts/translation-context";
 import { LanguageSelector } from "@/components/ui/language-selector";
 const bebasNeue = Bebas_Neue({
@@ -83,37 +83,18 @@ export default function RootLayout({
         <ThemeProvider>
           <ConditionalLayout>
             <ToastProvider>
-<TranslationProvider>
-          {/* Language Selector - Fixed position */}
-          <div className="fixed bottom-4 right-4 z-50">
-            <LanguageSelector />
-          </div>
-          
-          {/* Main content */}
-          <main>{children}</main>
-        </TranslationProvider>
-        </ToastProvider>
+              <TranslationProvider>
+                {/* Language Selector - Fixed position */}
+                <div className="fixed bottom-4 right-4 z-50">
+                  <LanguageSelector />
+                </div>
+
+                {/* Main content */}
+                <main>{children}</main>
+              </TranslationProvider>
+            </ToastProvider>
           </ConditionalLayout>
         </ThemeProvider>
-        
-        {/* Service Worker Registration */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js')
-                    .then(function(registration) {
-                      console.log('SW registered: ', registration);
-                    })
-                    .catch(function(registrationError) {
-                      console.log('SW registration failed: ', registrationError);
-                    });
-                });
-              }
-            `,
-          }}
-        />
       </body>
     </html>
   );

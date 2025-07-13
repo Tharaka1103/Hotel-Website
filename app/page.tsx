@@ -637,64 +637,54 @@ const ImageSlider = () => {
 
 // Optimized Video Hero Section with lazy loading and fallback
 const VideoHero = ({ children }: { children: React.ReactNode }) => {
-const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-const [isPlaying, setIsPlaying] = useState(true);
-const videoRef = useRef<HTMLVideoElement>(null);
-    const { scrollY } = useScroll();
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const { scrollY } = useScroll();
 
-const togglePlay = () => {
-if (videoRef.current) {
-if (isPlaying) {
-    videoRef.current.pause();
-} else {
-    videoRef.current.play();
-}
-    setIsPlaying(!isPlaying);
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
     }
-    };
+  };
 
-return (
-<div className="relative min-h-screen w-full overflow-hidden">
-{/* Fallback background image for faster initial load */}
-<div 
-className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-400 via-cyan-500 to-teal-600"
-style={{
-opacity: isVideoLoaded ? 0 : 1,
-transition: 'opacity 0.5s ease-out'
-}}
->
-  <div className="absolute inset-0 bg-black/30" />
-            </div>
+  return (
+    <div className="relative min-h-screen w-full overflow-hidden">
 
-<video
-ref={videoRef}
-autoPlay
-    muted
-    loop
-                playsInline
-    preload="metadata"
-    className="absolute inset-0 w-full h-full object-cover"
-style={{
-opacity: isVideoLoaded ? 1 : 0,
-    transition: 'opacity 0.5s ease-out'
-    }}
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{
+          opacity: isVideoLoaded ? 1 : 0,
+          transition: 'opacity 0.5s ease-out'
+        }}
         onCanPlay={() => setIsVideoLoaded(true)}
-            onLoadedData={() => setIsVideoLoaded(true)}
-            >
-                <source src="/heronew.mp4" type="video/mp4" />
-                <source src="/heronew.webm" type="video/webm" />
-                Your browser does not support the video tag.
-            </video>
-            <div className="absolute inset-0 bg-black/40" />
+        onLoadedData={() => setIsVideoLoaded(true)}
+      >
+        <source src="/heronew.mp4" type="video/mp4" />
+        <source src="/heronew.webm" type="video/webm" />
+        Your browser does not support the video tag.
+      </video>
+      <div className="absolute inset-0 bg-black/40" />
 
-            {/* Content in front of video */}
-            <div className="absolute inset-0 flex items-center justify-center z-40">
-                <div className="container mx-auto px-4">
-                    {children}
-                </div>
-            </div>
+      {/* Content in front of video */}
+      <div className="absolute inset-0 flex items-center justify-center z-40">
+        <div className="container mx-auto px-4">
+          {children}
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 // Video Section Component for About Us and Invite sections
@@ -1143,7 +1133,7 @@ export default function HomePage() {
     const timeoutId = setTimeout(() => {
       fetchPackages();
     }, 100);
-    
+
     return () => clearTimeout(timeoutId);
   }, []);
 
