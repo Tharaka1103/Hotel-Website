@@ -68,10 +68,10 @@ class TranslationService {
       if (window.google && window.google.translate) {
         try {
           // Find and trigger translation
-          const iframe = document.querySelector('iframe.goog-te-menu-frame');
+          const iframe = document.querySelector('iframe.goog-te-menu-frame') as HTMLIFrameElement;
           if (iframe) {
             const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-            const langLink = iframeDoc?.querySelector(`a[lang="${languageCode}"]`);
+            const langLink = iframeDoc?.querySelector(`a[lang="${languageCode}"]`) as HTMLAnchorElement;
             if (langLink) {
               langLink.click();
               return true;
@@ -79,7 +79,7 @@ class TranslationService {
           }
           
           // Alternative method: use Google Translate API directly
-          const translateElement = document.querySelector('.goog-te-combo');
+          const translateElement = document.querySelector('.goog-te-combo') as HTMLSelectElement;
           if (translateElement) {
             translateElement.value = languageCode;
             translateElement.dispatchEvent(new Event('change'));
@@ -106,7 +106,7 @@ class TranslationService {
     // Try to reset without reload first
     if (window.google && window.google.translate) {
       try {
-        const translateElement = document.querySelector('.goog-te-combo');
+        const translateElement = document.querySelector('.goog-te-combo') as HTMLSelectElement;
         if (translateElement) {
           translateElement.value = 'en';
           translateElement.dispatchEvent(new Event('change'));
