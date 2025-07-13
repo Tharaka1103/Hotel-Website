@@ -1421,11 +1421,35 @@ export default function SurfPage() {
         </div>
       </div>
 
+      {/* Contact Section */}
+      <div className="py-16 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-6 customtext">
+            Want a Custom Package?
+          </h2>
+          <p className="text-xl mb-8 max-w-2xl mx-auto">
+            Looking for something specific? Let us create a personalized surf package
+            that perfectly matches your needs and preferences.
+          </p>
+
+          <div className="mt-8">
+            <Button
+              size="lg"
+              className=" font-semibold px-8 py-3 rounded-full"
+              onClick={() => window.location.href = '/#contact'}
+            >
+              <MessageCircle className="w-5 h-5 mr-2" />
+              Request Custom Package
+            </Button>
+          </div>
+        </div>
+      </div>
+
       {/* FAQ Section */}
       <div className="py-16 bg-white">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-text mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-text mb-4 customtext">
               Frequently Asked Questions
             </h2>
             <p className="text-lg text-gray-600">
@@ -1469,41 +1493,6 @@ export default function SurfPage() {
                 />
               ))}
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Contact Section */}
-      <div className="py-16 bg-gradient-to-br from-primary to-cyan-600 text-white">
-        <div className="container mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-            Ready to Catch Some Waves?
-          </h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Have questions about our packages? Need help with your booking?
-            Our team is here to help you plan the perfect surf adventure.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <div className="flex items-center gap-2">
-              <Phone className="w-5 h-5" />
-              <span className="font-semibold">+94 77 123 4567</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Mail className="w-5 h-5" />
-              <span className="font-semibold">info@surfparadise.com</span>
-            </div>
-          </div>
-
-          <div className="mt-8">
-            <Button
-              size="lg"
-              variant="secondary"
-              className="bg-white text-primary hover:bg-gray-100 font-semibold px-8 py-3 rounded-full"
-            >
-              <MessageCircle className="w-5 h-5 mr-2" />
-              Contact Us Now
-            </Button>
           </div>
         </div>
       </div>
