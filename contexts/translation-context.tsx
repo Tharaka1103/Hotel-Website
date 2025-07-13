@@ -24,27 +24,42 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({ childr
     // Initialize translation service
     translationService.initialize();
     
-    // Check for Google Translate cookie first (most accurate)
-    const cookies = document.cookie.split(';');
-    const googtransCookie = cookies.find(cookie => cookie.trim().startsWith('googtrans='));
-    
-    if (googtransCookie) {
-      const parts = googtransCookie.split('/');
-      const langCode = parts[2];
-      if (langCode && langCode !== 'null' && langCode !== 'auto') {
-        setCurrentLanguage(langCode);
-        localStorage.setItem('preferred-language', langCode);
+    const detectCurrentLanguage = () => {
+      // Check for Google Translate cookie first (most accurate)
+      const cookies = document.cookie.split(';');
+      const googtransCookie = cookies.find(cookie => cookie.trim().startsWith('googtrans='));
+      
+      if (googtransCookie) {
+        const parts = googtransCookie.split('/');
+        const langCode = parts[2];
+        if (langCode && langCode !== 'null' && langCode !== 'auto' && langCode !== 'en') {
+          setCurrentLanguage(langCode);
+          localStorage.setItem('preferred-language', langCode);
+          return;
+        }
+      }
+      
+      // Check URL parameters (sometimes Google Translate adds these)
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlLang = urlParams.get('hl');
+      if (urlLang && urlLang !== 'en') {
+        setCurrentLanguage(urlLang);
+        localStorage.setItem('preferred-language', urlLang);
         return;
       }
-    }
-    
-    // Fallback to saved language preference
-    const savedLanguage = localStorage.getItem('preferred-language');
-    if (savedLanguage && savedLanguage !== 'en') {
-      setCurrentLanguage(savedLanguage);
-      // Set cookie to match saved preference
-      document.cookie = `googtrans=/en/${savedLanguage}; path=/; max-age=31536000`;
-    }
+      
+      // Fallback to saved language preference
+      const savedLanguage = localStorage.getItem('preferred-language');
+      if (savedLanguage && savedLanguage !== 'en') {
+        setCurrentLanguage(savedLanguage);
+        return;
+      }
+      
+      // Default to English
+      setCurrentLanguage('en');
+    };
+
+    detectCurrentLanguage();
 
     // Listen for language changes from other tabs
     const handleStorageChange = (e: StorageEvent) => {
@@ -53,8 +68,18 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({ childr
       }
     };
 
+    // Listen for URL changes (for single page apps)
+    const handlePopState = () => {
+      detectCurrentLanguage();
+    };
+
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('popstate', handlePopState);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('popstate', handlePopState);
+    };
   }, []);
 
   const translateTo = async (languageCode: string): Promise<void> => {

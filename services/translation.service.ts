@@ -54,44 +54,21 @@ class TranslationService {
     try {
       await this.initialize();
       
+      // Always use reload method for more reliable translation
+      // Set translation cookie
+      document.cookie = `googtrans=/en/${languageCode}; path=/; max-age=31536000; domain=${window.location.hostname}`;
+      
       if (languageCode === 'en') {
         // Reset to original language
-        this.resetTranslation();
-        return true;
+        document.cookie = `googtrans=/en/en; path=/; max-age=31536000; domain=${window.location.hostname}`;
+        // Also clear the cookie entirely for English
+        document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=${window.location.hostname}`;
       }
-
-      // Set translation cookie
-      document.cookie = `googtrans=/en/${languageCode}; path=/; max-age=31536000`;
+      
       this.currentLanguage = languageCode;
       
-      // Try to trigger translation without reload if widget exists
-      if (window.google && window.google.translate) {
-        try {
-          // Find and trigger translation
-          const iframe = document.querySelector('iframe.goog-te-menu-frame') as HTMLIFrameElement;
-          if (iframe) {
-            const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-            const langLink = iframeDoc?.querySelector(`a[lang="${languageCode}"]`) as HTMLAnchorElement;
-            if (langLink) {
-              langLink.click();
-              return true;
-            }
-          }
-          
-          // Alternative method: use Google Translate API directly
-          const translateElement = document.querySelector('.goog-te-combo') as HTMLSelectElement;
-          if (translateElement) {
-            translateElement.value = languageCode;
-            translateElement.dispatchEvent(new Event('change'));
-            return true;
-          }
-        } catch (e) {
-          console.warn('Direct translation failed, falling back to reload:', e);
-        }
-      }
-      
-      // Fallback: reload page (only if direct method fails)
-      setTimeout(() => window.location.reload(), 100);
+      // Force reload for reliable translation
+      window.location.reload();
       return true;
     } catch (error) {
       console.error('Translation failed:', error);
@@ -100,25 +77,15 @@ class TranslationService {
   }
 
   resetTranslation(): void {
-    document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    // Clear all possible cookie variations
+    document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=${window.location.hostname}`;
+    document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+    document.cookie = `googtrans=/en/en; path=/; max-age=31536000; domain=${window.location.hostname}`;
+    
     this.currentLanguage = 'en';
     
-    // Try to reset without reload first
-    if (window.google && window.google.translate) {
-      try {
-        const translateElement = document.querySelector('.goog-te-combo') as HTMLSelectElement;
-        if (translateElement) {
-          translateElement.value = 'en';
-          translateElement.dispatchEvent(new Event('change'));
-          return;
-        }
-      } catch (e) {
-        console.warn('Direct reset failed, falling back to reload:', e);
-      }
-    }
-    
-    // Fallback: reload page
-    setTimeout(() => window.location.reload(), 100);
+    // Always reload for reliable reset
+    window.location.reload();
   }
 
   getCurrentLanguage(): string {

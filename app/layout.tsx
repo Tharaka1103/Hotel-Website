@@ -63,6 +63,9 @@ export const metadata: Metadata = {
   title: "Rupa's Surf Camp",
   description: "Experience luxury and comfort at our oceanfront hotel with world-class amenities",
   keywords: "hotel, resort, luxury, oceanfront, vacation, accommodation",
+  other: {
+    "google": "notranslate",
+  },
 };
 
 export default function RootLayout({
@@ -72,6 +75,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${poiret0ne.variable} ${montserrat.variable} ${tanMeringue.variable} ${tanHeading.variable} ${bebasNeue.variable}`}>
+      <head>
+        <meta name="google" content="notranslate" />
+        <meta name="google-translate-customization" content="(YOUR_KEY)" />
+      </head>
       <body className="min-h-screen">
         <ThemeProvider>
           <ConditionalLayout>
