@@ -55,14 +55,21 @@ class TranslationService {
       await this.initialize();
       
       // Always use reload method for more reliable translation
-      // Set translation cookie
-      document.cookie = `googtrans=/en/${languageCode}; path=/; max-age=31536000; domain=${window.location.hostname}`;
+      // Set translation cookie - handle different domains for Vercel
+      const domain = window.location.hostname.includes('.') ? window.location.hostname : '';
+      const domainPart = domain ? `; domain=${domain}` : '';
+      document.cookie = `googtrans=/en/${languageCode}; path=/; max-age=31536000${domainPart}`;
+      
+      // Also set without domain for localhost compatibility
+      document.cookie = `googtrans=/en/${languageCode}; path=/; max-age=31536000`;
       
       if (languageCode === 'en') {
         // Reset to original language
-        document.cookie = `googtrans=/en/en; path=/; max-age=31536000; domain=${window.location.hostname}`;
+        document.cookie = `googtrans=/en/en; path=/; max-age=31536000${domainPart}`;
+        document.cookie = `googtrans=/en/en; path=/; max-age=31536000`;
         // Also clear the cookie entirely for English
-        document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=${window.location.hostname}`;
+        document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${domainPart}`;
+        document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
       }
       
       this.currentLanguage = languageCode;
@@ -78,9 +85,13 @@ class TranslationService {
 
   resetTranslation(): void {
     // Clear all possible cookie variations
-    document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=${window.location.hostname}`;
+    const domain = window.location.hostname.includes('.') ? window.location.hostname : '';
+    const domainPart = domain ? `; domain=${domain}` : '';
+    
+    document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${domainPart}`;
     document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
-    document.cookie = `googtrans=/en/en; path=/; max-age=31536000; domain=${window.location.hostname}`;
+    document.cookie = `googtrans=/en/en; path=/; max-age=31536000${domainPart}`;
+    document.cookie = `googtrans=/en/en; path=/; max-age=31536000`;
     
     this.currentLanguage = 'en';
     

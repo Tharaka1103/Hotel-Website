@@ -1,0 +1,22 @@
+{
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://translate.googleapis.com https://translate.google.com https://translate-pa.googleapis.com *.google.com *.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://translate.google.com https://translate.googleapis.com *.google.com *.gstatic.com; img-src 'self' data: blob: https: *.google.com *.gstatic.com; font-src 'self' data: https: *.gstatic.com; connect-src 'self' https://translate.googleapis.com https://translate.google.com;"
+        }
+      ]
+    }
+  ],
+  "functions": {
+    "app/**/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "installCommand": "npm install"
+}

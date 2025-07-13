@@ -32,8 +32,8 @@ const nextConfig: NextConfig = {
   },
   // Performance optimizations (swcMinify is enabled by default in Next.js 13+)
   
-  // Enable static optimization
-  output: 'standalone',
+  // Enable static optimization - disabled for Google Translate compatibility
+  // output: 'standalone',
   
   // Bundle analyzer for production builds
   // Add bundle analysis when needed with: ANALYZE=true npm run build
@@ -63,6 +63,10 @@ const nextConfig: NextConfig = {
           {
             key: 'X-Content-Type-Options',
             value: 'nosniff'
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://translate.googleapis.com https://translate.google.com https://translate-pa.googleapis.com *.google.com *.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://translate.google.com https://translate.googleapis.com *.google.com *.gstatic.com; img-src 'self' data: blob: https: *.google.com *.gstatic.com; font-src 'self' data: https: *.gstatic.com;"
           },
           {
             key: 'Referrer-Policy',

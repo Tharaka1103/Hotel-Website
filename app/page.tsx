@@ -747,25 +747,25 @@ const VideoSection = ({
 
 const highlights = [
   {
-    icon: <img src="/icons/wavesnew.png" alt="Waves" className="w-20 h-20" />,
+    icon: <Image src="/icons/wavesnew.png" alt="Waves" width={20} height={20} quality={75} />,
     title: "Waves for all",
     description:
       "Whether you're just starting out your surfing journey or chasing barrels, Arugam Bay has surf spots for all levels.",
   },
   {
-    icon: <img src="/icons/cave.png" alt="Sun" className="w-20 h-20" />,
+    icon: <Image src="/icons/cave.png" alt="Sun" width={20} height={20} quality={75} />,
     title: "More Than Just Surf",
     description:
       "With culture-rich villages, stunning view points, parties & music – the vibe will make you want to stay forever.",
   },
   {
-    icon: <img src="/icons/zoo.png" alt="Mountain" className="w-20 h-20" />,
+    icon: <Image src="/icons/zoo.png" alt="Mountain" width={20} height={20} quality={75} />,
     title: "Surrounded by Wildlife",
     description:
       "From elephants and monkeys to vibrant birdlife and even leopards, the area teems with natural wonders. Just a short drive away, Kumana National Park offers some of Sri Lanka's best wildlife safaris.",
   },
   {
-    icon: <img src="/icons/discovery.png" alt="Globe" className="w-20 h-20" />,
+    icon: <Image src="/icons/discovery.png" alt="Globe" width={20} height={20} quality={75} />,
     title: "Globally Recognized",
     description:
       "One of the top surf destinations in the world, loved by surfers from every corner of the globe.",
@@ -1387,6 +1387,7 @@ export default function HomePage() {
             src="/bg.jpg"
             alt="Background"
             fill
+            quality={75}
             className="object-cover"
             priority
           />
@@ -1671,6 +1672,7 @@ export default function HomePage() {
                             src={item.icon}
                             alt="Package feature"
                             fill
+                            quality={75}
                             className="object-contain"
                           />
                         </div>
@@ -1756,6 +1758,7 @@ export default function HomePage() {
                                     src={service.icon}
                                     alt={service.text}
                                     fill
+                                    quality={75}
                                     className="object-contain"
                                   />
                                 </motion.div>
@@ -1808,6 +1811,7 @@ export default function HomePage() {
                                     src={service.icon}
                                     alt={service.text}
                                     fill
+                                    quality={75}
                                     className="object-contain"
                                   />
                                 </motion.div>
@@ -1894,6 +1898,7 @@ export default function HomePage() {
                     src="/images/proom1.jpg"
                     alt="Luxury Suite View 1"
                     fill
+                    quality={75}
                     className="object-cover transition-opacity duration-1000 rounded-3xl"
                   />
                 </motion.div>
@@ -1906,6 +1911,7 @@ export default function HomePage() {
                     src="/images/proom2.jpg"
                     alt="Luxury Suite View 2"
                     fill
+                    quality={75}
                     className="object-cover transition-opacity duration-1000 rounded-3xl"
                   />
                 </motion.div>
@@ -1918,6 +1924,7 @@ export default function HomePage() {
                     src="/images/proom3.jpg"
                     alt="Luxury Suite View 3"
                     fill
+                    quality={75}
                     className="object-cover transition-opacity duration-1000 rounded-3xl"
                   />
                 </motion.div>
@@ -1977,6 +1984,7 @@ export default function HomePage() {
                     src="/images/image1.jpg"
                     alt="Luxury Suite View 1"
                     fill
+                    quality={75}
                     className="object-cover transition-opacity duration-1000 rounded-3xl"
                   />
                 </motion.div>
@@ -1989,6 +1997,7 @@ export default function HomePage() {
                     src="/images/image3.jpg"
                     alt="Luxury Suite View 2"
                     fill
+                    quality={75}
                     className="object-cover transition-opacity duration-1000 rounded-3xl"
                   />
                 </motion.div>
@@ -2001,6 +2010,7 @@ export default function HomePage() {
                     src="/images/image4.jpg"
                     alt="Luxury Suite View 3"
                     fill
+                    quality={75}
                     className="object-cover transition-opacity duration-1000 rounded-3xl"
                   />
                 </motion.div>
@@ -2087,6 +2097,7 @@ export default function HomePage() {
                     src={`/images/image${currentImageIndex + 1}.jpg`}
                     alt={`Culinary Experience ${currentImageIndex + 1}`}
                     fill
+                    quality={75}
                     className="object-cover rounded-3xl"
                   />
                 </motion.div>
@@ -2106,6 +2117,7 @@ export default function HomePage() {
                 src="/images/image2.jpg"
                 alt="Local Cuisine"
                 fill
+                quality={75}
                 className="object-cover rounded-3xl"
               />
             </motion.div>
@@ -2205,6 +2217,7 @@ export default function HomePage() {
                     src="/images/client1.jpg"
                     alt="Guest 1"
                     width={96}
+                    quality={75}
                     height={96}
                     className="object-cover"
                   />
@@ -2237,6 +2250,7 @@ export default function HomePage() {
                     src="/images/client1.jpg"
                     alt="Guest 2"
                     width={112}
+                    quality={75}
                     height={112}
                     className="object-cover"
                   />
@@ -2269,6 +2283,7 @@ export default function HomePage() {
                     src="/images/client1.jpg"
                     alt="Guest 3"
                     width={96}
+                    quality={75}
                     height={96}
                     className="object-cover"
                   />
@@ -2313,6 +2328,7 @@ export default function HomePage() {
                   alt="Location Map"
                   width={1200}
                   height={675}
+                  quality={75}
                   className="rounded-3xl object-cover w-full aspect-auto"
                 />
               </div>
