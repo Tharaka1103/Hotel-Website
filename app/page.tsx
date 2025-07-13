@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { motion, AnimatePresence, useScroll, useTransform, useInView, useMotionValue } from "framer-motion";
 import {
   Waves,
@@ -64,7 +65,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
-import InteractiveMap from './Components/InteractiveMap';
+
+// Lazy load non-critical components for better performance
+const InteractiveMap = dynamic(() => import('./Components/InteractiveMap'), {
+  loading: () => (
+    <div className="flex justify-center items-center h-64 bg-gray-100 rounded-3xl animate-pulse">
+      <div className="h-8 w-8 bg-gray-300 rounded-full"></div>
+    </div>
+  ),
+  ssr: false
+});
+
+// Create a loading fallback component
+const SectionLoader = ({ height = "h-96" }: { height?: string }) => (
+  <div className={`${height} bg-gray-50 animate-pulse rounded-3xl flex items-center justify-center`}>
+    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
 
 // Optimized Animation variants with will-change for better performance
 const fadeInUp = {
@@ -618,50 +635,66 @@ const ImageSlider = () => {
 };
 
 
-// Enhanced Video Hero Section with Floating Images
+// Optimized Video Hero Section with lazy loading and fallback
 const VideoHero = ({ children }: { children: React.ReactNode }) => {
-  const [isPlaying, setIsPlaying] = useState(true);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const { scrollY } = useScroll();
+const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+const [isPlaying, setIsPlaying] = useState(true);
+const videoRef = useRef<HTMLVideoElement>(null);
+    const { scrollY } = useScroll();
 
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
+const togglePlay = () => {
+if (videoRef.current) {
+if (isPlaying) {
+    videoRef.current.pause();
+} else {
+    videoRef.current.play();
+}
+    setIsPlaying(!isPlaying);
     }
-  };
+    };
 
-  return (
-    <div className="relative min-h-screen w-full overflow-hidden">
-      <video
-        ref={videoRef}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        className="absolute inset-0 w-full h-full object-cover"
-        onLoadStart={() => console.log('Video loading started')}
-        onCanPlayThrough={() => console.log('Video can play through')}
-      >
-        <source src="/heronew.mp4" type="video/mp4" />
-        <source src="/heronew.webm" type="video/webm" />
-        Your browser does not support the video tag.
-      </video>
-      <div className="absolute inset-0 bg-black/40" />
+return (
+<div className="relative min-h-screen w-full overflow-hidden">
+{/* Fallback background image for faster initial load */}
+<div 
+className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-400 via-cyan-500 to-teal-600"
+style={{
+opacity: isVideoLoaded ? 0 : 1,
+transition: 'opacity 0.5s ease-out'
+}}
+>
+  <div className="absolute inset-0 bg-black/30" />
+            </div>
 
-      {/* Content in front of video */}
-      <div className="absolute inset-0 flex items-center justify-center z-40">
-        <div className="container mx-auto px-4">
-          {children}
+<video
+ref={videoRef}
+autoPlay
+    muted
+    loop
+                playsInline
+    preload="metadata"
+    className="absolute inset-0 w-full h-full object-cover"
+style={{
+opacity: isVideoLoaded ? 1 : 0,
+    transition: 'opacity 0.5s ease-out'
+    }}
+        onCanPlay={() => setIsVideoLoaded(true)}
+            onLoadedData={() => setIsVideoLoaded(true)}
+            >
+                <source src="/heronew.mp4" type="video/mp4" />
+                <source src="/heronew.webm" type="video/webm" />
+                Your browser does not support the video tag.
+            </video>
+            <div className="absolute inset-0 bg-black/40" />
+
+            {/* Content in front of video */}
+            <div className="absolute inset-0 flex items-center justify-center z-40">
+                <div className="container mx-auto px-4">
+                    {children}
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 // Video Section Component for About Us and Invite sections
@@ -1104,19 +1137,31 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const { scrollY } = useScroll();
 
-  // Fetch packages on component mount
+  // Fetch packages on component mount with priority scheduling
   useEffect(() => {
-    fetchPackages();
+    // Defer package fetching to avoid blocking initial render
+    const timeoutId = setTimeout(() => {
+      fetchPackages();
+    }, 100);
+    
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const fetchPackages = async () => {
     try {
-      const response = await fetch('/api/packages');
+      const response = await fetch('/api/packages', {
+        // Add cache control for better performance
+        cache: 'force-cache',
+        next: { revalidate: 3600 } // Cache for 1 hour
+      });
       const data = await response.json();
       setPackages(data.packages || []);
     } catch (error) {
       console.error('Failed to fetch packages:', error);
-      toast.error('Failed to fetch packages');
+      // Don't show toast error on initial load to avoid disrupting UX
+      if (packages.length === 0) {
+        console.warn('Package loading failed, using fallback');
+      }
     } finally {
       setLoading(false);
     }

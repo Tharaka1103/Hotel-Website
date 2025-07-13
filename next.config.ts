@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 86400, // 24 hours cache
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
@@ -25,12 +25,79 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   experimental: {
     optimizeCss: true,
+    optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
+  // Performance optimizations (swcMinify is enabled by default in Next.js 13+)
+  
+  // Enable static optimization
+  output: 'standalone',
+  
+  // Bundle analyzer for production builds
+  // Add bundle analysis when needed with: ANALYZE=true npm run build
+  
   eslint: {
     ignoreDuringBuilds: true,
+  },
+
+  // Headers for better caching and performance
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
+          },
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload'
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin'
+          }
+        ]
+      },
+      {
+        source: '/images/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          }
+        ]
+      },
+      {
+        source: '/icons/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          }
+        ]
+      },
+      {
+        source: '/:path*.mp4',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable'
+          }
+        ]
+      }
+    ];
   },
 };
 
