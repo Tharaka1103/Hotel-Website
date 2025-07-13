@@ -620,25 +620,25 @@ const VideoSection = ({
 
 const highlights = [
   {
-    icon: <img src="/icons/waves.png" alt="Waves" className="w-20 h-20" />,
+    icon: <img src="/icons/wavesnew.png" alt="Waves" className="w-20 h-20" />,
     title: "Waves for all",
     description:
       "Whether you're just starting out your surfing journey or chasing barrels, Arugam Bay has surf spots for all levels.",
   },
   {
-    icon: <img src="/icons/elephant.png" alt="Sun" className="w-20 h-20" />,
+    icon: <img src="/icons/cave.png" alt="Sun" className="w-20 h-20" />,
     title: "More Than Just Surf",
     description:
       "With culture-rich villages, stunning view points, parties & music – the vibe will make you want to stay forever.",
   },
   {
-    icon: <img src="/icons/elephant.png" alt="Mountain" className="w-20 h-20" />,
+    icon: <img src="/icons/zoo.png" alt="Mountain" className="w-20 h-20" />,
     title: "Surrounded by Wildlife",
     description:
       "From elephants and monkeys to vibrant birdlife and even leopards, the area teems with natural wonders. Just a short drive away, Kumana National Park offers some of Sri Lanka's best wildlife safaris.",
   },
   {
-    icon: <img src="/icons/elephant.png" alt="Globe" className="w-20 h-20" />,
+    icon: <img src="/icons/discovery.png" alt="Globe" className="w-20 h-20" />,
     title: "Globally Recognized",
     description:
       "One of the top surf destinations in the world, loved by surfers from every corner of the globe.",
@@ -1053,7 +1053,7 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7, duration: 0.8, ease: "easeOut" }}
-                className="text-md md:text-lg mb-6 max-w-2xl mx-auto leading-relaxed text-white/90"
+                className="text-md md:text-lg mb-6 max-w-2xl mx-auto leading-relaxed text-white/90 mt-5"
               >
                 Sri Lanka's surfing paradise - the iconic surf town
               </motion.p>
@@ -1503,24 +1503,23 @@ export default function HomePage() {
                   <motion.div
                     key={index}
                     variants={staggerItem}
-                    whileHover={{ scale: 1.02, y: -5 }}
                     className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300"
                   >
-                    <div className="p-6 flex flex-col items-center">
+                    <div className="p-4 sm:p-6 flex flex-col items-center text-center">
                       <motion.div
                         initial={{ scale: 0 }}
                         whileInView={{ scale: 1 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1, duration: 0.5, type: "spring" }}
-                        className="text-6xl font-bold text-primary mb-2 flex flex-row items-center"
+                        className="text-4xl sm:text-6xl font-bold text-primary mb-4 flex flex-row items-center justify-center"
                       >
-                        {item.number && <span>{item.number} <span className="font-normal ml-4 mr-4"> x</span></span>}
-                        <div className="relative h-20 w-20">
+                        {item.number && <span className="whitespace-nowrap">{item.number} <span className="font-normal mx-2 sm:mx-4">x</span></span>}
+                        <div className="relative h-16 w-16 sm:h-20 sm:w-20">
                           <Image
                             src={item.icon}
                             alt="Package feature"
                             fill
-                            className="object-cover"
+                            className="object-contain"
                           />
                         </div>
                       </motion.div>
@@ -1529,7 +1528,7 @@ export default function HomePage() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1 + 0.2, duration: 0.5 }}
-                        className="text-xl font-bold text-text mb-2 flex flex-row items-center justify-center"
+                        className="text-lg sm:text-xl font-bold text-text mb-3 text-center"
                       >
                         {item.title}
                       </motion.p>
@@ -1538,7 +1537,7 @@ export default function HomePage() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1 + 0.4, duration: 0.5 }}
-                        className="text-text text-sm text-justify"
+                        className="text-text text-sm sm:text-base text-center max-w-xs mx-auto"
                       >
                         {item.description}
                       </motion.p>
@@ -1592,7 +1591,6 @@ export default function HomePage() {
                             <motion.div
                               className="relative w-16 md:w-20 h-24 md:h-28 cursor-pointer"
                               initial={false}
-                              whileHover={{ rotateY: 180, scale: 1.05 }}
                               style={{ transformStyle: "preserve-3d" }}
                               transition={{ duration: 0.6 }}
                             >
@@ -1610,14 +1608,6 @@ export default function HomePage() {
                                   />
                                 </motion.div>
                                 <span className="text-[10px] md:text-xs font-semibold text-text text-center">{service.text}</span>
-                              </div>
-
-                              {/* Back of card */}
-                              <div
-                                className="absolute w-full h-full p-2 bg-primary/10 rounded-lg flex items-center justify-center backface-hidden"
-                                style={{ transform: "rotateY(180deg)" }}
-                              >
-                                <p className="text-[8px] md:text-[10px] text-text text-center">{service.description}</p>
                               </div>
                             </motion.div>
                           </motion.div>
@@ -1653,7 +1643,6 @@ export default function HomePage() {
                             <motion.div
                               className="relative w-20 md:w-24 h-28 md:h-32 cursor-pointer"
                               initial={false}
-                              whileHover={{ rotateY: 180, scale: 1.05 }}
                               style={{ transformStyle: "preserve-3d" }}
                               transition={{ duration: 0.6 }}
                             >
@@ -1671,14 +1660,6 @@ export default function HomePage() {
                                   />
                                 </motion.div>
                                 <span className="text-[10px] md:text-xs font-semibold text-text text-center">{service.text}</span>
-                              </div>
-
-                              {/* Back of card */}
-                              <div
-                                className="absolute w-full h-full p-2 bg-primary/10 rounded-lg flex items-center justify-center backface-hidden"
-                                style={{ transform: "rotateY(180deg)" }}
-                              >
-                                <p className="text-[10px] md:text-xs text-text text-center">{service.description}</p>
                               </div>
                             </motion.div>
                           </motion.div>
