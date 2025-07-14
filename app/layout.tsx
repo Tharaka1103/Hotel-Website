@@ -9,6 +9,7 @@ import ConditionalLayout from './Components/ConditionalLayout'
 import { ToastProvider } from '@/contexts/toast-context'
 import { TranslationProvider } from "@/contexts/translation-context";
 import { LanguageSelector } from "@/components/ui/language-selector";
+
 const bebasNeue = Bebas_Neue({
   subsets: ['latin'],
   weight: ['400'],
@@ -43,6 +44,7 @@ const tanMeringue = localFont({
   variable: '--font-tan-meringue',
   display: 'swap',
 })
+
 const tanHeading = localFont({
   src: [
     {
@@ -59,13 +61,11 @@ const tanHeading = localFont({
   variable: '--font-tan-heading',
   display: 'swap',
 })
+
 export const metadata: Metadata = {
   title: "Rupa's Surf Camp",
   description: "Experience luxury and comfort at our oceanfront hotel with world-class amenities",
   keywords: "hotel, resort, luxury, oceanfront, vacation, accommodation",
-  other: {
-    "google": "notranslate",
-  },
 };
 
 export default function RootLayout({
@@ -77,39 +77,35 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className={`${poiret0ne.variable} ${montserrat.variable} ${tanMeringue.variable} ${tanHeading.variable} ${bebasNeue.variable}`}>
       <head>
         <meta name="google" content="notranslate" />
-        <meta name="google-translate-customization" content="(YOUR_KEY)" />
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            // Block Google Analytics tracking requests
-            if (typeof window !== 'undefined') {
-              const originalFetch = window.fetch;
-              window.fetch = function(...args) {
-                const url = args[0];
-                if (typeof url === 'string' && url.includes('gen204')) {
-                  return Promise.resolve(new Response('', { status: 204 }));
-                }
-                return originalFetch.apply(this, args);
-              };
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Declare global function for Google Translate
+              window.googleTranslateElementInit = window.googleTranslateElementInit || function() {};
               
-              // Also block image requests to gen204
-              const originalImage = window.Image;
-              window.Image = function() {
-                const img = new originalImage();
-                const originalSrc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
-                Object.defineProperty(img, 'src', {
-                  set: function(value) {
-                    if (typeof value === 'string' && value.includes('gen204')) {
-                      return;
+              // Optimize Google Translate loading
+              (function() {
+                var gtConstEvalStartTime = new Date();
+                function gtElInit() {
+                  var lib = new google.translate.TranslateService();
+                  return lib;
+                }
+                
+                // Block unnecessary requests to improve performance
+                if (typeof window !== 'undefined') {
+                  const originalFetch = window.fetch;
+                  window.fetch = function(...args) {
+                    const url = args[0];
+                    if (typeof url === 'string' && (url.includes('gen204') || url.includes('analytics'))) {
+                      return Promise.resolve(new Response('', { status: 204 }));
                     }
-                    originalSrc.set.call(this, value);
-                  },
-                  get: originalSrc.get
-                });
-                return img;
-              };
-            }
-          `
-        }} />
+                    return originalFetch.apply(this, args);
+                  };
+                }
+              })();
+            `,
+          }}
+        />
       </head>
       <body className="min-h-screen">
         <ThemeProvider>

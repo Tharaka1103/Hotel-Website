@@ -100,7 +100,16 @@ const nextConfig: NextConfig = {
             value: 'public, max-age=31536000, immutable'
           }
         ]
-      }
+      },
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://translate.google.com https://translate.googleapis.com; frame-src 'self' https://translate.google.com;",
+          },
+        ],
+      },
     ];
   },
 };
