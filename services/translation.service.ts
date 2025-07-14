@@ -33,16 +33,24 @@ class TranslationService {
 
       window.googleTranslateElementInit = () => {
         if (window.google && window.google.translate) {
-          new window.google.translate.TranslateElement({
-            pageLanguage: 'en',
-            includedLanguages: 'en,de,fr,es,ru',
-            layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-            autoDisplay: false,
-            multilanguagePage: true
-          }, 'google_translate_element');
-          
-          this.isInitialized = true;
-          resolve();
+          try {
+            new window.google.translate.TranslateElement({
+              pageLanguage: 'en',
+              includedLanguages: 'en,de,fr,es,ru',
+              layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+              autoDisplay: false,
+              multilanguagePage: true,
+              gaTrack: false,
+              gaId: null
+            }, 'google_translate_element');
+            
+            this.isInitialized = true;
+            resolve();
+          } catch (error) {
+            console.error('Google Translate initialization error:', error);
+            this.isInitialized = true; // Still mark as initialized to prevent retries
+            resolve();
+          }
         }
       };
 
@@ -54,27 +62,30 @@ class TranslationService {
     try {
       await this.initialize();
       
-      // Always use reload method for more reliable translation
-      // Set translation cookie - handle different domains for Vercel
-      const domain = window.location.hostname.includes('.') ? window.location.hostname : '';
-      const domainPart = domain ? `; domain=${domain}` : '';
-      document.cookie = `googtrans=/en/${languageCode}; path=/; max-age=31536000${domainPart}`;
-      
-      // Also set without domain for localhost compatibility
-      document.cookie = `googtrans=/en/${languageCode}; path=/; max-age=31536000`;
+      // Clear any existing translation first
+      this.clearTranslation();
       
       if (languageCode === 'en') {
-        // Reset to original language
-        document.cookie = `googtrans=/en/en; path=/; max-age=31536000${domainPart}`;
-        document.cookie = `googtrans=/en/en; path=/; max-age=31536000`;
-        // Also clear the cookie entirely for English
-        document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${domainPart}`;
-        document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+        // For English, just reload without translation
+        this.currentLanguage = 'en';
+        window.location.reload();
+        return true;
+      }
+      
+      // Set the translation cookie with proper format
+      const cookieValue = `/en/${languageCode}`;
+      document.cookie = `googtrans=${cookieValue}; path=/; max-age=31536000`;
+      
+      // Also try setting with domain for better compatibility
+      try {
+        document.cookie = `googtrans=${cookieValue}; path=/; domain=${window.location.hostname}; max-age=31536000`;
+      } catch (e) {
+        // Ignore domain errors for localhost
       }
       
       this.currentLanguage = languageCode;
       
-      // Force reload for reliable translation
+      // Force reload to apply translation
       window.location.reload();
       return true;
     } catch (error) {
@@ -83,19 +94,19 @@ class TranslationService {
     }
   }
 
-  resetTranslation(): void {
+  clearTranslation(): void {
     // Clear all possible cookie variations
-    const domain = window.location.hostname.includes('.') ? window.location.hostname : '';
-    const domainPart = domain ? `; domain=${domain}` : '';
-    
-    document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${domainPart}`;
+    try {
+      document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=${window.location.hostname}`;
+    } catch (e) {
+      // Ignore domain errors for localhost
+    }
     document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
-    document.cookie = `googtrans=/en/en; path=/; max-age=31536000${domainPart}`;
-    document.cookie = `googtrans=/en/en; path=/; max-age=31536000`;
-    
+  }
+
+  resetTranslation(): void {
+    this.clearTranslation();
     this.currentLanguage = 'en';
-    
-    // Always reload for reliable reset
     window.location.reload();
   }
 

@@ -70,6 +70,7 @@ const Footer = () => {
                   alt="Rupa's Surf Logo"
                   width={48}
                   height={48}
+                  quality={75}
                   className="w-full h-full object-contain"
                   priority
                 />

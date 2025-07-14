@@ -66,7 +66,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://translate.googleapis.com https://translate.google.com https://translate-pa.googleapis.com *.google.com *.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://translate.google.com https://translate.googleapis.com *.google.com *.gstatic.com; img-src 'self' data: blob: https: *.google.com *.gstatic.com; font-src 'self' data: https: *.gstatic.com;"
+            value: "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://translate.googleapis.com https://translate.google.com https://translate-pa.googleapis.com *.google.com *.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com *.google.com *.gstatic.com; img-src 'self' data: blob: https: *.google.com *.gstatic.com; font-src 'self' data: https: *.gstatic.com;"
           },
           {
             key: 'Referrer-Policy',

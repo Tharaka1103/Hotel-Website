@@ -29,33 +29,37 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({ childr
       const cookies = document.cookie.split(';');
       const googtransCookie = cookies.find(cookie => cookie.trim().startsWith('googtrans='));
       
-      if (googtransCookie) {
-        const parts = googtransCookie.split('/');
-        const langCode = parts[2];
-        if (langCode && langCode !== 'null' && langCode !== 'auto' && langCode !== 'en') {
-          setCurrentLanguage(langCode);
-          localStorage.setItem('preferred-language', langCode);
-          return;
-        }
-      }
+      console.log('All cookies:', document.cookie);
+      console.log('Google translate cookie:', googtransCookie);
       
-      // Check URL parameters (sometimes Google Translate adds these)
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlLang = urlParams.get('hl');
-      if (urlLang && urlLang !== 'en') {
-        setCurrentLanguage(urlLang);
-        localStorage.setItem('preferred-language', urlLang);
-        return;
+      if (googtransCookie) {
+        const cookieValue = googtransCookie.split('=')[1];
+        console.log('Cookie value:', cookieValue);
+        
+        if (cookieValue && cookieValue !== '' && cookieValue.includes('/')) {
+          const parts = cookieValue.split('/');
+          const langCode = parts[2]; // Format is usually /en/langcode
+          console.log('Detected language from cookie:', langCode);
+          
+          if (langCode && langCode !== 'null' && langCode !== 'auto' && langCode !== '') {
+            setCurrentLanguage(langCode);
+            localStorage.setItem('preferred-language', langCode);
+            return;
+          }
+        }
       }
       
       // Fallback to saved language preference
       const savedLanguage = localStorage.getItem('preferred-language');
-      if (savedLanguage && savedLanguage !== 'en') {
+      console.log('Saved language preference:', savedLanguage);
+      
+      if (savedLanguage) {
         setCurrentLanguage(savedLanguage);
         return;
       }
       
       // Default to English
+      console.log('Defaulting to English');
       setCurrentLanguage('en');
     };
 
@@ -92,23 +96,18 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({ childr
     try {
       // Save preference first
       localStorage.setItem('preferred-language', languageCode);
-      setCurrentLanguage(languageCode);
       
-      // Apply translation
-      const success = await translationService.translateTo(languageCode);
-      if (!success) {
-        // Revert if translation fails
-        const previousLang = currentLanguage;
-        setCurrentLanguage(previousLang);
-        localStorage.setItem('preferred-language', previousLang);
-      }
+      // Apply translation (this will reload the page)
+      await translationService.translateTo(languageCode);
+      
+      // Note: The page will reload, so the code below won't execute
+      // The new page load will detect the cookie and set the correct language
     } catch (error) {
       console.error('Translation error:', error);
-      // Revert on error
+      // Only revert if there was an error and page didn't reload
       const previousLang = currentLanguage;
       setCurrentLanguage(previousLang);
       localStorage.setItem('preferred-language', previousLang);
-    } finally {
       setIsLoading(false);
     }
   };
