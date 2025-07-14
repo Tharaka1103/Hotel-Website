@@ -664,10 +664,6 @@ const VideoHero = ({ children }: { children: React.ReactNode }) => {
         playsInline
         preload="metadata"
         className="absolute inset-0 w-full h-full object-cover"
-        style={{
-          opacity: isVideoLoaded ? 1 : 0,
-          transition: 'opacity 0.5s ease-out'
-        }}
         onCanPlay={() => setIsVideoLoaded(true)}
         onLoadedData={() => setIsVideoLoaded(true)}
       >
@@ -675,7 +671,7 @@ const VideoHero = ({ children }: { children: React.ReactNode }) => {
         <source src="/heronew.webm" type="video/webm" />
         Your browser does not support the video tag.
       </video>
-      <div className="absolute inset-0 bg-black/40" />
+      <div className="absolute inset-0 bg-black/50" />
 
       {/* Content in front of video */}
       <div className="absolute inset-0 flex items-center justify-center z-40">
@@ -747,25 +743,25 @@ const VideoSection = ({
 
 const highlights = [
   {
-    icon: <Image src="/icons/wavesnew.png" alt="Waves" width={20} height={20} quality={75} />,
+    icon: <Image src="/icons/wavesnew.png" alt="Waves" width={100} height={100} quality={75} />,
     title: "Waves for all",
     description:
       "Whether you're just starting out your surfing journey or chasing barrels, Arugam Bay has surf spots for all levels.",
   },
   {
-    icon: <Image src="/icons/cave.png" alt="Sun" width={20} height={20} quality={75} />,
+    icon: <Image src="/icons/cave.png" alt="Sun" width={100} height={100} quality={75} />,
     title: "More Than Just Surf",
     description:
       "With culture-rich villages, stunning view points, parties & music – the vibe will make you want to stay forever.",
   },
   {
-    icon: <Image src="/icons/zoo.png" alt="Mountain" width={20} height={20} quality={75} />,
+    icon: <Image src="/icons/zoo.png" alt="Mountain" width={100} height={100} quality={75} />,
     title: "Surrounded by Wildlife",
     description:
       "From elephants and monkeys to vibrant birdlife and even leopards, the area teems with natural wonders. Just a short drive away, Kumana National Park offers some of Sri Lanka's best wildlife safaris.",
   },
   {
-    icon: <Image src="/icons/discovery.png" alt="Globe" width={20} height={20} quality={75} />,
+    icon: <Image src="/icons/discovery.png" alt="Globe" width={100} height={100} quality={75} />,
     title: "Globally Recognized",
     description:
       "One of the top surf destinations in the world, loved by surfers from every corner of the globe.",
