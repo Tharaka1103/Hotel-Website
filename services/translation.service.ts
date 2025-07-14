@@ -1,132 +1,120 @@
 "use client";
 
-class TranslationService {
-  private static instance: TranslationService;
-  private isInitialized = false;
-  private currentLanguage = 'en';
-
-  static getInstance(): TranslationService {
-    if (!TranslationService.instance) {
-      TranslationService.instance = new TranslationService();
-    }
-    return TranslationService.instance;
+declare global {
+  interface Window {
+    google?: any;
+    googleTranslateElementInit?: () => void;
   }
+}
+
+class TranslationService {
+  private isInitialized = false;
+  private initPromise: Promise<void> | null = null;
 
   async initialize(): Promise<void> {
-    return new Promise((resolve) => {
-      if (this.isInitialized) {
-        resolve();
-        return;
-      }
+    if (this.isInitialized) return;
+    if (this.initPromise) return this.initPromise;
 
+    this.initPromise = new Promise((resolve) => {
       // Check if already loaded
-      if (window.google && window.google.translate) {
+      if (window.google?.translate) {
         this.isInitialized = true;
         resolve();
         return;
       }
 
-      // Load Google Translate script
-      const script = document.createElement('script');
-      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-      script.async = true;
-
+      // Set up the callback
       window.googleTranslateElementInit = () => {
-        if (window.google && window.google.translate) {
+        if (window.google?.translate) {
           try {
-            // Disable all analytics before creating translate element
-            if (window.google && window.google.translate) {
-              window.google.translate._const = window.google.translate._const || {};
-              window.google.translate._const._cest = 'TE';
-              window.google.translate._const._cl = 'en';
-              window.google.translate._const._cuc = 'googleTranslateElementInit';
-            }
-
             new window.google.translate.TranslateElement({
               pageLanguage: 'en',
               includedLanguages: 'en,de,fr,es,ru',
               layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
               autoDisplay: false,
-              multilanguagePage: true,
-              gaTrack: false,
-              gaId: null
+              multilanguagePage: true
             }, 'google_translate_element');
             
             this.isInitialized = true;
             resolve();
           } catch (error) {
-            console.error('Google Translate initialization error:', error);
-            this.isInitialized = true; // Still mark as initialized to prevent retries
+            console.error('Error initializing Google Translate:', error);
             resolve();
           }
         }
       };
 
+      // Load the script
+      const script = document.createElement('script');
+      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+      script.async = true;
+      script.onerror = () => {
+        console.error('Failed to load Google Translate script');
+        resolve();
+      };
+      
       document.head.appendChild(script);
     });
+
+    return this.initPromise;
   }
 
-  async translateTo(languageCode: string): Promise<boolean> {
+  async translateTo(languageCode: string): Promise<void> {
+    await this.initialize();
+    
+    if (!this.isInitialized) {
+      throw new Error('Translation service not initialized');
+    }
+
     try {
-      await this.initialize();
-      
       if (languageCode === 'en') {
-        // For English, clear translation and reload
-        this.clearTranslation();
-        this.currentLanguage = 'en';
+        // Reset to original language
+        this.clearTranslationCookie();
         window.location.reload();
-        return true;
+      } else {
+        // Set translation cookie and reload
+        this.setTranslationCookie(languageCode);
+        window.location.reload();
       }
-      
-      // Set the translation cookie with proper format - don't clear first for non-English
-      const cookieValue = `/en/${languageCode}`;
-      document.cookie = `googtrans=${cookieValue}; path=/; max-age=31536000`;
-      
-      // Also try setting with domain for better compatibility
-      try {
-        document.cookie = `googtrans=${cookieValue}; path=/; domain=${window.location.hostname}; max-age=31536000`;
-      } catch (e) {
-        // Ignore domain errors for localhost
-      }
-      
-      this.currentLanguage = languageCode;
-      
-      // Add a small delay to ensure cookie is set before reload
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Force reload to apply translation
-      window.location.reload();
-      return true;
     } catch (error) {
       console.error('Translation failed:', error);
-      return false;
+      throw error;
     }
-  }
-
-  clearTranslation(): void {
-    // Clear all possible cookie variations
-    try {
-      document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=${window.location.hostname}`;
-    } catch (e) {
-      // Ignore domain errors for localhost
-    }
-    document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
   }
 
   resetTranslation(): void {
-    this.clearTranslation();
-    this.currentLanguage = 'en';
+    this.clearTranslationCookie();
     window.location.reload();
   }
 
-  getCurrentLanguage(): string {
-    return this.currentLanguage;
+  getCurrentLanguageFromCookie(): string {
+    const cookies = document.cookie.split(';');
+    const googtransCookie = cookies.find(cookie => 
+      cookie.trim().startsWith('googtrans=')
+    );
+    
+    if (googtransCookie) {
+      const cookieValue = googtransCookie.split('=')[1];
+      if (cookieValue && cookieValue.includes('/')) {
+        const parts = cookieValue.split('/');
+        const langCode = parts[2];
+        if (langCode && langCode !== 'null' && langCode !== 'auto') {
+          return langCode;
+        }
+      }
+    }
+    
+    return 'en';
   }
 
-  isRTL(languageCode: string): boolean {
-    const rtlLanguages = ['ar', 'he', 'fa', 'ur'];
-    return rtlLanguages.includes(languageCode);
+  private setTranslationCookie(languageCode: string): void {
+    const cookieValue = `/en/${languageCode}`;
+    document.cookie = `googtrans=${cookieValue}; path=/; max-age=31536000; SameSite=Lax`;
+  }
+
+  private clearTranslationCookie(): void {
+    document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
   }
 }
 
-export const translationService = TranslationService.getInstance();
+export const translationService = new TranslationService();

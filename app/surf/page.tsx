@@ -1068,7 +1068,7 @@ export default function SurfPage() {
                           <div className="mt-2 p-3 bg-gray-50 rounded-lg">
                             <div className="text-sm text-gray-700 mb-1">Pricing options:</div>
                             <div className="flex justify-between text-sm">
-                              <span>Dome Room:</span>
+                              <span>Dorm Room:</span>
                               <span className="font-semibold text-green-600">${pkg.domeRoomPrice}/person</span>
                             </div>
                             <div className="flex justify-between text-sm">
@@ -1199,7 +1199,7 @@ export default function SurfPage() {
                                     <div className="flex items-center gap-3">
                                       <Bed className="w-5 h-5 text-green-600" />
                                       <div>
-                                        <h4 className="font-semibold">Dome Room</h4>
+                                        <h4 className="font-semibold">Dorm Room</h4>
                                         <p className="text-sm text-gray-600">Shared dome accommodation</p>
                                         <p className="text-sm font-semibold text-green-600">
                                           ${selectedPackage?.domeRoomPrice}/person
@@ -1359,7 +1359,7 @@ export default function SurfPage() {
                                     </div>
                                     <div className="flex justify-between">
                                       <span>Room Type:</span>
-                                      <span>{roomType === 'room' ? 'Double Room' : 'Dome Room'}</span>
+                                      <span>{roomType === 'room' ? 'Double Room' : 'Dorm Room'}</span>
                                     </div>
                                     <div className="flex justify-between">
                                       <span>Price per person:</span>
@@ -1462,7 +1462,7 @@ export default function SurfPage() {
               {[
                 {
                   question: "What's included in the accommodation?",
-                  answer: "All rooms come with air conditioning, hot water, free WiFi, and daily housekeeping. Double rooms are private with 2 beds, while dome rooms are shared accommodation with individual beds."
+                  answer: "All rooms come with air conditioning, hot water, free WiFi, and daily housekeeping. Double rooms are private with 2 beds, while dorm rooms are shared accommodation with individual beds."
                 },
                 {
                   question: "Do I need to be an experienced surfer?",

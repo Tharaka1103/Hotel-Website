@@ -21,119 +21,87 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({ childr
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Initialize translation service
-    translationService.initialize();
-    
-    const detectCurrentLanguage = () => {
-      // First check localStorage for user preference
-      const savedLanguage = localStorage.getItem('preferred-language');
-      console.log('Saved language preference:', savedLanguage);
-      
-      if (savedLanguage && savedLanguage !== 'en') {
-        setCurrentLanguage(savedLanguage);
+    const initializeTranslation = async () => {
+      try {
+        await translationService.initialize();
         
-        // Ensure the cookie matches the preference
-        const cookies = document.cookie.split(';');
-        const googtransCookie = cookies.find(cookie => cookie.trim().startsWith('googtrans='));
-        
-        if (!googtransCookie || !googtransCookie.includes(savedLanguage)) {
-          // Set the cookie to match the preference
-          const cookieValue = `/en/${savedLanguage}`;
-          document.cookie = `googtrans=${cookieValue}; path=/; max-age=31536000`;
-          console.log('Set cookie to match preference:', cookieValue);
-        }
-        return;
-      }
-      
-      // Check for Google Translate cookie if no preference saved
-      const cookies = document.cookie.split(';');
-      const googtransCookie = cookies.find(cookie => cookie.trim().startsWith('googtrans='));
-      
-      console.log('All cookies:', document.cookie);
-      console.log('Google translate cookie:', googtransCookie);
-      
-      if (googtransCookie) {
-        const cookieValue = googtransCookie.split('=')[1];
-        console.log('Cookie value:', cookieValue);
-        
-        if (cookieValue && cookieValue !== '' && cookieValue.includes('/')) {
-          const parts = cookieValue.split('/');
-          const langCode = parts[2]; // Format is usually /en/langcode
-          console.log('Detected language from cookie:', langCode);
-          
-          if (langCode && langCode !== 'null' && langCode !== 'auto' && langCode !== '') {
-            setCurrentLanguage(langCode);
-            localStorage.setItem('preferred-language', langCode);
-            return;
+        // Detect current language from various sources
+        const detectLanguage = () => {
+          // First check localStorage
+          const savedLanguage = localStorage.getItem('preferred-language');
+          if (savedLanguage && savedLanguage !== 'en') {
+            setCurrentLanguage(savedLanguage);
+            return savedLanguage;
           }
-        }
+          
+          // Then check Google Translate cookie
+          const cookieLanguage = translationService.getCurrentLanguageFromCookie();
+          if (cookieLanguage !== 'en') {
+            setCurrentLanguage(cookieLanguage);
+            localStorage.setItem('preferred-language', cookieLanguage);
+            return cookieLanguage;
+          }
+          
+          // Default to English
+          setCurrentLanguage('en');
+          return 'en';
+        };
+
+        // Small delay to ensure DOM is ready
+        setTimeout(detectLanguage, 100);
+      } catch (error) {
+        console.error('Failed to initialize translation:', error);
       }
-      
-      // Default to English
-      console.log('Defaulting to English');
-      setCurrentLanguage('en');
     };
 
-    // Delay detection slightly to ensure DOM is ready
-    setTimeout(detectCurrentLanguage, 100);
+    initializeTranslation();
 
-    // Listen for language changes from other tabs
+    // Listen for storage changes (other tabs)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'preferred-language' && e.newValue) {
         setCurrentLanguage(e.newValue);
       }
     };
 
-    // Listen for URL changes (for single page apps)
-    const handlePopState = () => {
-      setTimeout(detectCurrentLanguage, 100);
-    };
-
     window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('popstate', handlePopState);
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('popstate', handlePopState);
     };
   }, []);
 
   const translateTo = async (languageCode: string): Promise<void> => {
-    if (languageCode === currentLanguage) {
-      return; // No need to translate to the same language
+    if (languageCode === currentLanguage || isLoading) {
+      return;
     }
     
     setIsLoading(true);
     
     try {
-      // Save preference first - this is critical for the page reload detection
+      // Save preference immediately
       localStorage.setItem('preferred-language', languageCode);
-      console.log('Setting preferred language to:', languageCode);
-      
-      // Update current language immediately to prevent race conditions
       setCurrentLanguage(languageCode);
       
       // Apply translation (this will reload the page)
       await translationService.translateTo(languageCode);
-      
-      // Note: The page will reload, so the code below won't execute
-      // The new page load will detect the localStorage preference and set the correct language
     } catch (error) {
       console.error('Translation error:', error);
-      // Only revert if there was an error and page didn't reload
+      // Revert on error
       const previousLang = currentLanguage;
       setCurrentLanguage(previousLang);
       localStorage.setItem('preferred-language', previousLang);
       setIsLoading(false);
+      throw error;
     }
   };
 
   const resetTranslation = (): void => {
+    if (isLoading) return;
+    
     setIsLoading(true);
     localStorage.removeItem('preferred-language');
-    translationService.resetTranslation();
     setCurrentLanguage('en');
-    setIsLoading(false);
+    translationService.resetTranslation();
   };
 
   return (
