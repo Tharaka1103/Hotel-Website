@@ -326,6 +326,15 @@ style[type="text/css"] {
   visibility: hidden !important;
 }
 
+/* Block analytics tracking images */
+img[src*="gen204"],
+img[src*="google.com/gen204"] {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .fixed.top-4.right-4 {
