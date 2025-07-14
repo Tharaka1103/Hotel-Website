@@ -25,7 +25,27 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({ childr
     translationService.initialize();
     
     const detectCurrentLanguage = () => {
-      // Check for Google Translate cookie first (most accurate)
+      // First check localStorage for user preference
+      const savedLanguage = localStorage.getItem('preferred-language');
+      console.log('Saved language preference:', savedLanguage);
+      
+      if (savedLanguage && savedLanguage !== 'en') {
+        setCurrentLanguage(savedLanguage);
+        
+        // Ensure the cookie matches the preference
+        const cookies = document.cookie.split(';');
+        const googtransCookie = cookies.find(cookie => cookie.trim().startsWith('googtrans='));
+        
+        if (!googtransCookie || !googtransCookie.includes(savedLanguage)) {
+          // Set the cookie to match the preference
+          const cookieValue = `/en/${savedLanguage}`;
+          document.cookie = `googtrans=${cookieValue}; path=/; max-age=31536000`;
+          console.log('Set cookie to match preference:', cookieValue);
+        }
+        return;
+      }
+      
+      // Check for Google Translate cookie if no preference saved
       const cookies = document.cookie.split(';');
       const googtransCookie = cookies.find(cookie => cookie.trim().startsWith('googtrans='));
       
@@ -49,21 +69,13 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({ childr
         }
       }
       
-      // Fallback to saved language preference
-      const savedLanguage = localStorage.getItem('preferred-language');
-      console.log('Saved language preference:', savedLanguage);
-      
-      if (savedLanguage) {
-        setCurrentLanguage(savedLanguage);
-        return;
-      }
-      
       // Default to English
       console.log('Defaulting to English');
       setCurrentLanguage('en');
     };
 
-    detectCurrentLanguage();
+    // Delay detection slightly to ensure DOM is ready
+    setTimeout(detectCurrentLanguage, 100);
 
     // Listen for language changes from other tabs
     const handleStorageChange = (e: StorageEvent) => {
@@ -74,7 +86,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({ childr
 
     // Listen for URL changes (for single page apps)
     const handlePopState = () => {
-      detectCurrentLanguage();
+      setTimeout(detectCurrentLanguage, 100);
     };
 
     window.addEventListener('storage', handleStorageChange);
@@ -94,14 +106,18 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({ childr
     setIsLoading(true);
     
     try {
-      // Save preference first
+      // Save preference first - this is critical for the page reload detection
       localStorage.setItem('preferred-language', languageCode);
+      console.log('Setting preferred language to:', languageCode);
+      
+      // Update current language immediately to prevent race conditions
+      setCurrentLanguage(languageCode);
       
       // Apply translation (this will reload the page)
       await translationService.translateTo(languageCode);
       
       // Note: The page will reload, so the code below won't execute
-      // The new page load will detect the cookie and set the correct language
+      // The new page load will detect the localStorage preference and set the correct language
     } catch (error) {
       console.error('Translation error:', error);
       // Only revert if there was an error and page didn't reload

@@ -62,17 +62,15 @@ class TranslationService {
     try {
       await this.initialize();
       
-      // Clear any existing translation first
-      this.clearTranslation();
-      
       if (languageCode === 'en') {
-        // For English, just reload without translation
+        // For English, clear translation and reload
+        this.clearTranslation();
         this.currentLanguage = 'en';
         window.location.reload();
         return true;
       }
       
-      // Set the translation cookie with proper format
+      // Set the translation cookie with proper format - don't clear first for non-English
       const cookieValue = `/en/${languageCode}`;
       document.cookie = `googtrans=${cookieValue}; path=/; max-age=31536000`;
       
@@ -84,6 +82,9 @@ class TranslationService {
       }
       
       this.currentLanguage = languageCode;
+      
+      // Add a small delay to ensure cookie is set before reload
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       // Force reload to apply translation
       window.location.reload();
