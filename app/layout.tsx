@@ -78,6 +78,38 @@ export default function RootLayout({
       <head>
         <meta name="google" content="notranslate" />
         <meta name="google-translate-customization" content="(YOUR_KEY)" />
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            // Block Google Analytics tracking requests
+            if (typeof window !== 'undefined') {
+              const originalFetch = window.fetch;
+              window.fetch = function(...args) {
+                const url = args[0];
+                if (typeof url === 'string' && url.includes('gen204')) {
+                  return Promise.resolve(new Response('', { status: 204 }));
+                }
+                return originalFetch.apply(this, args);
+              };
+              
+              // Also block image requests to gen204
+              const originalImage = window.Image;
+              window.Image = function() {
+                const img = new originalImage();
+                const originalSrc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+                Object.defineProperty(img, 'src', {
+                  set: function(value) {
+                    if (typeof value === 'string' && value.includes('gen204')) {
+                      return;
+                    }
+                    originalSrc.set.call(this, value);
+                  },
+                  get: originalSrc.get
+                });
+                return img;
+              };
+            }
+          `
+        }} />
       </head>
       <body className="min-h-screen">
         <ThemeProvider>

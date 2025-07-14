@@ -34,6 +34,14 @@ class TranslationService {
       window.googleTranslateElementInit = () => {
         if (window.google && window.google.translate) {
           try {
+            // Disable all analytics before creating translate element
+            if (window.google && window.google.translate) {
+              window.google.translate._const = window.google.translate._const || {};
+              window.google.translate._const._cest = 'TE';
+              window.google.translate._const._cl = 'en';
+              window.google.translate._const._cuc = 'googleTranslateElementInit';
+            }
+
             new window.google.translate.TranslateElement({
               pageLanguage: 'en',
               includedLanguages: 'en,de,fr,es,ru',
