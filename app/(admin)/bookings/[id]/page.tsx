@@ -60,7 +60,7 @@ interface BookingDetails {
   packagePrice: number;
   packageFeatures: string[];
   personCount: number;
-  roomType: 'room' | 'dome';
+  roomType: 'room' | 'dorm' | 'single' | 'family';
   roomNumbers: number[];
   bedNumbers: number[];
   customerName: string;
@@ -73,7 +73,9 @@ interface BookingDetails {
   pricePerPerson: number;
   basePackagePrice?: number;
   doubleRoomPrice?: number;
-  domeRoomPrice?: number;
+  dormRoomPrice?: number;
+  singleRoomPrice?: number;
+  familyRoomPrice?: number;
   status: string;
   adminNotes?: string;
 }
@@ -351,10 +353,10 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
                           <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-500 text-white rounded-xl shadow-lg">
                             <div className="flex items-center gap-2 mb-2">
                               <Bed className="w-5 h-5" />
-                              <span className="font-semibold">Dome Room</span>
+                              <span className="font-semibold">Dorm Room</span>
                             </div>
                             <p className="text-2xl font-bold">
-                              ${booking.domeRoomPrice || 'N/A'}
+                              ${booking.dormRoomPrice || 'N/A'}
                             </p>
                             <p className="text-sm opacity-90">per person</p>
                           </div>
@@ -365,7 +367,7 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
                           <div className="flex items-center justify-center gap-3">
                             <Tag className="w-6 h-6" />
                             <div className="text-center">
-                              <p className="font-semibold">Customer Selected: {booking.roomType === 'room' ? 'Double Room' : 'Dome Room'}</p>
+                              <p className="font-semibold">Customer Selected: {booking.roomType === 'room' ? 'Double Room' : booking.roomType === 'single' ? 'Single Room' : booking.roomType === 'family' ? 'Family Room' : 'Dorm Room'}</p>
                               <p className="text-2xl font-bold">${booking.pricePerPerson} per person</p>
                             </div>
                           </div>
@@ -467,7 +469,7 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
                           <Bed className="w-12 h-12 mx-auto mb-4" />
                         )}
                         <h3 className="text-2xl font-bold mb-2">
-                          {booking.roomType === 'room' ? 'Double Room(s)' : 'Dome Accommodation'}
+                          {booking.roomType === 'room' ? 'Double Room(s)' : booking.roomType === 'single' ? 'Single Room(s)' : booking.roomType === 'family' ? 'Family Room(s)' : 'Dorm Accommodation'}
                         </h3>
                         <div className="text-lg opacity-90">
                           {booking.roomType === 'room' ? (
@@ -537,7 +539,7 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
                         <Tag className="w-10 h-10 mx-auto mb-3 text-blue-600" />
                         <p className="text-sm text-gray-500 font-medium">Room Type Selected</p>
                         <p className="text-xl font-bold text-gray-800">
-                          {booking.roomType === 'room' ? 'Double Room' : 'Dome Room'}
+                          {booking.roomType === 'room' ? 'Double Room' : booking.roomType === 'single' ? 'Single Room' : booking.roomType === 'family' ? 'Family Room' : 'Dorm Room'}
                         </p>
                       </div>
                       
@@ -581,9 +583,9 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
                           </p>
                         </div>
                         <div className="p-3 bg-white rounded-lg">
-                          <p className="text-sm font-medium text-gray-600">Dome Room Rate</p>
+                          <p className="text-sm font-medium text-gray-600">Dorm Room Rate</p>
                           <p className="text-lg font-bold text-green-600">
-                            ${booking.domeRoomPrice || 'N/A'}/person
+                            ${booking.dormRoomPrice || 'N/A'}/person
                           </p>
                         </div>
                       </div>
@@ -591,7 +593,7 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
                       <div className="mt-4 p-3 bg-yellow-100 rounded-lg border border-yellow-300">
                         <p className="text-center text-yellow-800 font-semibold">
                           Customer paid: <span className="text-lg">${booking.pricePerPerson}/person</span> 
-                          <span className="text-sm"> ({booking.roomType === 'room' ? 'Double Room' : 'Dome Room'} rate)</span>
+                          <span className="text-sm"> ({booking.roomType === 'room' ? 'Double Room' : booking.roomType === 'single' ? 'Single Room' : booking.roomType === 'family' ? 'Family Room' : 'Dorm Room'} rate)</span>
                         </p>
                       </div>
                     </div>
@@ -694,7 +696,7 @@ export default function AdminBookingPage({ params }: AdminBookingPageProps) {
                     <div className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm">
                       <span className="text-sm font-medium text-gray-600">Room Type</span>
                       <span className="font-bold text-purple-600">
-                        {booking.roomType === 'room' ? 'Double Room' : 'Dome'}
+                        {booking.roomType === 'room' ? 'Double Room' : booking.roomType === 'single' ? 'Single Room' : booking.roomType === 'family' ? 'Family Room' : 'Dorm'}
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm">

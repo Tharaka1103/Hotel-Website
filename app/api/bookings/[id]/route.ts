@@ -9,58 +9,70 @@ const HARDCODED_PACKAGES = {
     title: 'Basic Surf Pack',
     description: 'Perfect for beginners or casual surfers, this package includes everything you need to get started.',
     features: [
-      '7 nights accommodation (Dorm or Private Room)',
+      '7 nights accommodation',
       'Breakfast x 7',
-      '5 x Unlimited Local Buffet (Lunch or Dinner)',
-      'Surf course 6 x 1.5 hours',
+      '2 x Unlimited Local Buffet (Lunch or Dinner)',
+      'Surf course twise a day',
       'Surf equipment (2 hours x 2 Daily)',
       'Transport to surf spots',
       'Surf theory',
-      '2 video analysis sessions',
-      '2 ice bath recovery sessions'
+      'Video analysis sessions',
+      '2 ice bath recovery sessions',
+      '10% off in restaurant',
+      'Surf photo/video package',
     ],
     doubleRoomPrice: 750,
-    domeRoomPrice: 550
+    dormRoomPrice: 550,
+    singleRoomPrice: 900,
+    familyRoomPrice: 650
   },
   'surf-and-safari-retreat': {
     _id: 'surf-and-safari-retreat',
     title: 'Surf & Safari Retreat',
     description: 'A balanced mix of surf, nature and relaxation, this retreat is for those wanting more than just waves.',
     features: [
-      '7 nights accommodation (Dorm or Private Room)',
+      '7 nights accommodation',
       'Breakfast x 7',
-      '5 x Unlimited Local Buffet (Lunch or Dinner)',
+      '2 x Unlimited Local Buffet (Lunch or Dinner)',
       'Surf course 5 x 1.5 hours',
       'Surf equipment (2 hours x 2 Daily)',
       'Transport to surf spots',
       'Surf theory',
-      '2 video analysis sessions',
-      '5 ice bath recovery sessions',
+      'Video analysis sessions',
+      'Ice bath recovery sessions',
       '1 x surf skate session',
-      'Kumana Safari (Half Day)',
+      'Kumana national park (Half Day)',
       'Sunset Lagoon Tour',
+      '10% off in restaurant',
+      'Surf photo/video package',
       'Sunset BBQ'
     ],
     doubleRoomPrice: 850,
-    domeRoomPrice: 650
+    dormRoomPrice: 650,
+    singleRoomPrice: 1000,
+    familyRoomPrice: 750
   },
   'surf-guiding-pack': {
     _id: 'surf-guiding-pack',
     title: 'Surf Guiding Pack',
     description: 'Tailored for seasoned surfers, this premium option offers expert-guided surf trips, in-depth analysis, and daily briefings.',
     features: [
-      '7 nights accommodation (Dorm or Private Room)',
+      '7 nights accommodation',
       'Breakfast x 7',
-      '5 x Unlimited Local Buffet (Lunch or Dinner)',
+      '2 x Unlimited Local Buffet (Lunch or Dinner)',
       'Meet your new surf buddies and feel part of the crew instantly',
       'Surf the top local spots with a knowledgeable local guide',
       'Transportation included to all surf spots - no rental car required.',
       '5 days of surf guiding, with 2 sessions each day',
       'Daily updates on surf spots and conditions',
-      '3 video analysis sessions'
+      '3 video analysis sessions',
+      '10% off in restaurant',
+      'Surf photo/video package',
     ],
     doubleRoomPrice: 1350,
-    domeRoomPrice: 1150
+    dormRoomPrice: 1150,
+    singleRoomPrice: 1500,
+    familyRoomPrice: 1250
   }
 };
 
@@ -109,8 +121,12 @@ export async function GET(request: NextRequest) {
     // If room type exists in booking, use the correct price from package
     if (booking.roomType === 'room') {
       basePackagePrice = packageData.doubleRoomPrice;
-    } else if (booking.roomType === 'dome') {
-      basePackagePrice = packageData.domeRoomPrice;
+    } else if (booking.roomType === 'dorm') {
+      basePackagePrice = packageData.dormRoomPrice;
+    } else if (booking.roomType === 'single') {
+      basePackagePrice = packageData.singleRoomPrice;
+    } else if (booking.roomType === 'family') {
+      basePackagePrice = packageData.familyRoomPrice;
     }
 
     // Format the response for customer view
@@ -136,7 +152,9 @@ export async function GET(request: NextRequest) {
       pricePerPerson: actualPricePerPerson,
       basePackagePrice: basePackagePrice, // Price for the selected room type
       doubleRoomPrice: packageData.doubleRoomPrice, // For display purposes
-      domeRoomPrice: packageData.domeRoomPrice, // For display purposes
+      dormRoomPrice: packageData.dormRoomPrice, // For display purposes
+      singleRoomPrice: packageData.singleRoomPrice, // For display purposes
+      familyRoomPrice: packageData.familyRoomPrice, // For display purposes
       status: booking.status,
       adminNotes: booking.adminNotes || '',
       createdAt: booking.createdAt || booking.bookingDate,
@@ -212,7 +230,9 @@ export async function PUT(request: NextRequest) {
       packageFeatures: packageData?.features || [],
       packagePrice: packageData?.doubleRoomPrice || 0, // Default to double room price
       doubleRoomPrice: packageData?.doubleRoomPrice || 0,
-      domeRoomPrice: packageData?.domeRoomPrice || 0
+      dormRoomPrice: packageData?.dormRoomPrice || 0,
+      singleRoomPrice: packageData?.singleRoomPrice || 0,
+      familyRoomPrice: packageData?.familyRoomPrice || 0
     };
 
     return NextResponse.json({ 

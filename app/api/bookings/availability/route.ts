@@ -8,19 +8,25 @@ const HARDCODED_PACKAGES = {
     _id: "basic-surf-pack",
     title: "Basic Surf Pack",
     doubleRoomPrice: 750,
-    domeRoomPrice: 550
+    dormRoomPrice: 550,
+    singleRoomPrice: 900,
+    familyRoomPrice: 650
   },
   "surf-and-safari-retreat": {
     _id: "surf-and-safari-retreat",
     title: "Surf & Safari Retreat",
     doubleRoomPrice: 850,
-    domeRoomPrice: 650
+    dormRoomPrice: 650,
+    singleRoomPrice: 1000,
+    familyRoomPrice: 750
   },
   "surf-guiding-pack": {
     _id: "surf-guiding-pack",
     title: "Surf Guiding Pack",
     doubleRoomPrice: 1350,
-    domeRoomPrice: 1150
+    dormRoomPrice: 1150,
+    singleRoomPrice: 1500,
+    familyRoomPrice: 1250
   }
 };
 
@@ -49,9 +55,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Validate room type
-    if (!['room', 'dome'].includes(roomType)) {
+    if (!['room', 'dorm', 'single', 'family'].includes(roomType)) {
       return NextResponse.json({ 
-        error: 'Room type must be either "room" or "dome"' 
+        error: 'Room type must be "room", "dorm", "single", or "family"' 
       }, { status: 400 });
     }
 
@@ -84,10 +90,10 @@ export async function GET(request: NextRequest) {
     const checkOut = new Date(checkIn);
     checkOut.setDate(checkOut.getDate() + 7);
 
-    if (roomType === 'room') {
-      // Check double room availability (rooms 1-5, each with 2 beds)
+    if (roomType === 'room' || roomType === 'single' || roomType === 'family') {
+      // Check room availability (rooms 1-5 for each type)
       const bookedRooms = await Booking.find({
-        roomType: 'room',
+        roomType: roomType,
         status: { $in: ['confirmed', 'pending'] },
         $or: [
           {
@@ -114,16 +120,23 @@ export async function GET(request: NextRequest) {
       }).select('roomNumbers');
 
       const bookedRoomNumbers = bookedRooms.flatMap(booking => booking.roomNumbers || []);
-      const allRooms = [1, 2, 3, 4, 5]; // 5 double rooms available
+      const allRooms = [1, 2, 3, 4, 5]; // 5 rooms available for each type
       const availableRooms = allRooms.filter(room => !bookedRoomNumbers.includes(room));
 
       // Get pricing information for the room type
-      const roomPrice = packageDetails.doubleRoomPrice;
+      let roomPrice;
+      if (roomType === 'room') {
+        roomPrice = packageDetails.doubleRoomPrice;
+      } else if (roomType === 'single') {
+        roomPrice = packageDetails.singleRoomPrice;
+      } else if (roomType === 'family') {
+        roomPrice = packageDetails.familyRoomPrice;
+      }
 
       return NextResponse.json({
         availableRooms,
         bookedRooms: bookedRoomNumbers,
-        roomType: 'room',
+        roomType: roomType,
         totalRooms: allRooms.length,
         availableCount: availableRooms.length,
         pricePerPerson: roomPrice,
@@ -132,10 +145,10 @@ export async function GET(request: NextRequest) {
         packageTitle: packageDetails.title
       });
 
-    } else if (roomType === 'dome') {
-      // Check dome bed availability (beds 1-6 in shared dome)
+    } else if (roomType === 'dorm') {
+      // Check dorm bed availability (beds 1-6 in shared dorm)
       const bookedBeds = await Booking.find({
-        roomType: 'dome',
+        roomType: 'dorm',
         status: { $in: ['confirmed', 'pending'] },
         $or: [
           {
@@ -162,19 +175,19 @@ export async function GET(request: NextRequest) {
       }).select('bedNumbers');
 
       const bookedBedNumbers = bookedBeds.flatMap(booking => booking.bedNumbers || []);
-      const allBeds = [1, 2, 3, 4, 5, 6]; // 6 beds in dome accommodation
+      const allBeds = [1, 2, 3, 4, 5, 6]; // 6 beds in dorm accommodation
       const availableBeds = allBeds.filter(bed => !bookedBedNumbers.includes(bed));
 
-      // Get pricing information for the dome type
-      const domePrice = packageDetails.domeRoomPrice;
+      // Get pricing information for the dorm type
+      const dormPrice = packageDetails.dormRoomPrice;
 
       return NextResponse.json({
         availableBeds,
         bookedBeds: bookedBedNumbers,
-        roomType: 'dome',
+        roomType: 'dorm',
         totalBeds: allBeds.length,
         availableCount: availableBeds.length,
-        pricePerPerson: domePrice,
+        pricePerPerson: dormPrice,
         checkInDate: checkIn.toISOString().split('T')[0],
         checkOutDate: checkOut.toISOString().split('T')[0],
         packageTitle: packageDetails.title

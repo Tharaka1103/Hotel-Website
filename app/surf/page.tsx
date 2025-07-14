@@ -68,7 +68,9 @@ interface Package {
   description: string;
   features: string[];
   doubleRoomPrice: number;
-  domeRoomPrice: number;
+  dormRoomPrice: number;
+  singleRoomPrice: number;
+  familyRoomPrice: number;
   popular: boolean
 }
 
@@ -151,18 +153,22 @@ export default function SurfPage() {
       title: 'Basic Surf Pack',
       description: 'Perfect for beginners or casual surfers, this package includes everything you need to get started.',
       features: [
-        '7 nights accommodation (Dorm or Private Room)',
+        '7 nights accommodation',
         'Breakfast x 7',
-        '5 x Unlimited Local Buffet (Lunch or Dinner)',
-        'Surf course 6 x 1.5 hours',
+        '2 x Unlimited Local Buffet (Lunch or Dinner)',
+        'Surf course twise a day',
         'Surf equipment (2 hours x 2 Daily)',
         'Transport to surf spots',
         'Surf theory',
-        '2 video analysis sessions',
-        '2 ice bath recovery sessions'
+        'Video analysis sessions',
+        '2 ice bath recovery sessions',
+        '10% off in restaurant',
+        'Surf photo/video package',
       ],
       doubleRoomPrice: 750,
-      domeRoomPrice: 550,
+      dormRoomPrice: 550,
+      singleRoomPrice: 900,
+      familyRoomPrice: 650,
       popular: false
     },
     {
@@ -170,22 +176,26 @@ export default function SurfPage() {
       title: 'Surf & Safari Retreat',
       description: 'A balanced mix of surf, nature and relaxation, this retreat is for those wanting more than just waves.',
       features: [
-        '7 nights accommodation (Dorm or Private Room)',
+        '7 nights accommodation',
         'Breakfast x 7',
-        '5 x Unlimited Local Buffet (Lunch or Dinner)',
+        '2 x Unlimited Local Buffet (Lunch or Dinner)',
         'Surf course 5 x 1.5 hours',
         'Surf equipment (2 hours x 2 Daily)',
         'Transport to surf spots',
         'Surf theory',
-        '2 video analysis sessions',
-        '5 ice bath recovery sessions',
+        'Video analysis sessions',
+        'Ice bath recovery sessions',
         '1 x surf skate session',
-        'Kumana Safari (Half Day)',
+        'Kumana national park (Half Day)',
         'Sunset Lagoon Tour',
+        '10% off in restaurant',
+        'Surf photo/video package',
         'Sunset BBQ'
       ],
       doubleRoomPrice: 850,
-      domeRoomPrice: 650,
+      dormRoomPrice: 650,
+      singleRoomPrice: 1000,
+      familyRoomPrice: 750,
       popular: true
     },
     {
@@ -193,25 +203,29 @@ export default function SurfPage() {
       title: 'Surf Guiding Pack',
       description: 'Tailored for seasoned surfers, this premium option offers expert-guided surf trips, in-depth analysis, and daily briefings.',
       features: [
-        '7 nights accommodation (Dorm or Private Room)',
+        '7 nights accommodation',
         'Breakfast x 7',
-        '5 x Unlimited Local Buffet (Lunch or Dinner)',
+        '2 x Unlimited Local Buffet (Lunch or Dinner)',
         'Meet your new surf buddies and feel part of the crew instantly',
         'Surf the top local spots with a knowledgeable local guide',
         'Transportation included to all surf spots - no rental car required.',
         '5 days of surf guiding, with 2 sessions each day',
         'Daily updates on surf spots and conditions',
-        '3 video analysis sessions'
+        '3 video analysis sessions',
+        '10% off in restaurant',
+        'Surf photo/video package',
       ],
       doubleRoomPrice: 1350,
-      domeRoomPrice: 1150,
+      dormRoomPrice: 1150,
+      singleRoomPrice: 1500,
+      familyRoomPrice: 1250,
       popular: false
     }
   ]);
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [checkInDate, setCheckInDate] = useState('');
   const [personCount, setPersonCount] = useState(1);
-  const [roomType, setRoomType] = useState<'room' | 'dome' | ''>('');
+  const [roomType, setRoomType] = useState<'room' | 'dorm' | 'single' | 'family' | ''>('');
   const [selectedRooms, setSelectedRooms] = useState<number[]>([]);
   const [selectedBeds, setSelectedBeds] = useState<number[]>([]);
   const [availabilityData, setAvailabilityData] = useState<AvailabilityData | null>(null);
@@ -256,8 +270,8 @@ export default function SurfPage() {
       setSelectedRooms([]);
       setSelectedBeds([]);
 
-      // If dome is selected and we have fewer beds selected than persons, reset
-      if (roomType === 'dome') {
+      // If dorm is selected and we have fewer beds selected than persons, reset
+      if (roomType === 'dorm') {
         setSelectedBeds([]);
       }
     }
@@ -329,16 +343,24 @@ export default function SurfPage() {
       newErrors.roomType = 'Please select a room type';
     }
 
-    if (roomType === 'room') {
+    if (roomType === 'room' || roomType === 'single' || roomType === 'family') {
       if (selectedRooms.length === 0) {
         newErrors.roomSelection = 'Please select at least one room';
       } else {
-        const totalBeds = selectedRooms.length * 2;
+        let totalBeds = 0;
+        if (roomType === 'room') {
+          totalBeds = selectedRooms.length * 2; // Double rooms have 2 beds each
+        } else if (roomType === 'single') {
+          totalBeds = selectedRooms.length * 1; // Single rooms have 1 bed each
+        } else if (roomType === 'family') {
+          totalBeds = selectedRooms.length * 4; // Family rooms have 4 beds each
+        }
+
         if (totalBeds < personCount) {
           newErrors.roomSelection = 'Selected rooms do not have enough beds for all persons';
         }
       }
-    } else if (roomType === 'dome') {
+    } else if (roomType === 'dorm') {
       if (selectedBeds.length !== personCount) {
         newErrors.roomSelection = `Please select exactly ${personCount} bed${personCount > 1 ? 's' : ''}`;
       }
@@ -377,8 +399,8 @@ export default function SurfPage() {
         packageId: selectedPackage._id,
         personCount,
         roomType,
-        roomNumbers: roomType === 'room' ? selectedRooms : [],
-        bedNumbers: roomType === 'dome' ? selectedBeds : [],
+        roomNumbers: (roomType === 'room' || roomType === 'single' || roomType === 'family') ? selectedRooms : [],
+        bedNumbers: roomType === 'dorm' ? selectedBeds : [],
         customerName: customerInfo.name.trim(),
         customerEmail: customerInfo.email.trim(),
         customerPhone: customerInfo.phone.trim(),
@@ -456,56 +478,35 @@ export default function SurfPage() {
 
   const calculateTotalPrice = () => {
     if (!selectedPackage) return 0;
-    const roomPrice = roomType === 'room' ? selectedPackage.doubleRoomPrice : selectedPackage.domeRoomPrice;
+    let roomPrice = 0;
+    if (roomType === 'room') {
+      roomPrice = selectedPackage.doubleRoomPrice;
+    } else if (roomType === 'dorm') {
+      roomPrice = selectedPackage.dormRoomPrice;
+    } else if (roomType === 'single') {
+      roomPrice = selectedPackage.singleRoomPrice;
+    } else if (roomType === 'family') {
+      roomPrice = selectedPackage.familyRoomPrice;
+    }
     return roomPrice * personCount;
   };
 
   const getRoomPrice = () => {
     if (!selectedPackage || !roomType) return 0;
-    return roomType === 'room' ? selectedPackage.doubleRoomPrice : selectedPackage.domeRoomPrice;
+    if (roomType === 'room') {
+      return selectedPackage.doubleRoomPrice;
+    } else if (roomType === 'dorm') {
+      return selectedPackage.dormRoomPrice;
+    } else if (roomType === 'single') {
+      return selectedPackage.singleRoomPrice;
+    } else if (roomType === 'family') {
+      return selectedPackage.familyRoomPrice;
+    }
+    return 0;
   };
 
   const getFeatureIcon = (feature: string) => {
     const lowerFeature = feature.toLowerCase();
-
-    if (lowerFeature.includes('wifi') || lowerFeature.includes('internet'))
-      return <Wifi className="w-4 h-4 text-blue-500" />;
-    if (lowerFeature.includes('parking') || lowerFeature.includes('car'))
-      return <Car className="w-4 h-4 text-lime-600" />;
-    if (lowerFeature.includes('breakfast') || lowerFeature.includes('coffee'))
-      return <Coffee className="w-4 h-4 text-amber-600" />;
-    if (lowerFeature.includes('restaurant') || lowerFeature.includes('dining'))
-      return <Utensils className="w-4 h-4 text-green-600" />;
-    if (lowerFeature.includes('gym') || lowerFeature.includes('fitness'))
-      return <Dumbbell className="w-4 h-4 text-red-500" />;
-    if (lowerFeature.includes('sunrise') || lowerFeature.includes('morning'))
-      return <Sunrise className="w-4 h-4 text-orange-500" />;
-    if (lowerFeature.includes('sunset') || lowerFeature.includes('evening'))
-      return <Sunset className="w-4 h-4 text-purple-500" />;
-    if (lowerFeature.includes('photo') || lowerFeature.includes('camera'))
-      return <Camera className="w-4 h-4 text-pink-500" />;
-    if (lowerFeature.includes('mountain') || lowerFeature.includes('hiking'))
-      return <Mountain className="w-4 h-4 text-stone-600" />;
-    if (lowerFeature.includes('forest') || lowerFeature.includes('nature'))
-      return <TreePine className="w-4 h-4 text-green-700" />;
-    if (lowerFeature.includes('fishing') || lowerFeature.includes('fish'))
-      return <Fish className="w-4 h-4 text-blue-600" />;
-    if (lowerFeature.includes('game') || lowerFeature.includes('entertainment'))
-      return <Gamepad2 className="w-4 h-4 text-indigo-500" />;
-    if (lowerFeature.includes('music') || lowerFeature.includes('sound'))
-      return <Music className="w-4 h-4 text-violet-500" />;
-    if (lowerFeature.includes('security') || lowerFeature.includes('safe'))
-      return <Shield className="w-4 h-4 text-emerald-600" />;
-    if (lowerFeature.includes('24') || lowerFeature.includes('hour'))
-      return <Clock className="w-4 h-4 text-slate-600" />;
-    if (lowerFeature.includes('spa') || lowerFeature.includes('wellness'))
-      return <Heart className="w-4 h-4 text-rose-500" />;
-    if (lowerFeature.includes('energy') || lowerFeature.includes('power'))
-      return <Zap className="w-4 h-4 text-yellow-500" />;
-    if (lowerFeature.includes('gift') || lowerFeature.includes('bonus'))
-      return <Gift className="w-4 h-4 text-teal-500" />;
-    if (lowerFeature.includes('beach') || lowerFeature.includes('ocean') || lowerFeature.includes('surf'))
-      return <Waves className="w-4 h-4 text-cyan-500" />;
 
     return <CheckCircle2 className="w-4 h-4 text-primary" />;
   };
@@ -1062,18 +1063,25 @@ export default function SurfPage() {
                       <div className="space-y-4 pt-4 border-t border-gray-200">
                         <div className="text-center">
                           <div className="text-2xl font-bold text-primary mb-2">
-                            Starting from ${pkg.domeRoomPrice}
+                            Starting from ${pkg.dormRoomPrice}
                           </div>
-                          <p className="text-sm text-gray-600">per person (dome room)</p>
                           <div className="mt-2 p-3 bg-gray-50 rounded-lg">
                             <div className="text-sm text-gray-700 mb-1">Pricing options:</div>
                             <div className="flex justify-between text-sm">
-                              <span>Dorm Room:</span>
-                              <span className="font-semibold text-green-600">${pkg.domeRoomPrice}/person</span>
+                              <span>Dorm:</span>
+                              <span className="font-semibold text-green-600">${pkg.dormRoomPrice}/person</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span>Single Room:</span>
+                              <span className="font-semibold text-purple-600">${pkg.singleRoomPrice}/person</span>
                             </div>
                             <div className="flex justify-between text-sm">
                               <span>Double Room:</span>
                               <span className="font-semibold text-blue-600">${pkg.doubleRoomPrice}/person</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span>Family Room:</span>
+                              <span className="font-semibold text-orange-600">${pkg.familyRoomPrice}/person</span>
                             </div>
                           </div>
                         </div>
@@ -1161,8 +1169,8 @@ export default function SurfPage() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                   <div
                                     className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${roomType === 'room'
-                                        ? 'border-blue-400 bg-blue-100'
-                                        : 'border-gray-200 hover:border-gray-300'
+                                      ? 'border-blue-400 bg-blue-100'
+                                      : 'border-gray-200 hover:border-gray-300'
                                       }`}
                                     onClick={() => {
                                       setRoomType('room');
@@ -1184,25 +1192,73 @@ export default function SurfPage() {
                                     </div>
                                   </div>
                                   <div
-                                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${roomType === 'dome'
-                                        ? 'border-green-400 bg-green-100'
-                                        : 'border-gray-200 hover:border-gray-300'
+                                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${roomType === 'dorm'
+                                      ? 'border-green-400 bg-green-100'
+                                      : 'border-gray-200 hover:border-gray-300'
                                       }`}
                                     onClick={() => {
-                                      setRoomType('dome');
+                                      setRoomType('dorm');
                                       setErrors(prev => ({ ...prev, roomType: undefined }));
                                       if (checkInDate) {
-                                        checkAvailability(selectedPackage?._id || '', checkInDate, 'dome');
+                                        checkAvailability(selectedPackage?._id || '', checkInDate, 'dorm');
                                       }
                                     }}
                                   >
                                     <div className="flex items-center gap-3">
                                       <Bed className="w-5 h-5 text-green-600" />
                                       <div>
-                                        <h4 className="font-semibold">Dorm Room</h4>
-                                        <p className="text-sm text-gray-600">Shared dome accommodation</p>
+                                        <h4 className="font-semibold">Dorm</h4>
+                                        <p className="text-sm text-gray-600">Shared dorm accommodation</p>
                                         <p className="text-sm font-semibold text-green-600">
-                                          ${selectedPackage?.domeRoomPrice}/person
+                                          ${selectedPackage?.dormRoomPrice}/person
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${roomType === 'single'
+                                      ? 'border-purple-400 bg-purple-100'
+                                      : 'border-gray-200 hover:border-gray-300'
+                                      }`}
+                                    onClick={() => {
+                                      setRoomType('single');
+                                      setErrors(prev => ({ ...prev, roomType: undefined }));
+                                      if (checkInDate) {
+                                        checkAvailability(selectedPackage?._id || '', checkInDate, 'single');
+                                      }
+                                    }}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <User className="w-5 h-5 text-purple-600" />
+                                      <div>
+                                        <h4 className="font-semibold">Single Room</h4>
+                                        <p className="text-sm text-gray-600">Private room with 1 bed</p>
+                                        <p className="text-sm font-semibold text-purple-600">
+                                          ${selectedPackage?.singleRoomPrice}/person
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div
+                                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${roomType === 'family'
+                                      ? 'border-orange-400 bg-orange-100'
+                                      : 'border-gray-200 hover:border-gray-300'
+                                      }`}
+                                    onClick={() => {
+                                      setRoomType('family');
+                                      setErrors(prev => ({ ...prev, roomType: undefined }));
+                                      if (checkInDate) {
+                                        checkAvailability(selectedPackage?._id || '', checkInDate, 'family');
+                                      }
+                                    }}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <Users className="w-5 h-5 text-orange-600" />
+                                      <div>
+                                        <h4 className="font-semibold">Family Room</h4>
+                                        <p className="text-sm text-gray-600">Private room with 4 beds</p>
+                                        <p className="text-sm font-semibold text-orange-600">
+                                          ${selectedPackage?.familyRoomPrice}/person
                                         </p>
                                       </div>
                                     </div>
@@ -1223,9 +1279,15 @@ export default function SurfPage() {
 
                               {availabilityData && !availabilityLoading && (
                                 <div className="space-y-4">
-                                  {roomType === 'room' && (
+                                  {(roomType === 'room' || roomType === 'single' || roomType === 'family') && (
                                     <div className="space-y-2">
-                                      <label className="text-sm font-medium">Select Rooms (2 beds per room)</label>
+                                      <label className="text-sm font-medium">
+                                        Select Rooms (
+                                        {roomType === 'room' && '2 beds per room'}
+                                        {roomType === 'single' && '1 bed per room'}
+                                        {roomType === 'family' && '4 beds per room'}
+                                        )
+                                      </label>
                                       <div className="grid grid-cols-5 gap-2">
                                         {[1, 2, 3, 4, 5].map((roomNum) => {
                                           const isAvailable = availabilityData.availableRooms?.includes(roomNum);
@@ -1237,25 +1299,27 @@ export default function SurfPage() {
                                               disabled={!isAvailable}
                                               onClick={() => handleRoomSelection(roomNum)}
                                               className={`p-3 rounded-lg border-2 transition-all duration-200 ${isSelected
-                                                  ? 'border-primary bg-primary text-white'
-                                                  : isAvailable
-                                                    ? 'border-gray-300 hover:border-primary'
-                                                    : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                ? 'border-primary bg-primary text-white'
+                                                : isAvailable
+                                                  ? 'border-gray-300 hover:border-primary'
+                                                  : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
                                                 }`}
                                             >
-                                              <Home className="w-4 h-4 mx-auto mb-1" />
+                                              {roomType === 'room' && <Home className="w-4 h-4 mx-auto mb-1" />}
+                                              {roomType === 'single' && <User className="w-4 h-4 mx-auto mb-1" />}
+                                              {roomType === 'family' && <Users className="w-4 h-4 mx-auto mb-1" />}
                                               <div className="text-xs">Room {roomNum}</div>
                                             </button>
                                           );
                                         })}
                                       </div>
                                       <p className="text-xs text-gray-600">
-                                        Selected: {selectedRooms.length} room(s) = {selectedRooms.length * 2} beds
+                                        Selected: {selectedRooms.length} room(s) = {selectedRooms.length * (roomType === 'room' ? 2 : roomType === 'single' ? 1 : 4)} beds
                                       </p>
                                     </div>
                                   )}
 
-                                  {roomType === 'dome' && (
+                                  {roomType === 'dorm' && (
                                     <div className="space-y-2">
                                       <label className="text-sm font-medium">Select Beds ({personCount} needed)</label>
                                       <div className="grid grid-cols-6 gap-2">
@@ -1269,10 +1333,10 @@ export default function SurfPage() {
                                               disabled={!isAvailable || (selectedBeds.length >= personCount && !isSelected)}
                                               onClick={() => handleBedSelection(bedNum)}
                                               className={`p-2 rounded-lg border-2 transition-all duration-200 ${isSelected
-                                                  ? 'border-primary bg-primary text-white'
-                                                  : isAvailable && selectedBeds.length < personCount
-                                                    ? 'border-gray-300 hover:border-primary'
-                                                    : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                ? 'border-primary bg-primary text-white'
+                                                : isAvailable && selectedBeds.length < personCount
+                                                  ? 'border-gray-300 hover:border-primary'
+                                                  : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
                                                 }`}
                                             >
                                               <Bed className="w-3 h-3 mx-auto mb-1" />
@@ -1359,7 +1423,10 @@ export default function SurfPage() {
                                     </div>
                                     <div className="flex justify-between">
                                       <span>Room Type:</span>
-                                      <span>{roomType === 'room' ? 'Double Room' : 'Dorm Room'}</span>
+                                      <span>{roomType === 'room' ? 'Double Room' :
+                                        roomType === 'single' ? 'Single Room' :
+                                          roomType === 'family' ? 'family Room' :
+                                            roomType === 'dorm' ? 'Dorm' : ''}</span>
                                     </div>
                                     <div className="flex justify-between">
                                       <span>Price per person:</span>

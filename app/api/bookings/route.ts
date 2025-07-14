@@ -11,58 +11,70 @@ const HARDCODED_PACKAGES = {
     title: "Basic Surf Pack",
     description: "Perfect for beginners or casual surfers, this package includes everything you need to get started.",
     features: [
-      "7 nights accommodation (Dorm or Private Room)",
+      "7 nights accommodation",
       "Breakfast x 7",
-      "5 x Unlimited Local Buffet (Lunch or Dinner)",
-      "Surf course 6 x 1.5 hours",
+      "2 x Unlimited Local Buffet (Lunch or Dinner)",
+      "Surf course twise a day",
       "Surf equipment (2 hours x 2 Daily)",
       "Transport to surf spots",
       "Surf theory",
-      "2 video analysis sessions",
-      "2 ice bath recovery sessions"
+      "Video analysis sessions",
+      "2 ice bath recovery sessions",
+      "10% off in restaurant",
+      "Surf photo/video package",
     ],
     doubleRoomPrice: 750,
-    domeRoomPrice: 550
+    dormRoomPrice: 550,
+    singleRoomPrice: 900,
+    familyRoomPrice: 650
   },
   "surf-and-safari-retreat": {
     _id: "surf-and-safari-retreat",
     title: "Surf & Safari Retreat",
     description: "A balanced mix of surf, nature and relaxation, this retreat is for those wanting more than just waves.",
     features: [
-      "7 nights accommodation (Dorm or Private Room)",
+      "7 nights accommodation",
       "Breakfast x 7",
-      "5 x Unlimited Local Buffet (Lunch or Dinner)",
+      "2 x Unlimited Local Buffet (Lunch or Dinner)",
       "Surf course 5 x 1.5 hours",
       "Surf equipment (2 hours x 2 Daily)",
       "Transport to surf spots",
       "Surf theory",
-      "2 video analysis sessions",
-      "5 ice bath recovery sessions",
+      "Video analysis sessions",
+      "Ice bath recovery sessions",
       "1 x surf skate session",
-      "Kumana Safari (Half Day)",
+      "Kumana national park (Half Day)",
       "Sunset Lagoon Tour",
+      "10% off in restaurant",
+      "Surf photo/video package",
       "Sunset BBQ"
     ],
     doubleRoomPrice: 850,
-    domeRoomPrice: 650
+    dormRoomPrice: 650,
+    singleRoomPrice: 1000,
+    familyRoomPrice: 750
   },
   "surf-guiding-pack": {
     _id: "surf-guiding-pack",
     title: "Surf Guiding Pack",
     description: "Tailored for seasoned surfers, this premium option offers expert-guided surf trips, in-depth analysis, and daily briefings.",
     features: [
-      "7 nights accommodation (Dorm or Private Room)",
+      "7 nights accommodation",
       "Breakfast x 7",
-      "5 x Unlimited Local Buffet (Lunch or Dinner)",
+      "2 x Unlimited Local Buffet (Lunch or Dinner)",
       "Meet your new surf buddies and feel part of the crew instantly",
       "Surf the top local spots with a knowledgeable local guide",
       "Transportation included to all surf spots - no rental car required.",
       "5 days of surf guiding, with 2 sessions each day",
       "Daily updates on surf spots and conditions",
-      "3 video analysis sessions"
+      "3 video analysis sessions",
+      "10% off in restaurant",
+      "Surf photo/video package",
     ],
     doubleRoomPrice: 1350,
-    domeRoomPrice: 1150
+    dormRoomPrice: 1150,
+    singleRoomPrice: 1500,
+    familyRoomPrice: 1250
   }
 };
 
@@ -88,7 +100,7 @@ export async function GET(request: NextRequest) {
       const packageData = HARDCODED_PACKAGES[booking.packageId as keyof typeof HARDCODED_PACKAGES];
       return {
         ...booking.toObject(),
-        packageId: packageData || { title: 'Unknown Package', doubleRoomPrice: 0, domeRoomPrice: 0 }
+        packageId: packageData || { title: 'Unknown Package', doubleRoomPrice: 0, dormRoomPrice: 0, singleRoomPrice: 0, familyRoomPrice: 0 }
       };
     });
 
@@ -148,29 +160,39 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate room type
-    if (!['room', 'dome'].includes(roomType)) {
-      return NextResponse.json({ error: 'Room type must be either "room" or "dome"' }, { status: 400 });
+    if (!['room', 'dorm', 'single', 'family'].includes(roomType)) {
+      return NextResponse.json({ error: 'Room type must be "room", "dorm", "single", or "family"' }, { status: 400 });
     }
 
     // Validate room/bed selection based on type
-    if (roomType === 'room') {
+    if (roomType === 'room' || roomType === 'single' || roomType === 'family') {
       if (!Array.isArray(roomNumbers) || roomNumbers.length === 0) {
         return NextResponse.json({ error: 'At least one room must be selected' }, { status: 400 });
       }
-      // Check if rooms can accommodate all persons
-      const totalBeds = roomNumbers.length * 2;
+      
+      // Check if rooms can accommodate all persons based on room type
+      let totalBeds = 0;
+      if (roomType === 'room') {
+        totalBeds = roomNumbers.length * 2; // Double rooms have 2 beds each
+      } else if (roomType === 'single') {
+        totalBeds = roomNumbers.length * 1; // Single rooms have 1 bed each
+      } else if (roomType === 'family') {
+        totalBeds = roomNumbers.length * 4; // Family rooms have 4 beds each
+      }
+      
       if (totalBeds < persons) {
         return NextResponse.json({ error: 'Selected rooms do not have enough beds for all persons' }, { status: 400 });
       }
+      
       // Validate room numbers
       for (const roomNum of roomNumbers) {
         if (isNaN(Number(roomNum)) || roomNum < 1 || roomNum > 5) {
           return NextResponse.json({ error: 'Invalid room number. Must be between 1 and 5' }, { status: 400 });
         }
       }
-    } else if (roomType === 'dome') {
+    } else if (roomType === 'dorm') {
       if (!Array.isArray(bedNumbers) || bedNumbers.length !== persons) {
-        return NextResponse.json({ error: `Exactly ${persons} bed${persons > 1 ? 's' : ''} must be selected for dome accommodation` }, { status: 400 });
+        return NextResponse.json({ error: `Exactly ${persons} bed${persons > 1 ? 's' : ''} must be selected for dorm accommodation` }, { status: 400 });
       }
       // Validate bed numbers
       for (const bedNum of bedNumbers) {
@@ -227,11 +249,11 @@ export async function POST(request: NextRequest) {
     checkOut.setDate(checkOut.getDate() + 7); // 7-day stay
 
     // Check availability for rooms/beds for the selected dates
-    if (roomType === 'room') {
+    if (roomType === 'room' || roomType === 'single' || roomType === 'family') {
       // Check room availability
       for (const roomNum of roomNumbers) {
         const existingBooking = await Booking.findOne({
-          roomType: 'room',
+          roomType: roomType,
           roomNumbers: roomNum,
           status: { $in: ['confirmed', 'pending'] },
           $or: [
@@ -260,11 +282,11 @@ export async function POST(request: NextRequest) {
           }, { status: 400 });
         }
       }
-    } else if (roomType === 'dome') {
-      // Check bed availability in dome
+    } else if (roomType === 'dorm') {
+      // Check bed availability in dorm
       for (const bedNum of bedNumbers) {
         const existingBooking = await Booking.findOne({
-          roomType: 'dome',
+          roomType: 'dorm',
           bedNumbers: bedNum,
           status: { $in: ['confirmed', 'pending'] },
           $or: [
@@ -289,7 +311,7 @@ export async function POST(request: NextRequest) {
 
         if (existingBooking) {
           return NextResponse.json({ 
-            error: `Bed ${bedNum} in dome is not available for selected dates. Please choose different beds or dates.` 
+            error: `Bed ${bedNum} in dorm is not available for selected dates. Please choose different beds or dates.` 
           }, { status: 400 });
         }
       }
@@ -302,8 +324,12 @@ export async function POST(request: NextRequest) {
     let pricePerPerson;
     if (roomType === 'room') {
       pricePerPerson = packageDetails.doubleRoomPrice; // Room price per person
-    } else if (roomType === 'dome') {
-      pricePerPerson = packageDetails.domeRoomPrice; // Dome price per person
+    } else if (roomType === 'dorm') {
+      pricePerPerson = packageDetails.dormRoomPrice; // Dorm price per person
+    } else if (roomType === 'single') {
+      pricePerPerson = packageDetails.singleRoomPrice; // Single room price per person
+    } else if (roomType === 'family') {
+      pricePerPerson = packageDetails.familyRoomPrice; // Family room price per person
     } else {
       pricePerPerson = packageDetails.doubleRoomPrice; // Default to double room price
     }
@@ -316,8 +342,8 @@ export async function POST(request: NextRequest) {
       packageId,
       personCount: persons,
       roomType,
-      roomNumbers: roomType === 'room' ? roomNumbers : [],
-      bedNumbers: roomType === 'dome' ? bedNumbers : [],
+      roomNumbers: (roomType === 'room' || roomType === 'single' || roomType === 'family') ? roomNumbers : [],
+      bedNumbers: roomType === 'dorm' ? bedNumbers : [],
       customerName: customerName.trim(),
       customerEmail: customerEmail.toLowerCase().trim(),
       customerPhone: cleanPhone,
@@ -439,7 +465,7 @@ export async function PUT(request: NextRequest) {
     const packageData = HARDCODED_PACKAGES[booking.packageId as keyof typeof HARDCODED_PACKAGES];
     const populatedBooking = {
       ...booking.toObject(),
-      packageId: packageData || { title: 'Unknown Package', doubleRoomPrice: 0, domeRoomPrice: 0 }
+      packageId: packageData || { title: 'Unknown Package', doubleRoomPrice: 0, dormRoomPrice: 0, singleRoomPrice: 0, familyRoomPrice: 0 }
     };
 
     // Create notification for booking update (with error handling)
@@ -504,7 +530,7 @@ export async function DELETE(request: NextRequest) {
     const packageData = HARDCODED_PACKAGES[booking.packageId as keyof typeof HARDCODED_PACKAGES];
     const populatedBooking = {
       ...booking.toObject(),
-      packageId: packageData || { title: 'Unknown Package', doubleRoomPrice: 0, domeRoomPrice: 0 }
+      packageId: packageData || { title: 'Unknown Package', doubleRoomPrice: 0, dormRoomPrice: 0, singleRoomPrice: 0, familyRoomPrice: 0 }
     };
 
     // Create notification for booking deletion (with error handling)

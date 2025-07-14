@@ -19,7 +19,7 @@ const BookingSchema = new mongoose.Schema({
   roomType: {
     type: String,
     required: true,
-    enum: ['room', 'dome']
+    enum: ['room', 'dorm', 'single', 'family']
   },
   roomNumbers: [{
     type: Number,
@@ -89,20 +89,20 @@ const BookingSchema = new mongoose.Schema({
 
 // Add validation to ensure proper room/bed selection
 BookingSchema.pre('validate', function(next) {
-  if (this.roomType === 'room') {
+  if (this.roomType === 'room' || this.roomType === 'single' || this.roomType === 'family') {
     if (!this.roomNumbers || this.roomNumbers.length === 0) {
       this.invalidate('roomNumbers', 'At least one room must be selected for room type');
     }
     // Clear bed numbers for room type
     this.bedNumbers = [];
-  } else if (this.roomType === 'dome') {
+  } else if (this.roomType === 'dorm') {
     if (!this.bedNumbers || this.bedNumbers.length === 0) {
-      this.invalidate('bedNumbers', 'At least one bed must be selected for dome type');
+      this.invalidate('bedNumbers', 'At least one bed must be selected for dorm type');
     }
     if (this.bedNumbers && this.bedNumbers.length !== this.personCount) {
       this.invalidate('bedNumbers', `Number of beds (${this.bedNumbers.length}) must match person count (${this.personCount})`);
     }
-    // Clear room numbers for dome type
+    // Clear room numbers for dorm type
     this.roomNumbers = [];
   }
   next();

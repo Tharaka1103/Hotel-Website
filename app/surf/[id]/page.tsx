@@ -65,7 +65,7 @@ interface BookingDetails {
   packagePrice: number;
   packageFeatures: string[];
   personCount: number;
-  roomType: 'room' | 'dome';
+  roomType: 'room' | 'dorm' | 'single' | 'family';
   roomNumbers: number[];
   bedNumbers: number[];
   customerName: string;
@@ -78,7 +78,9 @@ interface BookingDetails {
   pricePerPerson: number;
   basePackagePrice: number;
   doubleRoomPrice?: number;
-  domeRoomPrice?: number;
+  dormRoomPrice?: number;
+  singleRoomPrice?: number;
+  familyRoomPrice?: number;
   status: string;
   adminNotes?: string;
   createdAt: string;
@@ -312,7 +314,7 @@ export default function BookingDetailsPage() {
         ['Persons:', booking.personCount.toString()],
         ['Accommodation:', booking.roomType === 'room' 
           ? `Room${booking.roomNumbers.length > 1 ? 's' : ''} ${booking.roomNumbers.join(', ')}`
-          : `Dome - Bed${booking.bedNumbers.length > 1 ? 's' : ''} ${booking.bedNumbers.join(', ')}`
+          : `Dorm - Bed${booking.bedNumbers.length > 1 ? 's' : ''} ${booking.bedNumbers.join(', ')}`
         ]
       ];
       
@@ -371,7 +373,7 @@ export default function BookingDetailsPage() {
       yPosition += 20;
       
       // Pricing Table
-      const roomTypeText = booking.roomType === 'room' ? 'Double Room' : 'Dome Room';
+      const roomTypeText = booking.roomType === 'room' ? 'Double Room' : booking.roomType === 'single' ? 'Single Room' : booking.roomType === 'family' ? 'Family Room' : 'Dorm Room';
       const pricingData = [
         ['Package', booking.packageTitle],
         ['Accommodation Type', roomTypeText],
@@ -795,7 +797,7 @@ export default function BookingDetailsPage() {
                     <div className="bg-blue-50 p-3 rounded-lg">
                       <p className="text-sm font-medium text-blue-800">Selected Room Type</p>
                       <p className="text-xl font-bold text-blue-900">
-                        {booking.roomType === 'room' ? 'Double Room' : 'Dome Room'}
+                        {booking.roomType === 'room' ? 'Double Room' : booking.roomType === 'single' ? 'Single Room' : booking.roomType === 'family' ? 'Family Room' : 'Dorm Room'}
                       </p>
                       <p className="text-xs text-blue-600">
                         ${booking.pricePerPerson} per person
@@ -811,7 +813,7 @@ export default function BookingDetailsPage() {
                   </div>
 
                   {/* Room Type Pricing Info */}
-                  {booking.doubleRoomPrice && booking.domeRoomPrice && (
+                  {booking.doubleRoomPrice && booking.dormRoomPrice && (
                     <div className="bg-gray-50 p-3 rounded-lg">
                       <p className="text-sm font-medium text-gray-700 mb-2">Available Pricing Options:</p>
                       <div className="grid grid-cols-2 gap-2 text-sm">
@@ -819,10 +821,22 @@ export default function BookingDetailsPage() {
                           <span className="font-medium">Double Room:</span> ${booking.doubleRoomPrice}/person
                           {booking.roomType === 'room' && <span className="text-blue-600 ml-1">(Selected)</span>}
                         </div>
-                        <div className={`p-2 rounded ${booking.roomType === 'dome' ? 'bg-blue-100 border border-blue-300' : 'bg-white'}`}>
-                          <span className="font-medium">Dome Room:</span> ${booking.domeRoomPrice}/person
-                          {booking.roomType === 'dome' && <span className="text-blue-600 ml-1">(Selected)</span>}
+                        <div className={`p-2 rounded ${booking.roomType === 'dorm' ? 'bg-blue-100 border border-blue-300' : 'bg-white'}`}>
+                          <span className="font-medium">Dorm Room:</span> ${booking.dormRoomPrice}/person
+                          {booking.roomType === 'dorm' && <span className="text-blue-600 ml-1">(Selected)</span>}
                         </div>
+                        {booking.singleRoomPrice && (
+                          <div className={`p-2 rounded ${booking.roomType === 'single' ? 'bg-blue-100 border border-blue-300' : 'bg-white'}`}>
+                            <span className="font-medium">Single Room:</span> ${booking.singleRoomPrice}/person
+                            {booking.roomType === 'single' && <span className="text-blue-600 ml-1">(Selected)</span>}
+                          </div>
+                        )}
+                        {booking.familyRoomPrice && (
+                          <div className={`p-2 rounded ${booking.roomType === 'family' ? 'bg-blue-100 border border-blue-300' : 'bg-white'}`}>
+                            <span className="font-medium">Family Room:</span> ${booking.familyRoomPrice}/person
+                            {booking.roomType === 'family' && <span className="text-blue-600 ml-1">(Selected)</span>}
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -881,18 +895,26 @@ export default function BookingDetailsPage() {
                   <div className="flex items-center gap-3 mb-3">
                     {booking.roomType === 'room' ? (
                       <Home className="w-5 h-5 text-blue-600" />
+                    ) : booking.roomType === 'single' ? (
+                      <User className="w-5 h-5 text-blue-600" />
+                    ) : booking.roomType === 'family' ? (
+                      <Users className="w-5 h-5 text-blue-600" />
                     ) : (
                       <Bed className="w-5 h-5 text-blue-600" />
                     )}
                     <span className="font-semibold text-blue-800">
-                      {booking.roomType === 'room' ? 'Private Room(s)' : 'Dome Accommodation'}
+                      {booking.roomType === 'room' ? 'Private Room(s)' : booking.roomType === 'single' ? 'Single Room(s)' : booking.roomType === 'family' ? 'Family Room(s)' : 'Dorm Accommodation'}
                     </span>
                   </div>
                   <div className="space-y-2">
                     <p className="text-blue-700 text-sm">
                       {booking.roomType === 'room' 
                         ? `Room${booking.roomNumbers.length > 1 ? 's' : ''} ${booking.roomNumbers.join(', ')} - ${booking.roomNumbers.length * 2} beds total`
-                        : `Bed${booking.bedNumbers.length > 1 ? 's' : ''} ${booking.bedNumbers.join(', ')} in shared dome`
+                        : booking.roomType === 'single'
+                        ? `Single Room${booking.roomNumbers.length > 1 ? 's' : ''} ${booking.roomNumbers.join(', ')} - ${booking.roomNumbers.length * 1} bed total`
+                        : booking.roomType === 'family'
+                        ? `Family Room${booking.roomNumbers.length > 1 ? 's' : ''} ${booking.roomNumbers.join(', ')} - ${booking.roomNumbers.length * 4} beds total`
+                        : `Bed${booking.bedNumbers.length > 1 ? 's' : ''} ${booking.bedNumbers.join(', ')} in shared dorm`
                       }
                     </p>
                     <div className="flex items-center gap-4 text-xs text-blue-600">
@@ -963,7 +985,7 @@ export default function BookingDetailsPage() {
                   <div className="flex justify-between items-center border-b border-white/20 pb-2">
                     <span>Room Type</span>
                     <span className="font-semibold">
-                      {booking.roomType === 'room' ? 'Double Room' : 'Dome Room'}
+                      {booking.roomType === 'room' ? 'Double Room' : booking.roomType === 'single' ? 'Single Room' : booking.roomType === 'family' ? 'Family Room' : 'Dorm Room'}
                     </span>
                   </div>
                   <div className="flex justify-between items-center border-b border-white/20 pb-2">

@@ -127,12 +127,24 @@ export class NotificationService {
           return roomCount > 1 
             ? `Rooms ${roomList} (${roomCount * 2} beds total)`
             : `Room ${roomList} (2 beds)`;
-        } else if (booking.roomType === 'dome') {
+        } else if (booking.roomType === 'dorm') {
           const bedCount = booking.bedNumbers?.length || 0;
           const bedList = booking.bedNumbers?.join(', ') || '';
           return bedCount > 1
-            ? `Dome - Beds ${bedList} (${bedCount} beds)`
-            : `Dome - Bed ${bedList}`;
+            ? `Dorm - Beds ${bedList} (${bedCount} beds)`
+            : `Dorm - Bed ${bedList}`;
+        } else if (booking.roomType === 'single') {
+          const roomCount = booking.roomNumbers?.length || 0;
+          const roomList = booking.roomNumbers?.join(', ') || '';
+          return roomCount > 1 
+            ? `Single Rooms ${roomList} (${roomCount} beds total)`
+            : `Single Room ${roomList} (1 bed)`;
+        } else if (booking.roomType === 'family') {
+          const roomCount = booking.roomNumbers?.length || 0;
+          const roomList = booking.roomNumbers?.join(', ') || '';
+          return roomCount > 1 
+            ? `Family Rooms ${roomList} (${roomCount * 4} beds total)`
+            : `Family Room ${roomList} (4 beds)`;
         }
         return 'Unknown accommodation';
       };
