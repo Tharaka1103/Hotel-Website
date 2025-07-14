@@ -311,13 +311,23 @@ const ImageSlider = () => {
     },
     {
       src: "/images/image6.jpg",
-      title: "Certified surf instructors",
+      title: "ISA certified instructors",
       description: "Young passionate local pros ready to get you riding waves safely and confidently."
     },
     {
       src: "/images/image7.jpg",
-      title: "More than surf",
-      description: "Live music, wildlife safari, lagoon tours, camping and  many other unique experiences."
+      title: "Safari and explore Arugam bay",
+      description: "Wildlife safari, lagoon tours, camping and  many other unique experiences."
+    },
+    {
+      src: "/images/image6.jpg",
+      title: "Trips to different surf spots",
+      description: "Explore nearby surf spots with our experienced guides for an unforgettable surfing adventure."
+    },
+    {
+      src: "/images/image7.jpg",
+      title: "Best Cafe in town",
+      description: "Enjoy delicious food and drinks at our cozy cafe while taking in the vibrant atmosphere of Arugam Bay."
     }
   ];
 
@@ -1652,24 +1662,24 @@ export default function HomePage() {
                   <motion.div
                     key={index}
                     variants={staggerItem}
+                    whileHover={{ scale: 1.02, y: -5 }}
                     className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300"
                   >
-                    <div className="p-4 sm:p-6 flex flex-col items-center text-center">
+                    <div className="p-6 flex flex-col items-center">
                       <motion.div
                         initial={{ scale: 0 }}
                         whileInView={{ scale: 1 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1, duration: 0.5, type: "spring" }}
-                        className="text-4xl sm:text-6xl font-bold text-primary mb-4 flex flex-row items-center justify-center"
+                        className="text-6xl font-bold text-primary mb-2 flex flex-row items-center"
                       >
-                        {item.number && <span className="whitespace-nowrap">{item.number} <span className="font-normal mx-2 sm:mx-4">x</span></span>}
-                        <div className="relative h-16 w-16 sm:h-20 sm:w-20">
+                        {item.number && <span>{item.number} <span className="font-normal ml-4 mr-4"> x</span></span>}
+                        <div className="relative h-20 w-20">
                           <Image
                             src={item.icon}
                             alt="Package feature"
                             fill
-                            quality={75}
-                            className="object-contain"
+                            className="object-cover"
                           />
                         </div>
                       </motion.div>
@@ -1678,7 +1688,7 @@ export default function HomePage() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1 + 0.2, duration: 0.5 }}
-                        className="text-lg sm:text-xl font-bold text-text mb-3 text-center"
+                        className="text-xl font-bold text-text mb-2 flex flex-row items-center justify-center"
                       >
                         {item.title}
                       </motion.p>
@@ -1687,7 +1697,7 @@ export default function HomePage() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1 + 0.4, duration: 0.5 }}
-                        className="text-text text-sm sm:text-base text-center max-w-xs mx-auto"
+                        className="text-text text-sm text-justify"
                       >
                         {item.description}
                       </motion.p>
@@ -1704,132 +1714,144 @@ export default function HomePage() {
               transition={{ delay: 0.8, duration: 0.6 }}
               className="mt-10 flex justify-center items-center"
             >
-              <div className="space-y-8 bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl">
-                <div className="flex justify-center">
-                  <div className="flex flex-col md:flex-row items-center justify-center gap-6 overflow-x-auto">
-                    <div className="gap-6 flex flex-col w-full md:w-auto px-2 md:pl-5 mt-4 md:mt-0 items-center">
-                      <motion.p
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                        className="text-lg text-primary text-center"
-                      >
-                        Free services included with your package
-                      </motion.p>
-                      <motion.div
-                        variants={staggerContainer}
-                        initial="initial"
-                        whileInView="animate"
-                        viewport={{ once: true }}
-                        className="flex flex-row gap-4 md:gap-6 flex-wrap justify-center"
-                      >
-                        {[
-                          { icon: "/icons/wifiicon.png", text: "HIGH SPEED Wi-Fi", description: "Stay connected with our high-speed internet access throughout your stay", type: "Free Services" },
-                          { icon: "/icons/surfeq.png", text: "SURF EQUIPMENT", description: "Complete set of quality surfing gear including boards and wetsuits", type: "Free Services" },
-                          { icon: "/icons/videoi.png", text: "SURF VIDEOS & PHOTOS", description: "Professional photography and video coverage of your surfing sessions", type: "Free Services" },
-                          { icon: "/icons/tukicon.png", text: "TRANSPORT TO ACTIVITIES", description: "Convenient transportation to all surfing spots and activities", type: "Free Services" },
-                          { icon: "/icons/towelicon.png", text: "LINEN & TOWEL SERVICE", description: "Fresh linens and towels provided daily for your comfort", type: "Free Services" },
-                          { icon: "/icons/iceicon.png", text: "ICE BATH RECOVERY", description: "Rejuvenate with our ice bath facilities after surfing sessions", type: "Free Services" },
-                          { icon: "/icons/beachfront.png", text: "BEACHFRONT LOUNGE", description: "Exclusive access to our comfortable beachfront lounge area", type: "Free Services" },
-                        ].map((service, index) => (
+              <div className="w-full max-w-7xl bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-6">
+                <div className="flex flex-col lg:flex-row justify-between gap-8">
+                  <div className="flex-1">
+                    <motion.p
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6 }}
+                      className="text-lg text-primary text-center mb-4"
+                    >
+                      Included in your package
+                    </motion.p>
+                    <motion.div
+                      variants={staggerContainer}
+                      initial="initial"
+                      whileInView="animate"
+                      viewport={{ once: true }}
+                      className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 justify-items-center"
+                    >
+                      {[
+                        { icon: "/icons/wifiicon.png", text: "HIGH SPEED Wi-Fi", description: "Stay connected with our high-speed internet access throughout your stay", type: "Free Services" },
+                        { icon: "/icons/surfeq.png", text: "SURF EQUIPMENT", description: "Complete set of quality surfing gear including boards and wetsuits", type: "Free Services" },
+                        { icon: "/icons/videoi.png", text: "SURF VIDEOS & PHOTOS", description: "Professional photography and video coverage of your surfing sessions", type: "Free Services" },
+                        { icon: "/icons/tukicon.png", text: "TRANSPORT TO ACTIVITIES", description: "Convenient transportation to all surfing spots and activities", type: "Free Services" },
+                        { icon: "/icons/towelicon.png", text: "LINEN & TOWEL SERVICE", description: "Fresh linens and towels provided daily for your comfort", type: "Free Services" },
+                        { icon: "/icons/iceicon.png", text: "ICE BATH RECOVERY", description: "Rejuvenate with our ice bath facilities after surfing sessions", type: "Free Services" },
+                        { icon: "/icons/beachfront.png", text: "BEACHFRONT LOUNGE", description: "Exclusive access to our comfortable beachfront lounge area", type: "Free Services" },
+                        { icon: "/icons/10-percent.png", text: "10% OFF RESTAURENT", description: "Exclusive access to our comfortable beachfront lounge area", type: "Free Services" },
+                      ].map((service, index) => (
+                        <motion.div
+                          key={index}
+                          variants={staggerItem}
+                          className="perspective-1000"
+                        >
                           <motion.div
-                            key={index}
-                            variants={staggerItem}
-                            className="perspective-1000"
+                            className="relative w-14 h-20 cursor-pointer"
+                            initial={false}
+                            style={{ transformStyle: "preserve-3d" }}
+                            transition={{ duration: 0.6 }}
                           >
-                            <motion.div
-                              className="relative w-16 md:w-20 h-24 md:h-28 cursor-pointer"
-                              initial={false}
-                              style={{ transformStyle: "preserve-3d" }}
-                              transition={{ duration: 0.6 }}
+                            <div className="absolute w-full h-full flex flex-col items-center backface-hidden">
+                              <motion.div
+                                whileHover={{ scale: 1.1 }}
+                                className="relative w-10 h-10 mb-2"
+                              >
+                                <Image
+                                  src={service.icon}
+                                  alt={service.text}
+                                  fill
+                                  className="object-contain"
+                                />
+                              </motion.div>
+                              <span className="text-[10px] font-semibold text-text text-center">{service.text}</span>
+                            </div>
+                            <div
+                              className="absolute w-full h-full p-2 bg-primary/10 rounded-lg flex items-center justify-center backface-hidden"
+                              style={{ transform: "rotateY(180deg)" }}
                             >
-                              {/* Front of card */}
-                              <div className="absolute w-full h-full flex flex-col items-center backface-hidden">
-                                <motion.div
-                                  whileHover={{ scale: 1.1 }}
-                                  className="relative w-12 md:w-12 h-10 md:h-10 mb-2"
-                                >
-                                  <Image
-                                    src={service.icon}
-                                    alt={service.text}
-                                    fill
-                                    quality={75}
-                                    className="object-contain"
-                                  />
-                                </motion.div>
-                                <span className="text-[10px] md:text-xs font-semibold text-text text-center">{service.text}</span>
-                              </div>
-                            </motion.div>
+                              <p className="text-[8px] text-text text-center">{service.description}</p>
+                            </div>
                           </motion.div>
-                        ))}
-                      </motion.div>
-                    </div>
-                    <div className="gap-6 flex flex-col w-full md:w-auto px-2 md:pl-5 pt-4 items-center">
-                      <motion.p
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                        className="text-lg text-primary text-center"
-                      >
-                        Extra services
-                      </motion.p>
-                      <motion.div
-                        variants={staggerContainer}
-                        initial="initial"
-                        whileInView="animate"
-                        viewport={{ once: true }}
-                        className="flex flex-row gap-4 md:gap-6 md:border-l-2 border-t-2 md:border-t-0 border-primary pt-6 md:pt-0 md:pl-10 flex-wrap justify-center"
-                      >
-                        {[
-                          { icon: "/icons/caricon.png", text: "AIRPORT PICKUP & DROPOFF", description: "Convenient door-to-door transfer service from and to the airport", type: "Extra Services" },
-                          { icon: "/icons/sunsetbbq.png", text: "SUNSET BARBEQUE", description: "Enjoy delicious BBQ meals while watching beautiful sunsets", type: "Extra Services" }
-                        ].map((service, index) => (
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  </div>
+
+                  <div className="flex-1 lg:border-l-2 border-primary lg:pl-8">
+                    <motion.p
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6 }}
+                      className="text-lg text-primary text-center mb-4"
+                    >
+                      Extra services
+                    </motion.p>
+                    <motion.div
+                      variants={staggerContainer}
+                      initial="initial"
+                      whileInView="animate"
+                      viewport={{ once: true }}
+                      className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 justify-items-center"
+                    >
+                      {[
+                        { icon: "/icons/caricon.png", text: "AIRPORT PICKUP & DROPOFF", description: "Convenient door-to-door transfer service from and to the airport", type: "Extra Services" },
+                        { icon: "/icons/sunsetbbq.png", text: "SUNSET BARBEQUE", description: "Enjoy delicious BBQ meals while watching beautiful sunsets", type: "Extra Services" },
+                        { icon: "/icons/safariwild.png", text: "SAFARI TRIPS", description: "Exciting safari adventures to explore local wildlife and nature", type: "Extra Services" },
+                        { icon: "/icons/scooter.png", text: "MOTORBIKE RENTAL", description: "Freedom to explore with our quality motorbike rentals", type: "Extra Services" }
+                      ].map((service, index) => (
+                        <motion.div
+                          key={index}
+                          variants={staggerItem}
+                          className="perspective-1000"
+                        >
                           <motion.div
-                            key={index}
-                            variants={staggerItem}
-                            className="perspective-1000"
+                            className="relative w-14 h-20 cursor-pointer"
+                            initial={false}
+                            style={{ transformStyle: "preserve-3d" }}
+                            transition={{ duration: 0.6 }}
                           >
-                            <motion.div
-                              className="relative w-20 md:w-24 h-28 md:h-32 cursor-pointer"
-                              initial={false}
-                              style={{ transformStyle: "preserve-3d" }}
-                              transition={{ duration: 0.6 }}
+                            <div className="absolute w-full h-full flex flex-col items-center backface-hidden">
+                              <motion.div
+                                whileHover={{ scale: 1.1 }}
+                                className="relative w-10 h-10 mb-2"
+                              >
+                                <Image
+                                  src={service.icon}
+                                  alt={service.text}
+                                  fill
+                                  className="object-contain"
+                                />
+                              </motion.div>
+                              <span className="text-[10px] font-semibold text-text text-center">{service.text}</span>
+                            </div>
+                            <div
+                              className="absolute w-full h-full p-2 bg-primary/10 rounded-lg flex items-center justify-center backface-hidden"
+                              style={{ transform: "rotateY(180deg)" }}
                             >
-                              {/* Front of card */}
-                              <div className="absolute w-full h-full flex flex-col items-center backface-hidden">
-                                <motion.div
-                                  whileHover={{ scale: 1.1 }}
-                                  className="relative w-10 md:w-10 h-8 md:h-8 mb-2"
-                                >
-                                  <Image
-                                    src={service.icon}
-                                    alt={service.text}
-                                    fill
-                                    quality={75}
-                                    className="object-contain"
-                                  />
-                                </motion.div>
-                                <span className="text-[10px] md:text-xs font-semibold text-text text-center">{service.text}</span>
-                              </div>
-                            </motion.div>
+                              <p className="text-[8px] text-text text-center">{service.description}</p>
+                            </div>
                           </motion.div>
-                        ))}
-                      </motion.div>
-                    </div>
+                        </motion.div>
+                      ))}
+                    </motion.div>
                   </div>
                 </div>
               </div>
             </motion.div>
-            <style jsx global>{`
-              .perspective-1000 {
-                perspective: 1000px
-              }
-              .backface-hidden {
-                backface-visibility: hidden
-              }
-            `}</style>
+            <style jsx global>
+              {`
+                .perspective-1000 {
+                  perspective: 1000px
+                }
+                .backface-hidden {
+                  backface-visibility: hidden
+                }
+              `}
+            </style>
           </motion.div>
 
 
