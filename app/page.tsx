@@ -291,43 +291,43 @@ const ImageSlider = () => {
   const images = [
     {
       src: "/images/image1.jpg",
-      title: "Closest to the surf",
-      description: "We're right in front of the Arugam Bay's main surf point."
+      title: "Trusted Since 1978",
+      description: "One of the original surf stays in Arugam Bay, with a legacy of happy surfers from around the world. Decades of experience you can count on."
     },
     {
       src: "/images/image2.jpg",
-      title: "Trusted since 1978",
-      description: "One of the original surf stays in town, with a legacy of happy surfers from around the world."
+      title: "Central Location",
+      description: "Perfectly situated in the heart of Arugam Bay — just steps from the beach, surf points, cafes, and shops. Everything you need, all in one place."
     },
     {
       src: "/images/image4.jpg",
-      title: "Modern & Affordable rooms",
-      description: "Clean, specious,  rooms with all the creature comforts you need after a surf session."
+      title: "Modern & Affordable Rooms",
+      description: "Comfortable, stylish accommodations with modern amenities — ideal for relaxing after a day in the waves."
     },
     {
       src: "/images/image5.jpg",
-      title: "Legendary Food",
-      description: "All-day Sri Lankan buffet, a buzzing café, and plenty of tasty international options."
+      title: "Certified ISA Instructors",
+      description: "Learn from experienced, internationally certified ISA surf instructors committed to safe, professional, and fun surf lessons."
     },
     {
       src: "/images/image6.jpg",
-      title: "ISA certified instructors",
-      description: "Young passionate local pros ready to get you riding waves safely and confidently."
+      title: "Best Café in Town – Meori Café",
+      description: "Relax at Meori Café, loved for fresh dishes, great coffee, and a laid-back surf vibe. Plus, browse their small concept store with curated coastal-inspired items."
     },
     {
       src: "/images/image7.jpg",
-      title: "Safari and explore Arugam bay",
-      description: "Wildlife safari, lagoon tours, camping and  many other unique experiences."
+      title: "Shady Garden & Spacious Grounds",
+      description: "Rupa’s Surf Camp sits on spacious land with natural shade and a peaceful garden atmosphere — perfect for unwinding between surf sessions."
     },
     {
       src: "/images/image6.jpg",
-      title: "Trips to different surf spots",
-      description: "Explore nearby surf spots with our experienced guides for an unforgettable surfing adventure."
+      title: "Buffet Arugam Bay – By Rupa’s",
+      description: "Enjoy our famous Sri Lankan rice & curry buffet with fresh daily dishes, seafood specials, and a friendly, social setting right by the beach."
     },
     {
       src: "/images/image7.jpg",
-      title: "Best Cafe in town",
-      description: "Enjoy delicious food and drinks at our cozy cafe while taking in the vibrant atmosphere of Arugam Bay."
+      title: "East Coast Safaris & Adventures",
+      description: "Join guided safaris to nearby national parks, spot elephants and wildlife, explore scenic viewpoints, and end your day with sunset BBQs by the bay."
     }
   ];
 

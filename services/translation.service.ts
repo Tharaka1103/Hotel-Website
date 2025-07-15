@@ -1,12 +1,5 @@
 "use client";
 
-declare global {
-  interface Window {
-    google?: any;
-    googleTranslateElementInit?: () => void;
-  }
-}
-
 class TranslationService {
   private isInitialized = false;
   private initPromise: Promise<void> | null = null;
