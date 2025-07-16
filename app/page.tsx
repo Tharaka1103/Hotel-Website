@@ -677,8 +677,8 @@ const VideoHero = ({ children }: { children: React.ReactNode }) => {
         onCanPlay={() => setIsVideoLoaded(true)}
         onLoadedData={() => setIsVideoLoaded(true)}
       >
-        <source src="/heronew.mp4" type="video/mp4" />
-        <source src="/heronew.webm" type="video/webm" />
+        <source src="/rupas surf camp.webm" type="video/mp4" />
+        <source src="/rupas surf camp.webm" type="video/webm" />
         Your browser does not support the video tag.
       </video>
       <div className="absolute inset-0 bg-black/50" />
