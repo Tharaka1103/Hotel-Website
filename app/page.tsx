@@ -677,8 +677,8 @@ const VideoHero = ({ children }: { children: React.ReactNode }) => {
         onCanPlay={() => setIsVideoLoaded(true)}
         onLoadedData={() => setIsVideoLoaded(true)}
       >
-        <source src="/heronew.mp4" type="video/mp4" />
-        <source src="/heronew.webm" type="video/webm" />
+        <source src="/videos/hero-new-bg.webm" type="video/webm" />
+        <source src="/videos/hero-new-bg.webm" type="video/webm" />
         Your browser does not support the video tag.
       </video>
       <div className="absolute inset-0 bg-black/50" />
@@ -1526,10 +1526,10 @@ export default function HomePage() {
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mx-auto max-w-7xl relative z-20"
         >
           {[
-            { src: "/heronew.mp4", title: "Perfect Waves", description: "Surf coaching for all levels, led by local certified pros — right at the break." },
-            { src: "/video1.mp4", title: "Sunset Surfing", description: "Comfy, modern rooms just steps from the surf and perfect for winding down" },
-            { src: "/video2.mp4", title: "Pro Techniques", description: "Explore national parks, scenic lagoons - the wild and unique beauty of Arugambay" },
-            { src: "/video3.mp4", title: "Beach Vibes", description: "Sri Lankan buffet, cozy café, and a full à la carte menu with global flavors." }
+            { src: "/videos/surf.webm", title: "Perfect Waves", description: "Surf coaching for all levels, led by local certified pros — right at the break." },
+            { src: "/videos/sunset.webm", title: "Sunset Surfing", description: "Comfy, modern rooms just steps from the surf and perfect for winding down" },
+            { src: "/vides/wildlife.webm", title: "Pro Techniques", description: "Explore national parks, scenic lagoons - the wild and unique beauty of Arugambay" },
+            { src: "/videos/food.webm", title: "Beach Vibes", description: "Sri Lankan buffet, cozy café, and a full à la carte menu with global flavors." }
           ].map((video, index) => (
             <motion.div
               key={index}
